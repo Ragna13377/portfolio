@@ -1,0 +1,18 @@
+{
+  "heading": "НАСТРОЙКИ",
+  "language": "ЯЗЫК",
+  "controls": "УПРАВЛЕНИЕ",
+  "en": "АНГЛИЙСКИЙ",
+  "ru": "РУССКИЙ",
+  "active": "Текущий язык",
+  "navigation": "Навигация",
+  "navigationKeys": "Стрелки вверх / вниз · W / S",
+  "confirm": "Подтвердить",
+  "confirmKeys": "Enter / Пробел",
+  "back": "Назад",
+  "backKeys": "Escape / Backspace",
+  "options": "Настройки",
+  "optionsKeys": "O",
+  "mouse": "Мышь",
+  "mouseKeys": "Нажимайте на интерактивные элементы"
+}

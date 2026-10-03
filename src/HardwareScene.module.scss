@@ -1,0 +1,95 @@
+.scene { position: relative; width: 100%; height: 100%; color: #c1c4ad; font-family: 'Courier New', monospace; }
+.hardwareArt { position: absolute; left: 245px; top: 5px; width: 1120px; height: 840px; pointer-events: none; z-index: 3; filter: drop-shadow(16px 28px 18px #080b0990); }
+.identity { position: absolute; left: 86px; top: 110px; z-index: 5; width: 250px;
+  > span { font-size: 10px; letter-spacing: 2px; color: #a5ad91; }
+  strong { display: block; font-family: Georgia, serif; font-weight: 400; font-size: 34px; line-height: 1.13; margin: 25px 0 16px; color: #ebe6cb; letter-spacing: -1px; }
+  p { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #aeb5a0; }
+}
+.identityDot { color: #d4a86c; }
+.crt { position: absolute; left: 415px; top: 100px; width: 537px; height: 383px; z-index: 2; }
+.viewport { position: absolute; inset: 0; overflow: hidden; contain: paint; border-radius: 30px; background: #080c13; color: #e8d49c;
+  &::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 8; background: repeating-linear-gradient(0deg, #0002 0 1px, transparent 1px 3px), radial-gradient(ellipse, transparent 45%, #01020775 100%); box-shadow: inset 0 0 32px 8px #0008; mix-blend-mode: multiply; }
+  &::before { content: ''; position: absolute; inset: 0; z-index: 9; pointer-events: none; background: linear-gradient(125deg, #ffffde08 0%, transparent 45%); }
+}
+.romContent { width: 100%; height: 100%; transform-origin: center; }
+.screenScale { width: 734px; height: 524px; transform: scale(0.732); transform-origin: top left; }
+.powerEffect { position: absolute; inset: 0; z-index: 10; pointer-events: none;
+  &::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 3px; margin-top: -1.5px; background: #faffec; box-shadow: 0 0 12px 4px #c9f6e0; opacity: 0; }
+}
+.scene:not([data-power-state='on']) .powerEffect { pointer-events: auto; }
+.scene[data-power-state='shuttingDown'] { .romContent { animation: collapse var(--shutdown-duration) linear forwards; } .powerEffect::after { animation: shutdownLine var(--shutdown-duration) linear forwards; } }
+.scene[data-power-state='off'] .romContent { visibility: hidden; }
+.scene[data-power-state='booting'] { .romContent { animation: wakeImage var(--wake-duration) ease-out both; } .powerEffect::after { animation: wakeLine var(--wake-duration) ease-out both; } }
+.scene[data-power-state='resetting'] .romContent { animation: reset 180ms steps(2) both; }
+@keyframes collapse { 0% { transform: scaleY(1); filter: brightness(1); } 40% { transform: scaleY(.006); filter: brightness(3); opacity: 1; } 60%,100% { transform: scaleY(0); opacity: 0; } }
+@keyframes shutdownLine { 0%,32% { opacity: 0; transform: scaleX(1); } 42%,62% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(0); } }
+@keyframes wakeImage { 0%,35% { opacity: 0; transform: scaleY(.008); } 100% { opacity: 1; transform: scaleY(1); } }
+@keyframes wakeLine { 0% { opacity: 0; transform: scaleX(0); } 35% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1); } }
+@keyframes reset { 0%,65% { opacity: .35; transform: translateX(3px); filter: hue-rotate(30deg); } 30%,100% { opacity: 1; transform: translateX(0); } }
+.console { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.controllerButton { position: absolute; padding: 0; font: 11px 'Courier New', monospace; letter-spacing: 1px; color: #eee7d1; background: transparent; border: 0; cursor: pointer; pointer-events: auto; transition: filter 80ms, transform 80ms;
+  &:active, &[data-key-pressed] { transform: translateY(2px); background: #0004; box-shadow: inset 0 3px 7px #0009; }
+  &:focus-visible { outline: 2px solid #f6da8d; outline-offset: 4px; }
+  &[aria-disabled='true'] { cursor: default; }
+}
+.powerButton { left: 809px; top: 685px; width: 72px; height: 26px; border-radius: 45%; transform: rotate(3deg); font-size: 9px; }
+.resetButton { left: 1000px; top: 698px; width: 70px; height: 26px; border-radius: 45%; transform: rotate(3deg); font-size: 9px; }
+.powerLed { position: absolute; left: 943px; top: 697px; width: 4px; height: 4px; border-radius: 100%; background: #d4ed9e; box-shadow: 0 0 6px 2px #b7f068; }
+.scene[data-power-state='off'] .powerLed { background: #535842; box-shadow: none; }
+.cable { position: absolute; inset: 0; width: 1600px; height: 900px; z-index: 4; pointer-events: none; filter: drop-shadow(4px 4px 2px #0008); }
+.controller { position: absolute; left: 300px; top: 487px; width: 460px; height: 345px; z-index: 6; transform: rotate(-7deg); filter: drop-shadow(10px 14px 8px #0008);
+  > img { width: 100%; height: 100%; pointer-events: none; }
+}
+.controllerLabel { display: none; }
+.up { left: 82px; top: 163px; width: 31px; height: 31px; color: transparent; }
+.left { left: 67px; top: 188px; width: 30px; height: 29px; color: transparent; }
+.right { left: 117px; top: 185px; width: 29px; height: 30px; color: transparent; }
+.down { left: 100px; top: 211px; width: 29px; height: 32px; color: transparent; }
+.a,.b,.c { width: 35px; height: 35px; border-radius: 50%; background: #232722; box-shadow: inset 0 1px 3px #ffffff16, 0 2px 3px #0008; color: #d8d7c6; font-size: 12px; }
+.a { left: 285px; top: 235px; }
+.b { left: 326px; top: 220px; }
+.c { left: 369px; top: 203px; }
+.start { left: 204px; top: 181px; width: 43px; height: 16px; border-radius: 9px; font-size: 7px; }
+.activeCartridge { position: absolute; left: 879px; top: 450px; width: 256px; height: 202px; z-index: 4; transition: opacity 250ms, transform 250ms;
+  button { position: relative; width: 100%; height: 100%; border: 0; background: transparent; padding: 0; cursor: pointer; }
+  img { position: absolute; left: 0; top: -20px; width: 256px; height: 256px; transform: scaleY(.72); pointer-events: none; }
+  button:focus-visible { outline: 2px solid #f6da8d; outline-offset: -45px; }
+}
+.insertedLabel { position: absolute; left: 37px; right: 38px; top: 67px; height: 87px; display: grid; place-items: center; background: radial-gradient(ellipse at 70% 20%, #345996, #0b152c); font: 22px Tiny5, monospace; color: #e9d497; transform: rotate(-1deg); border: 2px solid #182331; }
+.insertedLabel[data-label-theme='nightshift'] { background: linear-gradient(140deg,#332443,#0d192a); color: #f5a884; }
+.ejectHint { position: absolute; bottom: 9px; left: 80px; font-size: 8px; letter-spacing: 2px; color: #d5d3b6; opacity: 0; }
+.scene[data-power-state='off'] .ejectHint { opacity: 1; }
+.scene[data-inserted='empty'] .activeCartridge { opacity: 0; transform: translateY(-30px); pointer-events: none; }
+.inactiveCartridge { position: absolute; left: 1280px; top: 429px; width: 255px; height: 390px; z-index: 7;
+  button { position: relative; display: block; width: 255px; height: 220px; background: transparent; border: 0; padding: 0; cursor: pointer; transform: rotate(7deg); transition: transform 180ms, filter 180ms; }
+  button:first-child { transform: rotate(-9deg); }
+  button + button { margin-top: -16px; }
+  img { position: absolute; inset: -28px 0 0; width: 255px; height: 255px; pointer-events: none; filter: drop-shadow(8px 10px 8px #0009); }
+  button:focus-visible { outline: 2px solid #f6da8d; outline-offset: -22px; }
+  button:hover:not(:disabled) { transform: translateY(-5px) rotate(0); }
+  button:disabled { cursor: default; }
+}
+.cartridgeLabel { position: absolute; left: 36px; top: 37px; width: 182px; height: 120px; padding: 11px 13px; color: #f2d491; text-align: left; background: radial-gradient(ellipse at 85% 100%, #3b5b87 0 15%, transparent 16%), linear-gradient(145deg,#173b6d,#0a122d); border: 2px solid #151b1c; border-radius: 6px;
+  small { font: 7px 'Courier New',monospace; letter-spacing: 1px; display: block; }
+  strong { font: 26px Tiny5,monospace; display: block; margin-top: 8px; }
+  em { font: normal 6px 'Courier New',monospace; letter-spacing: 1px; display: block; margin-top: 4px; }
+  > span { position: absolute; right: 14px; bottom: 10px; font-size: 35px; }
+}
+.cartridgeLabel[data-label-theme='nightshift'] { background: radial-gradient(circle at 85% 75%, #ffb77d 0 12%, transparent 13%), linear-gradient(150deg,#452044,#0b1830); color: #f6b08a; left: 53px; top: 35px; width: 161px; height: 138px; transform: skewY(-8deg); }
+.cartridgeCaption { position: absolute; bottom: 17px; left: 20px; color: #c3c8ad; font-size: 8px; letter-spacing: 1px; }
+.cartridgeStatus { position: absolute; left: 1150px; top: 853px; width: 390px; z-index: 6; font-size: 10px; line-height: 1.5; text-align: right; color: #a8b397; }
+.inputLegend { position: absolute; left: 86px; top: 832px; z-index: 6; font-size: 9px; line-height: 1.9; color: #aab496; letter-spacing: 1px; white-space: pre-line; }
+.reserved { display: none; }
+@media (prefers-reduced-motion: reduce) { .scene[data-power-state='shuttingDown'] .romContent { animation: none; visibility: hidden; } .scene[data-power-state='booting'] .romContent { animation: none; } .scene[data-power-state] .powerEffect::after { animation: none; opacity: 0; } }
+.a { left: 294px; top: 222px; }
+.b { left: 342px; top: 208px; }
+.c { left: 393px; top: 189px; }
+.a,.b,.c { background: transparent; box-shadow: none; }
+.x,.y,.z { width: 34px; height: 34px; border-radius: 50%; color: #30362f; font-size: 11px; }
+.x { left: 285px; top: 170px; }
+.y { left: 330px; top: 152px; }
+.z { left: 370px; top: 142px; }
+.inactiveCartridge button { position: absolute; top: 0; }
+.inactiveCartridge button + button { top: 195px; margin-top: 0; }
+.inactiveCartridge button[data-cartridge-stored='false'] { visibility: hidden; }
+.scene:not([data-inserted='empty']) .inactiveCartridge button[data-cartridge-stored='true'] { top: 85px; }

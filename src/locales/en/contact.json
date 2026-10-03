@@ -1,0 +1,10 @@
+{
+  "channels": "Contact channels",
+  "telegram": "TELEGRAM",
+  "github": "GITHUB",
+  "email": "EMAIL",
+  "openTelegram": "Open Telegram",
+  "openGithub": "Open GitHub",
+  "copyTelegram": "Copy Telegram handle",
+  "copyEmail": "Copy email address"
+}

@@ -1,0 +1,251 @@
+async (page) => {
+  const check = (condition, message) => {
+    if (!condition) throw new Error(message);
+  };
+  const issues = [];
+  const requests = [];
+  page.on('pageerror', (error) => issues.push(error.message));
+  page.on('request', (request) => {
+    if (request.url().includes('/assets/rom/')) requests.push(request.url());
+  });
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await page.evaluate(() => localStorage.setItem('portfolio-locale', 'en'));
+  const start = Date.now();
+  await page.reload();
+  const crt = page.locator('[data-hardware="crt"]');
+  const rom = page.locator('[data-theme]');
+  const choices = () => crt.locator('nav button');
+  const power = page.locator('[data-console-control="power"]');
+  const reset = page.locator('[data-console-control="reset"]');
+  const eject = page.locator('[data-cartridge-action="eject"]');
+  const wait = async (state) =>
+    page.locator(`[data-power-state="${state}"]`).waitFor();
+  const back = async () => crt.locator('[data-rom-back]').click();
+  await wait('on');
+  const firstMenuMs = Date.now() - start;
+  check(await eject.isDisabled(), 'Cartridge eject must be locked while on');
+  check(
+    requests.some((url) => url.includes('starfall-world')),
+    'Active ROM asset must load',
+  );
+  check(
+    !requests.some((url) => url.includes('nightshift-world')),
+    'Inactive ROM assets must not load',
+  );
+  check(
+    await page.evaluate(
+      () => document.documentElement.scrollHeight === innerHeight,
+    ),
+    'Desktop must not scroll',
+  );
+  const projectLabels = [
+    'TRANSPORT CONTROL',
+    'FINANCIAL PLATFORM',
+    'FACADE BUILDER',
+    'REAL-TIME PLATFORM',
+  ];
+  for (const theme of ['starfall', 'nightshift']) {
+    check(
+      (await rom.getAttribute('data-theme')) === theme,
+      'Wrong active theme',
+    );
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter');
+    check(
+      (await rom.getAttribute('data-screen')) === 'projects',
+      'Keyboard must open Projects',
+    );
+    for (let index = 0; index < 4; index++) {
+      await choices().nth(index).click();
+      check(
+        (await crt.locator('h2').textContent()) === projectLabels[index],
+        'Shared project detail mismatch',
+      );
+      check(
+        (await crt.locator('li').count()) === 4,
+        'Project highlights missing',
+      );
+      await back();
+    }
+    await back();
+    await choices().nth(0).click();
+    check(
+      (await crt.locator('h2').textContent()) === 'ABOUT',
+      'About unavailable',
+    );
+    await back();
+    await choices().nth(2).click();
+    for (let index = 0; index < 5; index++) {
+      await choices().nth(index).click();
+      check(
+        (await crt.locator('[aria-label="Technologies"] li').count()) > 0,
+        'Toolkit inventory missing',
+      );
+    }
+    await back();
+    await choices().nth(3).click();
+    check((await crt.locator('a').count()) === 2, 'Contact links missing');
+    await back();
+    await page.keyboard.press('o');
+    await choices().nth(1).click();
+    check(
+      (await crt.locator('h2').textContent()) === 'CONTROLS',
+      'Controls unavailable',
+    );
+    await back();
+    await choices().nth(0).click();
+    await choices().nth(1).click();
+    check(
+      (await page.locator('html').getAttribute('lang')) === 'ru',
+      'Russian locale must apply',
+    );
+    await choices().nth(0).click();
+    await back();
+    await back();
+    await reset.focus();
+    await page.keyboard.press('Enter');
+    await wait('on');
+    check(
+      (await rom.getAttribute('data-screen')) === 'main',
+      'Reset must reboot to menu',
+    );
+    check(
+      await reset.evaluate((el) => document.activeElement === el),
+      'Reset must preserve hardware focus',
+    );
+    if (theme === 'starfall') {
+      await power.focus();
+      await page.keyboard.press('Space');
+      await wait('off');
+      await eject.focus();
+      await page.keyboard.press('Enter');
+      check(
+        await page
+          .locator('[data-cartridge-id="starfall"]')
+          .evaluate((el) => document.activeElement === el),
+        'Eject must focus insertion control',
+      );
+      await power.focus();
+      await page.keyboard.press('Enter');
+      check(
+        (await page
+          .locator('[data-power-state]')
+          .getAttribute('data-power-state')) === 'off',
+        'Empty slot cannot boot',
+      );
+      await page.locator('[data-cartridge-id="nightshift"]').click();
+      check(
+        (await rom.getAttribute('data-theme')) === 'starfall',
+        'Inserting must not activate the new ROM',
+      );
+      check(
+        !requests.some((url) => url.includes('nightshift-world')),
+        'Inserting must not preload inactive ROM',
+      );
+      await power.click();
+      await wait('on');
+      // Reset selection is ABOUT; keyboard Down opens Projects on the next iteration.
+      await choices().nth(0).focus();
+    }
+  }
+  await page.locator('[data-readable-toggle]').click();
+  check(
+    (await page.locator('main[hidden]').count()) === 1,
+    'Readable view must hide hardware accessibly',
+  );
+  await page.keyboard.press('ArrowDown');
+  check(
+    (await rom.getAttribute('data-screen')) === 'main',
+    'Hidden ROM must not consume keys',
+  );
+  await page.locator('main:not([hidden]) summary').first().click();
+  check(
+    await page
+      .locator('main:not([hidden])')
+      .textContent()
+      .then((text) => text.includes(projectLabels[0])),
+    'Readable projects missing',
+  );
+  await page.locator('[data-return-to-console]').click();
+  check(
+    await choices()
+      .first()
+      .evaluate((el) => document.activeElement === el),
+    'Return must restore ROM focus',
+  );
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await power.click();
+  check(
+    (await crt.locator('[inert]').count()) === 1,
+    'Shutdown must make ROM inert',
+  );
+  check(
+    (await rom.evaluate(
+      (el) => getComputedStyle(el.parentElement).animationName,
+    )) === 'none',
+    'Reduced motion must suppress shutdown animation',
+  );
+  await wait('off');
+  await eject.click();
+  await page.locator('[data-cartridge-id="starfall"]').click();
+  await power.click();
+  await wait('on');
+  check(
+    requests.filter((url) => url.includes('starfall-world')).length === 1,
+    'Visited world must reuse cache',
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('[data-hardware]').first().waitFor({ state: 'detached' });
+  check(
+    (await page.locator('[data-hardware]').count()) === 0,
+    'Mobile fallback must replace scene',
+  );
+  await page.getByRole('button', { name: 'Русский', exact: true }).click();
+  check(
+    (await page.locator('html').getAttribute('lang')) === 'ru',
+    'Mobile locale switch unavailable',
+  );
+  check(
+    (await page.locator('a[href^="mailto:"]').count()) === 1,
+    'Mobile contact escape missing',
+  );
+  await page.setViewportSize({ width: 1600, height: 900 });
+  await wait('on');
+  await page.locator('[data-readable-toggle]').click();
+  await page.getByRole('button', { name: 'English', exact: true }).click();
+  await page.locator('[data-return-to-console]').click();
+  await choices().first().waitFor({ state: 'visible' });
+  await page.screenshot({ path: 'output/playwright/desktop-placeholders.png' });
+  await page.route('**/assets/rom/*', (route) => route.abort());
+  await page.reload();
+  await wait('on');
+  await choices().first().click();
+  check(
+    (await rom.getAttribute('data-screen')) === 'about',
+    'Asset failure must not block navigation',
+  );
+  await page.unroute('**/assets/rom/*');
+  check(issues.length === 0, `Runtime errors: ${issues.join(', ')}`);
+  return {
+    firstMenuMs,
+    themes: 2,
+    projectDetails: 8,
+    toolkitCategories: 10,
+    passed: [
+      'keyboard and mouse',
+      'reset',
+      'power',
+      'empty slot',
+      'swap locks',
+      'explicit ROM boot',
+      'locale switching',
+      'readable view',
+      'mobile fallback',
+      'reduced motion',
+      'active-only assets',
+      'cache reuse',
+      'asset failure recovery',
+    ],
+    runtimeErrors: issues,
+  };
+}

@@ -1,0 +1,18 @@
+{
+  "heading": "OPTIONS",
+  "language": "LANGUAGE",
+  "controls": "CONTROLS",
+  "en": "ENGLISH",
+  "ru": "RUSSIAN",
+  "active": "Active language",
+  "navigation": "Navigation",
+  "navigationKeys": "Arrow Up / Arrow Down · W / S",
+  "confirm": "Confirm",
+  "confirmKeys": "Enter / Space",
+  "back": "Back",
+  "backKeys": "Escape / Backspace",
+  "options": "Options",
+  "optionsKeys": "O",
+  "mouse": "Mouse",
+  "mouseKeys": "Click interactive elements"
+}
