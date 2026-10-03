@@ -142,7 +142,7 @@ test('D-pad wraps Main selection and A/B follow Projects detail hierarchy', asyn
   await click('down');
   expect(selected()).toBe(0);
   await click('down');
-  const projectName = choices()[1].textContent?.replace('>', '').trim();
+  const projectName = choices()[1].textContent?.replace('▶', '').trim();
   await click('a');
   expect(heading()).toBe(projectName);
   const detail = heading();

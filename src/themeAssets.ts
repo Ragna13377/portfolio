@@ -1,7 +1,7 @@
 import type { CartridgeId } from './cartridges';
 
-export const themeAssetUrl = (id: CartridgeId) =>
-  `${import.meta.env.BASE_URL}assets/rom/${id}-world.webp`;
+export const themeAssetUrl = (_id: CartridgeId) =>
+  `${import.meta.env.BASE_URL}assets/rom/lantern-trail.webp`;
 
 // Only powered ROMs request a world. Successful requests stay decoded in memory;
 // HTTP caching handles revisits across sessions. Failed requests may be retried.

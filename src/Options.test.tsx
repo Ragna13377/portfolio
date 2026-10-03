@@ -213,11 +213,11 @@ test('O works on a focused native Contact link without hijacking its other short
 
 test('Options contains only Language/Controls, wraps with arrows and W/S, activates with Enter/Space or mouse', async () => {
   await boot();
-  expect(choices().map((b) => b.textContent?.trim().replace(/^>/, ''))).toEqual(
+  expect(choices().map((b) => b.textContent?.trim().replace(/^▶/, ''))).toEqual(
     ['ABOUT', 'PROJECTS', 'TOOLKIT', 'CONTACT'],
   );
   await press('O');
-  expect(choices().map((b) => b.textContent?.trim().replace(/^>/, ''))).toEqual(
+  expect(choices().map((b) => b.textContent?.trim().replace(/^▶/, ''))).toEqual(
     ['LANGUAGE', 'CONTROLS'],
   );
   for (const [key, index] of [
@@ -484,7 +484,7 @@ test('all portfolio namespaces translate through Options while project IDs, tech
   );
 });
 
-test('unsupported viewport fallback uses active locale and offers native language buttons', async () => {
+test('unsupported viewport fallback uses active locale without duplicating portfolio content', async () => {
   vi.stubGlobal('innerWidth', 390);
   vi.stubGlobal('innerHeight', 844);
   await act(async () => {
@@ -493,10 +493,6 @@ test('unsupported viewport fallback uses active locale and offers native languag
   await render();
   expect(container.textContent).toContain(resources.ru.common.fallback);
   expect(container.textContent).toContain(resources.ru.about.role);
-  expect(container.querySelectorAll('button[lang]')).toHaveLength(2);
-  expect(
-    container.querySelector('button[lang="ru"]')?.getAttribute('aria-pressed'),
-  ).toBe('true');
+  expect(container.querySelectorAll('button, details, a')).toHaveLength(0);
   expect(container.querySelector('[data-hardware]')).toBeNull();
-  expect(container.textContent).toContain('@vedal988');
 });

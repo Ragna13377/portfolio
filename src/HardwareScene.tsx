@@ -1,13 +1,6 @@
-import {
-  type CSSProperties,
-  type ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { type CSSProperties, type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Controller from './Controller';
-import { CARTRIDGES, type CartridgeId, cartridge } from './cartridges';
 import styles from './HardwareScene.module.scss';
 import { type PowerState, SHUTDOWN_DURATION, WAKE_DURATION } from './power';
 import type { RomInput } from './romInput';
@@ -21,39 +14,21 @@ export default function HardwareScene({
   powerState,
   onPower,
   onReset,
-  insertedCartridge = 'starfall',
-  onCartridge,
 }: {
   children: ReactNode;
   onInput?: (input: RomInput) => void;
   powerState: PowerState;
   onPower: () => void;
   onReset?: () => void;
-  insertedCartridge?: CartridgeId | null;
-  onCartridge?: (id: CartridgeId | null) => void;
 }) {
   const { t } = useTranslation('common');
   const [powerKeyPressed, setPowerKeyPressed] = useState(false);
-  const scene = useRef<HTMLElement>(null);
-  const cartridgeFocus = useRef(false);
-  useEffect(() => {
-    if (!cartridgeFocus.current) return;
-    cartridgeFocus.current = false;
-    scene.current
-      ?.querySelector<HTMLButtonElement>(
-        insertedCartridge
-          ? '[data-cartridge-action="eject"]'
-          : '[data-cartridge-id]:not(:disabled)',
-      )
-      ?.focus();
-  }, [insertedCartridge]);
+  const [resetKeyPressed, setResetKeyPressed] = useState(false);
   return (
     <section
-      ref={scene}
       className={styles.scene}
       aria-label="Desktop hardware scene"
       data-power-state={powerState}
-      data-inserted={insertedCartridge ?? 'empty'}
       style={
         {
           '--shutdown-duration': `${SHUTDOWN_DURATION}ms`,
@@ -62,11 +37,10 @@ export default function HardwareScene({
       }
     >
       <div className={styles.identity}>
-        <span>{t('edition')}</span>
         <strong>
           Ivan
           <br />
-          Dmitrievich<span className={styles.identityDot}>.</span>
+          Dmitrievich
         </strong>
         <p>{t('about:role')}</p>
       </div>
@@ -79,15 +53,21 @@ export default function HardwareScene({
       />
       <svg className={styles.cable} viewBox="0 0 1600 900" aria-hidden="true">
         <path
-          d="M530 541 C530 608 386 698 405 794 C432 915 848 868 960 802"
+          d="M509 488 C503 450 351 485 333 601 C312 739 555 873 748 846 C809 837 823 810 851 782"
           fill="none"
-          stroke="#0b0e0d"
+          stroke="#151313"
           strokeWidth="9"
         />
         <path
-          d="M530 541 C530 608 386 698 405 794 C432 915 848 868 960 802"
+          d="M509 488 C503 450 351 485 333 601 C312 739 555 873 748 846 C809 837 823 810 851 782"
           fill="none"
-          stroke="#606359"
+          stroke="#625955"
+          strokeWidth="2"
+        />
+        <path
+          d="M846 773 L865 776 L863 789 L845 785 Z"
+          fill="#211f20"
+          stroke="#555050"
           strokeWidth="2"
         />
       </svg>
@@ -106,9 +86,7 @@ export default function HardwareScene({
           className={`${styles.controllerButton} ${styles.powerButton}`}
           data-console-control="power"
           data-key-pressed={powerKeyPressed || undefined}
-          aria-disabled={
-            powerState !== 'on' && (powerState !== 'off' || !insertedCartridge)
-          }
+          aria-disabled={powerState !== 'on' && powerState !== 'off'}
           aria-label={t('power')}
           onClick={onPower}
           onKeyDown={(event) => {
@@ -120,103 +98,42 @@ export default function HardwareScene({
               setPowerKeyPressed(false);
           }}
           onBlur={() => setPowerKeyPressed(false)}
-        >
-          POWER
-        </button>
+        ></button>
         <button
           type="button"
           className={`${styles.controllerButton} ${styles.resetButton}`}
           data-console-control="reset"
+          data-key-pressed={resetKeyPressed || undefined}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ')
+              setResetKeyPressed(true);
+          }}
+          onKeyUp={() => setResetKeyPressed(false)}
+          onBlur={() => setResetKeyPressed(false)}
           aria-label={t('reset')}
           aria-disabled={powerState !== 'on'}
           onClick={() => {
             if (powerState === 'on') onReset?.();
           }}
-        >
-          RESET
-        </button>
+        ></button>
       </div>
       <div className={styles.controller} data-hardware="controller">
         <img src={art('controller')} alt="" draggable={false} />
         <Controller onInput={powerState === 'on' ? onInput : undefined} />
       </div>
-      <div className={styles.activeCartridge} data-hardware="active-cartridge">
-        <button
-          type="button"
-          data-cartridge-action="eject"
-          disabled={powerState !== 'off' || !insertedCartridge}
-          onClick={() => {
-            cartridgeFocus.current = true;
-            onCartridge?.(null);
-          }}
-          aria-label={t('eject')}
-        >
-          <img src={art('cartridge-front')} alt="" draggable={false} />
-          <span
-            className={styles.insertedLabel}
-            data-label-theme={insertedCartridge ?? 'starfall'}
-          >
-            {insertedCartridge
-              ? cartridge(insertedCartridge).short
-              : t('emptySlot')}
-          </span>
-          <span className={styles.ejectHint}>{t('ejectShort')}</span>
-        </button>
-      </div>
       <div
-        className={styles.inactiveCartridge}
-        data-hardware="inactive-cartridge"
+        className={styles.activeCartridge}
+        data-hardware="active-cartridge"
+        role="img"
+        aria-label="Lantern Trail cartridge"
       >
-        {CARTRIDGES.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            data-cartridge-id={item.id}
-            data-cartridge-stored={insertedCartridge !== item.id}
-            disabled={powerState !== 'off' || insertedCartridge !== null}
-            onClick={() => {
-              cartridgeFocus.current = true;
-              onCartridge?.(item.id);
-            }}
-            aria-label={`${t('insert')} ${item.title}`}
-          >
-            <img
-              src={art(
-                item.id === 'starfall' ? 'cartridge-front' : 'cartridge-angled',
-              )}
-              alt=""
-              draggable={false}
-            />
-            <span className={styles.cartridgeLabel} data-label-theme={item.id}>
-              <small>16-BIT / {item.number}</small>
-              <strong>{item.short}</strong>
-              <em>{item.edition}</em>
-              <span aria-hidden="true">
-                {item.id === 'starfall' ? '✦' : '◉'}
-              </span>
-            </span>
-            <span className={styles.cartridgeCaption}>
-              {item.number} / {item.title}
-            </span>
-          </button>
-        ))}
+        <img src={art('cartridge-front')} alt="" draggable={false} />
+        <span className={styles.insertedLabel}>
+          LANTERN
+          <br />
+          TRAIL<small>A LITTLE STAR ADVENTURE</small>
+        </span>
       </div>
-      <p
-        className={styles.cartridgeStatus}
-        aria-live="polite"
-        data-cartridge-status
-      >
-        {powerState !== 'off'
-          ? t('swapLocked')
-          : insertedCartridge
-            ? t('readyToPower', { rom: cartridge(insertedCartridge).title })
-            : t('chooseCartridge')}
-      </p>
-      <div
-        className={styles.reserved}
-        data-cartridge-position="reserved"
-        aria-hidden="true"
-      ></div>
       <p className={styles.inputLegend}>{t('inputLegend')}</p>
     </section>
   );

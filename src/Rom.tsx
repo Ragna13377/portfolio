@@ -70,7 +70,7 @@ export default function Rom({
     if (
       !inputEnabled ||
       document.activeElement?.closest(
-        '[data-hardware="controller"], [data-console-control], [data-cartridge-action], [data-cartridge-id]',
+        '[data-hardware="controller"], [data-console-control]',
       )
     )
       return;

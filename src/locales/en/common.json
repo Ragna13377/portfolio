@@ -30,18 +30,7 @@
     "y": "Y — Back",
     "z": "Z — Options"
   },
-  "eject": "Eject cartridge — power off first",
-  "insert": "Insert cartridge",
-  "emptySlot": "EMPTY SLOT",
-  "swapLocked": "Power off to change cartridges.",
-  "readyToPower": "{{rom}} inserted. Press POWER to load.",
-  "chooseCartridge": "Slot empty. Choose a cartridge, then press POWER.",
-  "readableView": "Readable view",
-  "readableIntro": "The same portfolio, with standard controls.",
-  "returnToConsole": "Return to console",
-  "experienceError": "The console could not start. All portfolio content and contact links are available here.",
+  "experienceError": "The console could not start. Please reload to try again.",
   "reset": "Reset — Reboot the active ROM",
-  "edition": "INTERACTIVE PORTFOLIO / 16-BIT EDITION",
-  "ejectShort": "CLICK TO EJECT",
-  "inputLegend": "↑ ↓ SELECT · A CONFIRM · B BACK\nSTART / O OPTIONS · MOUSE SUPPORTED"
+  "inputLegend": "D-pad / ↑ ↓  Navigate\nA / Enter  Select · B / Esc  Back\nStart / O  Options"
 }

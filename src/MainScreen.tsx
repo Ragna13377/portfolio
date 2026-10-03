@@ -23,7 +23,7 @@ export default function MainScreen({
     <>
       <div className={styles.gameTitle} aria-hidden="true">
         <span>{cartridge(cartridgeId).short}</span>
-        <strong>{cartridgeId === 'starfall' ? 'ARCHIVE' : 'SIGNAL'}</strong>
+        <strong>A STAR ADVENTURE</strong>
       </div>
       <h1>{t('mainName')}</h1>
       <nav aria-label={t('mainMenu')}>
@@ -38,7 +38,7 @@ export default function MainScreen({
                 onClick={() => onActivate(index)}
               >
                 <span className={styles.cursor} aria-hidden="true">
-                  {selectedIndex === index ? '>' : '\u00a0'}
+                  {selectedIndex === index ? '▶' : '\u00a0'}
                 </span>
                 {t(`menu.${label}`)}
               </button>
@@ -57,7 +57,10 @@ export default function MainScreen({
           } as import('react').CSSProperties
         }
       >
-        <span>{cartridgeId === 'starfall' ? '✦' : '◈'}</span>
+        <span className={styles.mascot}>
+          <i />
+          <b />
+        </span>
       </div>
     </>
   );

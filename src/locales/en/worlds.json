@@ -1,38 +1,20 @@
 {
   "starfall": {
     "boot": "ROM 01",
-    "main": "THE SKYBOUND ARCHIVE",
+    "main": "FOLLOW THE LANTERNS",
     "about": "EXPLORER DOSSIER",
     "projects": "CHOOSE A DESTINATION",
     "detail": "MISSION RECORD",
     "toolkit": "EXPLORER INVENTORY",
     "contact": "BEACON FREQUENCY",
-    "options": "SHIP CONFIGURATION",
-    "optionsLanguage": "LANGUAGE CRYSTAL",
-    "optionsControls": "FLIGHT MANUAL",
+    "options": "TRAVEL SETTINGS",
+    "optionsLanguage": "TRAVEL LANGUAGE",
+    "optionsControls": "TRAVEL GUIDE",
     "stages": [
       "SKYWAY DOCK",
       "LEDGER CITADEL",
       "FOUNDRY WORKSHOP",
       "SIGNAL SPIRE"
-    ]
-  },
-  "nightshift": {
-    "boot": "ROM 02",
-    "main": "AFTER-HOURS TRANSMISSION",
-    "about": "OPERATOR PROFILE",
-    "projects": "SELECT A FREQUENCY",
-    "detail": "TRANSMISSION LOG",
-    "toolkit": "RADIO EQUIPMENT",
-    "contact": "OPEN A CHANNEL",
-    "options": "STATION SETTINGS",
-    "optionsLanguage": "DECODER LANGUAGE",
-    "optionsControls": "OPERATOR MANUAL",
-    "stages": [
-      "DOCK 01 / TRANSIT",
-      "TOWER 02 / LEDGER",
-      "WORKSHOP 03 / DESIGN",
-      "CHANNEL 04 / REALTIME"
     ]
   }
 }

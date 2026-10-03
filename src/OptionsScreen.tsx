@@ -30,7 +30,7 @@ export default function OptionsScreen({
                 onClick={() => onActivate(index)}
               >
                 <span className={styles.cursor} aria-hidden="true">
-                  {selectedIndex === index ? '>' : '\u00a0'}
+                  {selectedIndex === index ? '▶' : '\u00a0'}
                 </span>
                 {t(option)}
               </button>

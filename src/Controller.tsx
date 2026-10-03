@@ -25,7 +25,6 @@ export default function Controller({
   const { t } = useTranslation('common');
   return (
     <>
-      <span className={styles.controllerLabel}>CONTROLLER</span>
       {CONTROLS.map((control) => (
         <ControlButton
           key={control.id}
@@ -63,8 +62,6 @@ function ControlButton({
       }}
       onBlur={() => setKeyPressed(false)}
       onClick={() => onInput?.(control.input)}
-    >
-      {control.label}
-    </button>
+    ></button>
   );
 }

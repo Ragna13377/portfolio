@@ -49,58 +49,6 @@ const state = () =>
   container
     .querySelector('[data-power-state]')
     ?.getAttribute('data-power-state');
-test('readable view exposes shared content, pauses hidden input and restores the selected screen without remounting', async () => {
-  await advance(BOOT_DURATION);
-  await act(async () =>
-    container
-      .querySelectorAll<HTMLButtonElement>(
-        '[data-hardware="crt"] nav button',
-      )[1]
-      .click(),
-  );
-  const hardware = container.querySelector('[data-hardware="crt"]');
-  const rom = container.querySelector('[data-theme]');
-  await click('[data-readable-toggle]');
-  const desktop = container.querySelector('main[hidden]');
-  expect(desktop?.hasAttribute('inert')).toBe(true);
-  expect(document.activeElement).toBe(
-    container.querySelector('main:not([hidden]) h1'),
-  );
-  expect(
-    container.querySelector('main:not([hidden]) details')?.textContent,
-  ).toContain('TRANSPORT CONTROL');
-  const key = new KeyboardEvent('keydown', {
-    key: 'ArrowDown',
-    bubbles: true,
-    cancelable: true,
-  });
-  await act(async () => window.dispatchEvent(key));
-  expect(key.defaultPrevented).toBe(false);
-  expect(rom?.getAttribute('data-screen')).toBe('projects');
-  await click('[data-return-to-console]');
-  expect(container.querySelector('[data-hardware="crt"]')).toBe(hardware);
-  expect(container.querySelector('[data-theme]')).toBe(rom);
-  expect(container.querySelector('main[hidden]')).toBeNull();
-  expect(document.activeElement).toBe(
-    container.querySelector('[data-hardware="crt"] [aria-current="true"]'),
-  );
-});
-test('eject and insert move keyboard focus to the next usable physical control', async () => {
-  await advance(BOOT_DURATION);
-  await click('[data-console-control="power"]');
-  await advance(SHUTDOWN_DURATION);
-  await click('[data-cartridge-action="eject"]');
-  expect(document.activeElement).toBe(
-    container.querySelector('[data-cartridge-id="starfall"]'),
-  );
-  await click('[data-cartridge-id="nightshift"]');
-  expect(document.activeElement).toBe(
-    container.querySelector('[data-cartridge-action="eject"]'),
-  );
-  expect(
-    container.querySelector('[data-cartridge-status]')?.textContent,
-  ).toContain('Press POWER');
-});
 test('reset guards transitional and off states, returns to fresh menu, and preserves mounted hardware', async () => {
   const reset = container.querySelector<HTMLButtonElement>(
     '[data-console-control="reset"]',
@@ -115,7 +63,10 @@ test('reset guards transitional and off states, returns to fresh menu, and prese
   expect(state()).toBe('resetting');
   expect(reset.getAttribute('aria-disabled')).toBe('true');
   await advance(RESET_DURATION);
-  expect(state()).toBe('booting');
+  expect(state()).toBe('on');
+  expect(
+    container.querySelector('[data-theme]')?.getAttribute('data-screen'),
+  ).toBe('boot');
   await advance(BOOT_DURATION - RESET_DURATION);
   expect(state()).toBe('on');
   expect(
@@ -127,7 +78,7 @@ test('reset guards transitional and off states, returns to fresh menu, and prese
   await advance(SHUTDOWN_DURATION);
   expect(reset.getAttribute('aria-disabled')).toBe('true');
 });
-test('runtime failures provide readable projects and real contact links instead of trapping visitors', async () => {
+test('runtime failures show a minimal recovery message', async () => {
   const errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
   function Broken(): never {
     throw new Error('Failed renderer');
@@ -143,9 +94,6 @@ test('runtime failures provide readable projects and real contact links instead 
   );
   expect(errorLog).toHaveBeenCalled();
   expect(container.textContent).toContain('The console could not start.');
-  expect(container.querySelector('details')?.textContent).toContain(
-    'TRANSPORT CONTROL',
-  );
-  expect(container.querySelector('a[href^="mailto:"]')).not.toBeNull();
+  expect(container.querySelectorAll('details, a')).toHaveLength(0);
   expect(container.querySelector('[data-hardware]')).toBeNull();
 });

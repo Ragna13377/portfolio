@@ -27,16 +27,18 @@ test('only requested worlds preload, concurrent and repeat visits reuse cache, f
   expect(preloadTheme('starfall')).toBe(first);
   expect(images).toHaveLength(1);
   expect(images[0].src).toBe(
-    `${import.meta.env.BASE_URL}assets/rom/starfall-world.webp`,
+    `${import.meta.env.BASE_URL}assets/rom/lantern-trail.webp`,
   );
   images[0].onload?.();
   expect(await first).toBe(true);
   expect(await preloadTheme('starfall')).toBe(true);
-  const second = preloadTheme('nightshift');
+  vi.resetModules();
+  const { preloadTheme: loadAgain } = await import('./themeAssets');
+  const second = loadAgain('starfall');
   expect(images).toHaveLength(2);
   images[1].onerror?.();
   expect(await second).toBe(false);
-  const retry = preloadTheme('nightshift');
+  const retry = loadAgain('starfall');
   expect(images).toHaveLength(3);
   images[2].onload?.();
   expect(await retry).toBe(true);

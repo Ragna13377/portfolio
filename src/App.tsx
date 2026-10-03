@@ -2,14 +2,13 @@ import { useTranslation } from 'react-i18next';
 import './i18n';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './App.module.scss';
-import type { CartridgeId } from './cartridges';
+import DesktopFallback from './DesktopFallback';
 import HardwareScene from './HardwareScene';
 import { type PowerState, RESET_DURATION, SHUTDOWN_DURATION } from './power';
-import ReadablePortfolio from './ReadablePortfolio';
 import Rom from './Rom';
 import type { RomInputHandle } from './romInput';
 
-// Temporary support limits for placeholder geometry; revisit with final assets.
+// A uniformly scaled landscape scene needs enough room for readable CRT content.
 const DESKTOP_MINIMUM = { width: 1000, height: 600 };
 
 function readViewport() {
@@ -19,14 +18,8 @@ function readViewport() {
 export default function App() {
   const { t, i18n } = useTranslation('common');
   const [viewport, setViewport] = useState(readViewport);
-  const [readable, setReadable] = useState(false);
-  const wasReadable = useRef(false);
   const romInput = useRef<RomInputHandle>(null);
   const [powerState, setPowerState] = useState<PowerState>('booting');
-  const [insertedCartridge, setInsertedCartridge] =
-    useState<CartridgeId | null>('starfall');
-  const [activeCartridge, setActiveCartridge] =
-    useState<CartridgeId>('starfall');
   const onBootComplete = useCallback(() => {
     setPowerState((state) => (state === 'booting' ? 'on' : state));
   }, []);
@@ -42,17 +35,13 @@ export default function App() {
 
   useEffect(() => {
     if (powerState !== 'resetting') return;
-    const timer = window.setTimeout(
-      () => setPowerState('booting'),
-      RESET_DURATION,
-    );
+    const timer = window.setTimeout(() => setPowerState('on'), RESET_DURATION);
     return () => window.clearTimeout(timer);
   }, [powerState]);
 
   const togglePower = () => {
     if (powerState === 'on') setPowerState('shuttingDown');
-    else if (powerState === 'off' && insertedCartridge) {
-      setActiveCartridge(insertedCartridge);
+    else if (powerState === 'off') {
       romInput.current?.restartForPowerOn();
       setPowerState('booting');
     }
@@ -61,19 +50,6 @@ export default function App() {
   useEffect(() => {
     document.documentElement.lang = i18n.resolvedLanguage ?? 'en';
   }, [i18n.resolvedLanguage]);
-
-  useEffect(() => {
-    if (wasReadable.current && !readable) {
-      document
-        .querySelector<HTMLElement>(
-          powerState === 'on'
-            ? '[data-hardware="crt"] [aria-current="true"], [data-hardware="crt"] h2'
-            : '[data-console-control="power"]',
-        )
-        ?.focus();
-    }
-    wasReadable.current = readable;
-  }, [readable, powerState]);
 
   useEffect(() => {
     const resize = () => setViewport(readViewport());
@@ -88,54 +64,33 @@ export default function App() {
     viewport.width > viewport.height;
 
   if (!supported) {
-    return <ReadablePortfolio />;
+    return <DesktopFallback />;
   }
 
   const scale = Math.min(viewport.width / 1600, viewport.height / 900);
   return (
-    <>
-      <main
-        className={styles.desktop}
-        aria-label={t('portfolio')}
-        hidden={readable}
-        inert={readable}
+    <main className={styles.desktop} aria-label={t('portfolio')}>
+      <div
+        className={styles.artboard}
+        style={{ transform: `translate(-50%, -50%) scale(${scale})` }}
       >
-        <div
-          className={styles.artboard}
-          style={{ transform: `translate(-50%, -50%) scale(${scale})` }}
+        <HardwareScene
+          powerState={powerState}
+          onPower={togglePower}
+          onReset={() => {
+            if (powerState !== 'on') return;
+            romInput.current?.restartForPowerOn();
+            setPowerState('resetting');
+          }}
+          onInput={(input) => romInput.current?.send(input)}
         >
-          <HardwareScene
-            powerState={powerState}
-            onPower={togglePower}
-            onReset={() => {
-              if (powerState !== 'on') return;
-              romInput.current?.restartForPowerOn();
-              setPowerState('resetting');
-            }}
-            onInput={(input) => romInput.current?.send(input)}
-            insertedCartridge={insertedCartridge}
-            onCartridge={(id) => {
-              if (powerState === 'off') setInsertedCartridge(id);
-            }}
-          >
-            <Rom
-              ref={romInput}
-              inputEnabled={powerState === 'on' && !readable}
-              onBootComplete={onBootComplete}
-              cartridgeId={activeCartridge}
-            />
-          </HardwareScene>
-        </div>
-        <button
-          className={styles.readableToggle}
-          type="button"
-          data-readable-toggle
-          onClick={() => setReadable(true)}
-        >
-          {t('readableView')}
-        </button>
-      </main>
-      {readable && <ReadablePortfolio onReturn={() => setReadable(false)} />}
-    </>
+          <Rom
+            ref={romInput}
+            inputEnabled={powerState === 'on'}
+            onBootComplete={onBootComplete}
+          />
+        </HardwareScene>
+      </div>
+    </main>
   );
 }

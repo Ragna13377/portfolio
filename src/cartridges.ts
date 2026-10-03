@@ -1,20 +1,13 @@
 export const CARTRIDGES = [
   {
     id: 'starfall',
-    title: 'STARFALL ARCHIVE',
+    title: 'LANTERN TRAIL',
     number: '01',
-    short: 'STARFALL',
-    edition: 'CELESTIAL ADVENTURE',
-  },
-  {
-    id: 'nightshift',
-    title: 'NIGHTSHIFT SIGNAL',
-    number: '02',
-    short: 'NIGHTSHIFT',
-    edition: 'MIDNIGHT FREQUENCY',
+    short: 'LANTERN TRAIL',
+    edition: 'A LITTLE STAR ADVENTURE',
   },
 ] as const;
 export type CartridgeId = (typeof CARTRIDGES)[number]['id'];
-export function cartridge(id: CartridgeId) {
-  return CARTRIDGES.find((item) => item.id === id) ?? CARTRIDGES[0];
+export function cartridge(_id: CartridgeId) {
+  return CARTRIDGES[0];
 }

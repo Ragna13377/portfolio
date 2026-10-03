@@ -31,7 +31,7 @@ export default function LanguageScreen({
                 onClick={() => onActivate(locale)}
               >
                 <span className={styles.cursor} aria-hidden="true">
-                  {selectedIndex === index ? '>' : '\u00a0'}
+                  {selectedIndex === index ? '▶' : '\u00a0'}
                 </span>
                 {t(locale)}
                 {i18n.resolvedLanguage === locale && (

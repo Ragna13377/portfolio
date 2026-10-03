@@ -46,17 +46,10 @@ test('desktop renders separate hardware layers around a CRT viewport', async () 
     shell?.querySelector('[aria-label="CRT viewport"] [role="status"]')
       ?.textContent,
   ).toBe('BOOTING...');
-  for (const layer of [
-    'console',
-    'controller',
-    'active-cartridge',
-    'inactive-cartridge',
-  ]) {
+  for (const layer of ['console', 'controller', 'active-cartridge']) {
     expect(scene?.querySelector(`[data-hardware="${layer}"]`)).not.toBeNull();
   }
-  expect(
-    scene?.querySelector('[data-cartridge-position="reserved"]'),
-  ).not.toBeNull();
+
   expect(shell?.querySelector('button')).toBeNull();
   expect(
     container.querySelectorAll('[data-hardware="controller"] button'),
@@ -85,13 +78,7 @@ test.each([
     expect(container.textContent).toContain(
       'This experience is built for desktop.',
     );
-    expect(
-      container.querySelector('a[href="https://t.me/vedal988"]')?.textContent,
-    ).toContain('@vedal988');
-    expect(
-      container.querySelector('a[href="https://github.com/Ragna13377"]')
-        ?.textContent,
-    ).toContain('Ragna13377');
+    expect(container.querySelectorAll('details, a, button')).toHaveLength(0);
   },
 );
 
@@ -268,7 +255,7 @@ test('pending and rejected clipboard writes never claim success and Contact stay
   await act(async () =>
     container.querySelector<HTMLButtonElement>('[data-rom-back]')?.click(),
   );
-  expect(selected()).toBe('>CONTACT');
+  expect(selected()).toBe('▶CONTACT');
 });
 
 test('unavailable clipboard is safe and pending writes are ignored after leaving Contact', async () => {
@@ -321,7 +308,7 @@ test.each(['Escape', 'Backspace', 'button'])(
         container.querySelector<HTMLButtonElement>('[data-rom-back]')?.click();
       else press(method, container.querySelector('a') as HTMLAnchorElement);
     });
-    expect(selected()).toBe('>CONTACT');
+    expect(selected()).toBe('▶CONTACT');
     expect(document.activeElement).toBe(
       container.querySelectorAll('nav button')[3],
     );
@@ -349,7 +336,7 @@ test('Contact native links, Copy and Back keep activation and Tab without ROM do
   await act(async () =>
     container.querySelector<HTMLButtonElement>('[data-rom-back]')?.click(),
   );
-  expect(selected()).toBe('>CONTACT');
+  expect(selected()).toBe('▶CONTACT');
 });
 
 test('automatic boot and About navigation preserve every hardware element', async () => {
@@ -368,7 +355,7 @@ test('automatic boot and About navigation preserve every hardware element', asyn
   );
   await act(async () => vi.advanceTimersByTime(200));
   expect(container.querySelector('h1')?.textContent).toBe('IVAN DMITRIEVICH');
-  expect(selected()).toBe('>ABOUT');
+  expect(selected()).toBe('▶ABOUT');
   await act(async () => press('Enter'));
   expect(container.querySelector('h2')?.textContent).toBe('ABOUT');
   for (const text of [
@@ -382,7 +369,7 @@ test('automatic boot and About navigation preserve every hardware element', asyn
     expect(container.textContent).toContain(text);
   }
   await act(async () => press('Escape'));
-  expect(selected()).toBe('>ABOUT');
+  expect(selected()).toBe('▶ABOUT');
   await act(async () => press(' '));
   expect(container.querySelector('h2')?.textContent).toBe('ABOUT');
   await act(async () => press('Backspace'));
@@ -397,7 +384,7 @@ test('keyboard Main selection wraps across four available destinations', async (
   await boot();
   expect(
     Array.from(container.querySelectorAll('nav button'), (button) =>
-      button.textContent?.replace(/^[>\s]+/, ''),
+      button.textContent?.replace(/^[▶\s]+/, ''),
     ),
   ).toEqual(['ABOUT', 'PROJECTS', 'TOOLKIT', 'CONTACT']);
   for (const [key, label] of [
@@ -411,7 +398,7 @@ test('keyboard Main selection wraps across four available destinations', async (
     ['ArrowDown', 'ABOUT'],
   ]) {
     await act(async () => press(key));
-    expect(selected()).toBe(`>${label}`);
+    expect(selected()).toBe(`▶${label}`);
     if (label === 'CONTACT') {
       await act(async () => {
         press('Enter');
@@ -427,7 +414,7 @@ test('keyboard Main selection wraps across four available destinations', async (
     press('Escape');
     press('Backspace');
   });
-  expect(selected()).toBe('>ABOUT');
+  expect(selected()).toBe('▶ABOUT');
 });
 
 test('mouse opens Contact and About directly', async () => {
@@ -450,7 +437,7 @@ test('mouse opens Contact and About directly', async () => {
   await act(async () =>
     container.querySelector<HTMLButtonElement>('button')?.click(),
   );
-  expect(selected()).toBe('>ABOUT');
+  expect(selected()).toBe('▶ABOUT');
 });
 
 const projectCases = [
@@ -541,7 +528,7 @@ test('keyboard Projects flow wraps, restores selection/focus and preserves hardw
   expect(container.querySelector('h2')?.textContent).toBe('PROJECTS SELECT');
   expect(
     Array.from(container.querySelectorAll('nav button'), (button) =>
-      button.textContent?.replace(/^[>\s]+/, ''),
+      button.textContent?.replace(/^[▶\s]+/, ''),
     ),
   ).toEqual(projectCases.map((item) => item.label));
   assertHardware();
@@ -557,7 +544,7 @@ test('keyboard Projects flow wraps, restores selection/focus and preserves hardw
     ['w', 3],
   ] as const) {
     await act(async () => press(key));
-    expect(selected()).toBe(`>${projectCases[index].label}`);
+    expect(selected()).toBe(`▶${projectCases[index].label}`);
     expect(document.activeElement).toBe(
       container.querySelectorAll('nav button')[index],
     );
@@ -575,13 +562,13 @@ test('keyboard Projects flow wraps, restores selection/focus and preserves hardw
   expect(container.querySelector('h2')?.textContent).toBe('REAL-TIME PLATFORM');
   await act(async () => press('Backspace'));
   expect(container.querySelector('h2')?.textContent).toBe('PROJECTS SELECT');
-  expect(selected()).toBe('>REAL-TIME PLATFORM');
+  expect(selected()).toBe('▶REAL-TIME PLATFORM');
   expect(document.activeElement).toBe(
     container.querySelectorAll('nav button')[3],
   );
   assertHardware();
   await act(async () => press('Escape'));
-  expect(selected()).toBe('>PROJECTS');
+  expect(selected()).toBe('▶PROJECTS');
   expect(document.activeElement).toBe(
     container.querySelectorAll('nav button')[1],
   );
@@ -590,7 +577,7 @@ test('keyboard Projects flow wraps, restores selection/focus and preserves hardw
     press('Escape');
     press('Backspace');
   });
-  expect(selected()).toBe('>PROJECTS');
+  expect(selected()).toBe('▶PROJECTS');
 });
 
 test.each(projectCases)(
@@ -620,11 +607,11 @@ test.each(projectCases)(
     await act(async () =>
       container.querySelector<HTMLButtonElement>('[data-rom-back]')?.click(),
     );
-    expect(selected()).toBe(`>${item.label}`);
+    expect(selected()).toBe(`▶${item.label}`);
     await act(async () =>
       container.querySelector<HTMLButtonElement>('[data-rom-back]')?.click(),
     );
-    expect(selected()).toBe('>PROJECTS');
+    expect(selected()).toBe('▶PROJECTS');
     expect(container.querySelector('h1')?.textContent).toBe('IVAN DMITRIEVICH');
   },
 );
@@ -693,7 +680,7 @@ test('keyboard leaves unrelated keys, shortcuts, and text inputs alone', async (
       expect(press('ArrowDown', input).defaultPrevented).toBe(false);
       expect(press('Backspace', input).defaultPrevented).toBe(false);
     });
-    expect(selected()).toBe('>ABOUT');
+    expect(selected()).toBe('▶ABOUT');
   } finally {
     input.remove();
   }
@@ -725,10 +712,10 @@ function assertToolkit(index: number) {
   expect(container.querySelector('h2')?.textContent).toBe('TOOLKIT');
   expect(
     Array.from(container.querySelectorAll('nav button'), (button) =>
-      button.textContent?.replace(/^[>\s]+/, ''),
+      button.textContent?.replace(/^[▶\s]+/, ''),
     ),
   ).toEqual(toolkitCases.map((category) => category.label));
-  expect(selected()).toBe(`>${toolkitCases[index].label}`);
+  expect(selected()).toBe(`▶${toolkitCases[index].label}`);
   expect(document.activeElement).toBe(
     container.querySelectorAll('nav button')[index],
   );
@@ -797,7 +784,7 @@ test('Toolkit keyboard categories wrap, update contents, restore focus and prese
   });
   assertToolkit(4);
   await act(async () => press('Escape'));
-  expect(selected()).toBe('>TOOLKIT');
+  expect(selected()).toBe('▶TOOLKIT');
   expect(document.activeElement).toBe(
     container.querySelectorAll('nav button')[2],
   );
@@ -805,7 +792,7 @@ test('Toolkit keyboard categories wrap, update contents, restore focus and prese
   await act(async () => press(' '));
   assertToolkit(4);
   await act(async () => press('Backspace'));
-  expect(selected()).toBe('>TOOLKIT');
+  expect(selected()).toBe('▶TOOLKIT');
   expect(document.activeElement).toBe(
     container.querySelectorAll('nav button')[2],
   );
@@ -835,7 +822,7 @@ test('mouse opens Toolkit and selects every exact category inventory before retu
   });
   await act(async () => back?.click());
   expect(container.querySelector('h1')?.textContent).toBe('IVAN DMITRIEVICH');
-  expect(selected()).toBe('>TOOLKIT');
+  expect(selected()).toBe('▶TOOLKIT');
   expect(document.activeElement).toBe(
     container.querySelectorAll('nav button')[2],
   );
