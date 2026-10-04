@@ -20,7 +20,7 @@
   li[data-visible='true'] { opacity: 1; }
 }
 .settledLines { display: block; }
-.revealingLine { position: absolute; inset: 0; pointer-events: none; animation: lineAppear 260ms ease-out both; }
+.revealingLine { position: absolute; inset: 0; pointer-events: none; animation: lineAppear 200ms ease-out both; }
 .end { position: absolute; bottom: 7px; right: 16px; font: 24px Tiny5, monospace; color: inherit; }
 .footer { display: flex; align-items: center; padding-top: 8px; transform: translate(16px, -10px); }
 @keyframes dialogueOpen { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }

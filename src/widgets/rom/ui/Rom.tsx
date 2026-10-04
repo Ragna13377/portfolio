@@ -308,6 +308,13 @@ export default function Rom({
   );
 
   useEffect(() => {
+    let scrollTimer: number | undefined;
+    let scrollKey: string | undefined;
+    const stopScrolling = () => {
+      window.clearInterval(scrollTimer);
+      scrollTimer = undefined;
+      scrollKey = undefined;
+    };
     const keydown = (event: KeyboardEvent) => {
       if (
         !inputEnabled ||
@@ -353,6 +360,7 @@ export default function Rom({
       }
 
       if (key === 'o') {
+        stopScrolling();
         if (state.screen === 'boot' || isOptionsScreen(state.screen)) return;
         event.preventDefault();
         if (
@@ -365,6 +373,7 @@ export default function Rom({
       }
       let input: RomInput;
       if (state.screen === 'about' && ['a', 'enter'].includes(key)) {
+        stopScrolling();
         event.preventDefault();
         sendInput({ type: 'confirm' });
         return;
@@ -420,6 +429,14 @@ export default function Rom({
           return;
       }
       event.preventDefault();
+      if (state.screen === 'about' && input.type === 'navigate') {
+        if (input.direction === 'up' || input.direction === 'down') {
+          if (scrollKey === key && event.repeat) return;
+          stopScrolling();
+          scrollKey = key;
+          scrollTimer = window.setInterval(() => sendInput(input), 100);
+        } else stopScrolling();
+      } else stopScrolling();
       // Resume CRT keyboard focus when switching from hardware to ROM shortcuts.
       if (
         target instanceof HTMLElement &&
@@ -431,13 +448,17 @@ export default function Rom({
     window.addEventListener('keydown', keydown);
     const keyup = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
+      if (key === scrollKey) stopScrolling();
       if (['arrowleft', 'a'].includes(key))
         toolkitMovement.current?.release(-1);
       if (['arrowright', 'd'].includes(key))
         toolkitMovement.current?.release(1);
     };
     window.addEventListener('keyup', keyup);
+    window.addEventListener('blur', stopScrolling);
     return () => {
+      stopScrolling();
+      window.removeEventListener('blur', stopScrolling);
       window.removeEventListener('keydown', keydown);
       window.removeEventListener('keyup', keyup);
     };

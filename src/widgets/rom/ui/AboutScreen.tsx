@@ -98,7 +98,7 @@ export default function AboutScreen({
     if (!enabled || complete) return;
     const timer = window.setTimeout(
       () => setRevealed((count) => Math.min(totalLines, count + 1)),
-      revealed === 0 ? 200 : 450,
+      revealed === 0 ? 150 : 320,
     );
     return () => window.clearTimeout(timer);
   }, [enabled, complete, revealed, totalLines]);

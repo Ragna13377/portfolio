@@ -541,9 +541,9 @@ test('About reveals wrapped paragraphs one rendered line at a time', async () =>
   await act(async () => vi.advanceTimersByTime(200));
   expect(paragraphs[0].getAttribute('data-revealed-lines')).toBe('1');
   expect(paragraphs[1].getAttribute('data-visible')).toBe('false');
-  await act(async () => vi.advanceTimersByTime(250));
+  await act(async () => vi.advanceTimersByTime(150));
   expect(paragraphs[0].getAttribute('data-revealed-lines')).toBe('1');
-  await act(async () => vi.advanceTimersByTime(200));
+  await act(async () => vi.advanceTimersByTime(170));
   expect(paragraphs[0].getAttribute('data-revealed-lines')).toBe('2');
   expect(paragraphs[1].getAttribute('data-visible')).toBe('false');
   await act(async () => vi.advanceTimersByTime(450));
@@ -604,6 +604,30 @@ test('About scrolls before selecting Back and Up restores story navigation', asy
   expect(
     container.querySelector('[data-screen]')?.getAttribute('data-screen'),
   ).toBe('main');
+});
+
+test('holding Down scrolls without waiting for keyboard repeat and stops on release or blur', async () => {
+  await boot();
+  await act(async () => press('Enter'));
+  const story = container.querySelector<HTMLElement>(
+    '[data-about-scroll]',
+  ) as HTMLElement;
+  Object.defineProperties(story, {
+    clientHeight: { value: 176 },
+    scrollHeight: { value: 720 },
+  });
+  await act(async () => press('ArrowDown'));
+  await act(async () => vi.advanceTimersByTime(300));
+  expect(story.scrollTop).toBe(256);
+  await act(async () =>
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowDown' })),
+  );
+  await act(async () => vi.advanceTimersByTime(300));
+  expect(story.scrollTop).toBe(256);
+  await act(async () => press('ArrowDown'));
+  await act(async () => window.dispatchEvent(new Event('blur')));
+  await act(async () => vi.advanceTimersByTime(300));
+  expect(story.scrollTop).toBe(320);
 });
 
 test('About shows every beat immediately with reduced motion and updates the preference live', async () => {
