@@ -558,8 +558,33 @@ test('About reveals wrapped paragraphs one rendered line at a time', async () =>
   ).toEqual(['3', '3', '3', '3', '3', '3']);
 });
 
+test('About excludes unrevealed lines from layout and waits when visible text fits', async () => {
+  await boot();
+  await act(async () => press('Enter'));
+  const paragraphs =
+    container.querySelectorAll<HTMLElement>('[data-about-beat]');
+  const back = container.querySelector<HTMLElement>(
+    '[data-rom-back]',
+  ) as HTMLElement;
+  expect(Array.from(paragraphs, (paragraph) => paragraph.style.height)).toEqual(
+    Array(6).fill('0em'),
+  );
+  await act(async () => vi.advanceTimersByTime(150));
+  expect(paragraphs[0].style.height).toBe('1.3em');
+  expect(paragraphs[1].style.height).toBe('0em');
+  await act(async () => press('ArrowDown'));
+  expect(back.hasAttribute('data-rom-selected')).toBe(false);
+  await act(async () => {
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowDown' }));
+    press('Enter');
+  });
+  await act(async () => press('ArrowDown'));
+  expect(back.hasAttribute('data-rom-selected')).toBe(true);
+});
+
 test('About scrolls before selecting Back and Up restores story navigation', async () => {
   await boot();
+  await act(async () => press('Enter'));
   await act(async () => press('Enter'));
   const story = container.querySelector<HTMLElement>(
     '[data-about-scroll]',
@@ -571,18 +596,24 @@ test('About scrolls before selecting Back and Up restores story navigation', asy
     clientHeight: { value: 176 },
     scrollHeight: { value: 720 },
   });
-  await act(async () => press('ArrowDown'));
-  expect(story.scrollTop).toBe(64);
+  const scroll = async (key: string) => {
+    await act(async () => {
+      press(key);
+      window.dispatchEvent(new KeyboardEvent('keyup', { key }));
+      vi.advanceTimersByTime(300);
+    });
+  };
+  await scroll('ArrowDown');
+  expect(story.scrollTop).toBe(48);
   expect(back.hasAttribute('data-rom-selected')).toBe(false);
-  for (let step = 0; step < 8; step++)
-    await act(async () => press('ArrowDown'));
+  for (let step = 0; step < 11; step++) await scroll('ArrowDown');
   expect(story.scrollTop).toBe(544);
   expect(back.hasAttribute('data-rom-selected')).toBe(false);
-  await act(async () => press('ArrowDown'));
+  await scroll('ArrowDown');
   expect(back.hasAttribute('data-rom-selected')).toBe(true);
   expect(document.activeElement).toBe(back);
-  await act(async () => press('ArrowUp'));
-  expect(story.scrollTop).toBe(480);
+  await scroll('ArrowUp');
+  expect(story.scrollTop).toBe(496);
   expect(back.hasAttribute('data-rom-selected')).toBe(false);
   expect(document.activeElement).not.toBe(back);
   await act(async () => press('Enter'));
@@ -592,7 +623,10 @@ test('About scrolls before selecting Back and Up restores story navigation', asy
   const down = container.querySelector<HTMLButtonElement>(
     '[data-controller-input="down"]',
   ) as HTMLButtonElement;
-  await act(async () => down.click());
+  await act(async () => {
+    down.click();
+    vi.advanceTimersByTime(300);
+  });
   expect(back.hasAttribute('data-rom-selected')).toBe(false);
   await act(async () => down.click());
   expect(back.hasAttribute('data-rom-selected')).toBe(true);
@@ -618,16 +652,17 @@ test('holding Down scrolls without waiting for keyboard repeat and stops on rele
   });
   await act(async () => press('ArrowDown'));
   await act(async () => vi.advanceTimersByTime(300));
-  expect(story.scrollTop).toBe(256);
+  expect(story.scrollTop).toBeGreaterThan(100);
+  expect(story.scrollTop).toBeLessThan(192);
   await act(async () =>
     window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowDown' })),
   );
   await act(async () => vi.advanceTimersByTime(300));
-  expect(story.scrollTop).toBe(256);
+  expect(story.scrollTop).toBe(192);
   await act(async () => press('ArrowDown'));
   await act(async () => window.dispatchEvent(new Event('blur')));
   await act(async () => vi.advanceTimersByTime(300));
-  expect(story.scrollTop).toBe(320);
+  expect(story.scrollTop).toBe(240);
 });
 
 test('About shows every beat immediately with reduced motion and updates the preference live', async () => {

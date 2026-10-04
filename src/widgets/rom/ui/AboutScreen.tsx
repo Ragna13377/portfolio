@@ -52,6 +52,8 @@ export default function AboutScreen({
   const { t } = useTranslation('about');
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const story = useRef<HTMLOListElement>(null);
+  const scrollTarget = useRef<number | null>(null);
+  const scrollFrame = useRef(0);
   const [lineCounts, setLineCounts] = useState<number[]>(() =>
     beats.map(() => 1),
   );
@@ -70,7 +72,13 @@ export default function AboutScreen({
       const counts = Array.from(element.children, (paragraph) => {
         const lineHeight =
           Number.parseFloat(getComputedStyle(paragraph).lineHeight) || 19.5;
-        return Math.max(1, Math.round(paragraph.clientHeight / lineHeight));
+        const text = paragraph.querySelector<HTMLElement>('[data-about-text]');
+        return Math.max(
+          1,
+          Math.round(
+            (text?.clientHeight || paragraph.clientHeight) / lineHeight,
+          ),
+        );
       });
       setLineCounts((previous) =>
         counts.every((count, index) => count === previous[index])
@@ -90,17 +98,48 @@ export default function AboutScreen({
       window.removeEventListener('resize', measure);
     };
   }, []);
+  useEffect(() => () => cancelAnimationFrame(scrollFrame.current), []);
   useImperativeHandle(ref, () => ({
     revealAll,
     scroll: (direction) => {
       const element = story.current;
       if (!enabled || !element) return false;
       const bottom = Math.max(0, element.scrollHeight - element.clientHeight);
-      if (direction === 'down' && element.scrollTop >= bottom - 1) return false;
-      element.scrollTop = Math.max(
+      // Wait for more lines instead of selecting Back while dialogue is appearing.
+      if (direction === 'down' && element.scrollTop >= bottom - 1)
+        return !complete;
+      scrollTarget.current = Math.max(
         0,
-        Math.min(bottom, element.scrollTop + (direction === 'down' ? 64 : -64)),
+        Math.min(
+          bottom,
+          (scrollTarget.current ?? element.scrollTop) +
+            (direction === 'down' ? 48 : -48),
+        ),
       );
+      if (reducedMotion) {
+        element.scrollTop = scrollTarget.current;
+        scrollTarget.current = null;
+      } else if (!scrollFrame.current) {
+        let previous = performance.now();
+        const tick = (now: number) => {
+          const dt = Math.min(64, now - previous);
+          previous = now;
+          const target = Math.min(
+            scrollTarget.current ?? element.scrollTop,
+            Math.max(0, element.scrollHeight - element.clientHeight),
+          );
+          const distance = target - element.scrollTop;
+          if (Math.abs(distance) < 1) {
+            element.scrollTop = target;
+            scrollTarget.current = null;
+            scrollFrame.current = 0;
+            return;
+          }
+          element.scrollTop += distance * (1 - Math.exp(-dt / 45));
+          scrollFrame.current = requestAnimationFrame(tick);
+        };
+        scrollFrame.current = requestAnimationFrame(tick);
+      }
       return true;
     },
   }));
@@ -160,6 +199,7 @@ export default function AboutScreen({
                     data-about-beat={beat}
                     data-visible={visibleLines > 0}
                     data-revealed-lines={visibleLines}
+                    style={{ height: `${visibleLines * 1.3}em` }}
                   >
                     <span
                       className={styles.settledLines}
