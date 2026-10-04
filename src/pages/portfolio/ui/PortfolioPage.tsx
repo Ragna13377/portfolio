@@ -81,17 +81,35 @@ export default function PortfolioPage() {
           (window.innerHeight - 900 * scale) / 2 + 730 * scale;
         const scene = artboard.current.parentElement;
         scene?.style.setProperty('--scene-scale', String(scale));
-        // Match the hint's clamped font size so its text and arrow keep their
-        // distance from the controller at both small and high resolutions.
-        const hintScale = Math.max(12, Math.min(56, 14 * scale)) / 14;
-        scene?.style.setProperty(
-          '--hint-x',
-          `${Math.max(16, controllerLeft - 232 * hintScale)}px`,
+        const hints = scene?.querySelector<HTMLElement>(
+          '[data-controller-hints]',
         );
-        scene?.style.setProperty(
-          '--hint-y',
-          `${Math.max(16, controllerTop - 260 * hintScale)}px`,
-        );
+        const arrow = hints?.querySelector('svg');
+        if (scene && hints && arrow) {
+          // Anchor the actual SVG tip, including the rendered text height.
+          // The arrow path ends at (125, 112) in its 140 × 130 viewBox.
+          scene.style.setProperty('--hint-arrow-offset', '0px');
+          const hintBounds = hints.getBoundingClientRect();
+          const arrowBounds = arrow.getBoundingClientRect();
+          const tipX =
+            arrowBounds.left -
+            hintBounds.left +
+            (arrowBounds.width * 125) / 140;
+          const tipY =
+            arrowBounds.top - hintBounds.top + (arrowBounds.height * 112) / 130;
+          const gap = Math.max(24, 32 * scale);
+          const left = controllerLeft - gap - tipX;
+          scene.style.setProperty('--hint-x', `${Math.max(16, left)}px`);
+          scene.style.setProperty(
+            '--hint-y',
+            `${Math.max(16, controllerTop - tipY)}px`,
+          );
+          // Keep the tip clear even when the text reaches the viewport's edge.
+          scene.style.setProperty(
+            '--hint-arrow-offset',
+            `${Math.min(0, left - 16)}px`,
+          );
+        }
       }
     };
     const resize = () => {
@@ -99,8 +117,15 @@ export default function PortfolioPage() {
         frame = window.requestAnimationFrame(updateScale);
     };
     updateScale();
+    const hints = artboard.current?.parentElement?.querySelector(
+      '[data-controller-hints]',
+    );
+    const observer =
+      typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(resize);
+    if (hints) observer?.observe(hints);
     window.addEventListener('resize', resize);
     return () => {
+      observer?.disconnect();
       window.removeEventListener('resize', resize);
       if (frame !== undefined) window.cancelAnimationFrame(frame);
     };
