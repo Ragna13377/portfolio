@@ -5,6 +5,7 @@
   > * { position: relative; }
   h1,h2 { margin: 0 0 20px; font-weight: normal; }
   h2 { font-size: 32px; color: #f4dba8; border-bottom: 2px solid #d1bc702f; padding-bottom: 10px; }
+  h2[tabindex='-1']:focus { outline: none; }
   p { margin: 0 0 13px; }
   button { border: 1px solid transparent; padding: 6px 10px; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; cursor: pointer; text-align: left; text-shadow: inherit;
     &[aria-current='true'] { color: #fff1bf; background: linear-gradient(90deg,#a66c3a80,#49362b66); border-color: #e1b77755; box-shadow: inset 3px 0 #e3d080; }
@@ -20,8 +21,13 @@
 }
 .gameTitle { font-family: Tiny5,monospace; line-height: .92; font-size: 48px; letter-spacing: 2px; color: #ffe6a6; text-shadow: 3px 4px #29364a, 0 0 14px #e7ad6040; span,strong { display: block; font-weight: normal; } strong { font-size: 18px; color: #ecd0a5; margin-top: 7px; letter-spacing: 4px; } }
 .menu { list-style: none; margin: 0; padding: 0; li + li { margin-top: 5px; } }
-.cursor { display: inline-flex; flex: 0 0 18px; justify-content: center; margin-right: 18px; }
+.cursor { display: inline-flex; width: 18px; flex: 0 0 18px; justify-content: center; margin-right: 16px; }
 .rom[data-screen='main'] nav button { display: flex; align-items: center; }
+.rom[data-screen='options'], .rom[data-screen='optionsLanguage'] {
+  nav { width: max-content; max-width: 100%; }
+  .menu { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .menu button { display: flex; align-items: center; width: 100%; min-height: 46px; }
+}
 .menuPlayer { position: absolute !important; left: calc(300px + var(--offset) * .05px); top: 299px; width: 76px; height: 82px; transform-origin: center bottom; z-index: 2; transition: left 300ms ease-out; animation: heroBreathe 5s ease-in-out infinite; }
 .heroFrame { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; animation: heroFirst 2.7s steps(1, end) infinite; pointer-events: none; filter: drop-shadow(2px 2px 2px #101b36a8); }
 .menuPlayer::before { content: ''; position: absolute; left: 12%; right: 9%; bottom: 1px; height: 8px; border-radius: 50%; background: #10162f80; filter: blur(2px); transform: rotate(-3deg); }
@@ -53,7 +59,7 @@
 .channels { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; h3 { margin: 0; font-family: Tiny5,monospace; font-size: 24px; color: #eccca3; } p { margin: 0; font-size: 16px; } }
 .actions { display: flex; gap: 12px; font-size: 15px; a { padding: 4px 10px; color: #f0d297; text-underline-offset: 4px; &:focus-visible { outline: 2px solid #f6db99; outline-offset: 2px; } } button { font-size: 15px; padding: 4px 10px; } }
 .contactFooter { display: flex; align-items: center; gap: 24px; margin-top: 14px; font-size: 15px; }
-.activeLocale { color: #f3d8a7; }
+.activeLocale { color: #f3d8a7; margin-left: 16px; width: 1ch; flex: 0 0 1ch; }
 .activeLabel { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .controlList { margin: 0; font-size: 16px; div { margin-bottom: 8px; display: grid; grid-template-columns: 160px 1fr; gap: 10px; } dt { font-weight: bold; color: #dfcbaa; } dd { margin: 0; } }
 .bootTitle { margin: 112px auto 30px; text-align: center; font: 48px Tiny5,monospace; color: #efd89e; small { font-size: 15px; letter-spacing: 4px; } }

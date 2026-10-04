@@ -34,12 +34,16 @@ export default function LanguageScreen({
                   {selectedIndex === index ? '▶' : '\u00a0'}
                 </span>
                 {t(locale)}
-                {i18n.resolvedLanguage === locale && (
-                  <span className={styles.activeLocale}>
-                    {' '}
-                    ✓ <span className={styles.activeLabel}>{t('active')}</span>
-                  </span>
-                )}
+                <span className={styles.activeLocale}>
+                  {i18n.resolvedLanguage === locale ? (
+                    <>
+                      ✓{' '}
+                      <span className={styles.activeLabel}>{t('active')}</span>
+                    </>
+                  ) : (
+                    '\u00a0'
+                  )}
+                </span>
               </button>
             </li>
           ))}
