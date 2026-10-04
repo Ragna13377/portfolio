@@ -114,6 +114,7 @@ export function useToolkitScene(
           node.hidden = false;
           node.style.left = `${item.x}%`;
           node.style.top = `${item.y}%`;
+          node.style.setProperty('--tile-angle', `${item.angle ?? 0}deg`);
           node.dataset.falling = String(item.vy > 4 && item.bounces === 0);
           // Skew around the tile's top edge: the free end lags behind its motion.
           const trailAngle = Math.max(

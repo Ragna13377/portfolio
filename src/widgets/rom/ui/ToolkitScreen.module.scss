@@ -5,7 +5,7 @@
 .playfield { position: relative; overflow: hidden; isolation: isolate; container-type: size; }
 .stack { pointer-events: auto; align-self: start; margin-top: 48px; height: calc(79% - 48px); }
 .hero { position: absolute; left: 50%; bottom: 21%; width: var(--hero-width); height: var(--hero-height); object-fit: contain; object-position: center bottom; transform: translate(-50%, 14%); filter: drop-shadow(0 4px 2px #10172b88); z-index: 3; pointer-events: none; }
-.pickup { position: absolute; width: var(--tile-size); height: var(--tile-height); display: flex; justify-content: center; align-items: center; transform: translate(-50%, -50%); border: 1px solid color-mix(in srgb, var(--brand), #dcccae 35%); border-radius: 5px; background: #0b1323; box-shadow: 2px 3px #10203e99, 0 0 9px color-mix(in srgb, var(--brand), transparent 65%); color: var(--glyph); z-index: 2;
+.pickup { position: absolute; width: var(--tile-size); height: var(--tile-height); display: flex; justify-content: center; align-items: center; transform: translate(-50%, -50%) rotate(var(--tile-angle, 0deg)); border: 1px solid color-mix(in srgb, var(--brand), #dcccae 35%); border-radius: 5px; background: #0b1323; box-shadow: 2px 3px #10203e99, 0 0 9px color-mix(in srgb, var(--brand), transparent 65%); color: var(--glyph); z-index: 2;
   &[hidden] { display: none; }
   svg { width: 65%; height: 65%; fill: currentColor; }
 }

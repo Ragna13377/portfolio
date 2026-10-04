@@ -62,6 +62,9 @@ test('falling tiles settle on top of each other without overlapping or drifting'
   };
   const items = [base, middle, top];
   advancePickups(items, 0.016);
+  expect(middle.vy).toBeLessThan(0);
+  expect(middle.support).toBeUndefined();
+  for (let frame = 0; frame < 1000; frame++) advancePickups(items, 0.016);
   expect(middle.support).toBe(base.index);
   expect(top.support).toBe(middle.index);
   expect(base.y - middle.y).toBe(TILE_HEIGHT);
@@ -69,6 +72,38 @@ test('falling tiles settle on top of each other without overlapping or drifting'
   const settled = items.map((item) => ({ ...item }));
   for (let frame = 0; frame < 200; frame++) advancePickups(items, 0.016);
   expect(items).toEqual(settled);
+});
+
+test('an off-centre impact bounces and rotates before the upper cube settles flat', () => {
+  const base: Pickup = {
+    index: 0,
+    x: 50,
+    y: FLOOR - TILE_HEIGHT / 2,
+    vx: 0,
+    vy: 0,
+    bounces: 2,
+  };
+  const falling: Pickup = {
+    index: 1,
+    x: 52,
+    y: base.y - TILE_HEIGHT - 0.05,
+    vx: 3,
+    vy: 18,
+    bounces: 0,
+  };
+  const items = [base, falling];
+  advancePickups(items, 0.016);
+  expect(falling.vy).toBeLessThan(-6);
+  expect(falling.spin).toBeGreaterThan(0);
+  advancePickups(items, 0.016);
+  expect(falling.angle).toBeGreaterThan(0);
+  expect(falling.y).toBeLessThan(base.y - TILE_HEIGHT);
+  for (let frame = 0; frame < 1500; frame++) advancePickups(items, 0.016);
+  expect(falling.bounces).toBe(2);
+  expect(falling.angle).toBe(0);
+  expect(falling.spin).toBe(0);
+  expect(falling.support).toBe(base.index);
+  expect(falling.y).toBe(base.y - TILE_HEIGHT);
 });
 
 test('collecting the base releases the entire pile and the remaining blocks settle again', () => {
