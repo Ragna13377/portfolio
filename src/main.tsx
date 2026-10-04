@@ -1,8 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
-import ExperienceBoundary from './ExperienceBoundary';
-import './global.scss';
+import App from './app/App';
+import ExperienceBoundary from './app/providers/ExperienceBoundary';
+import './app/styles/global.scss';
 
 const container = document.getElementById('root');
 

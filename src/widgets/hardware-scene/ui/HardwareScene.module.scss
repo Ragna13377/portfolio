@@ -1,0 +1,58 @@
+.scene { position: relative; width: 100%; height: 100%; color: #cfbeb0; font-family: 'Courier New', monospace; }
+.hardware { position: absolute; left: 340px; top: 10px; width: 1448px; height: 1086px; transform: scale(.8); transform-origin: top left; isolation: isolate;
+  &::before { content: ''; position: absolute; left: 7%; right: 4%; bottom: 2%; height: 9%; background: #020609b0; border-radius: 50%; filter: blur(22px); z-index: -1; }
+}
+.hardwareArt { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; user-select: none; -webkit-user-drag: none; }
+.identity { position: absolute; left: 80px; top: 190px; width: 220px;
+ strong { display: block; font: 500 25px/1.3 Arial,sans-serif; color: #eee2d4; letter-spacing: -.5px; }
+ p { margin-top: 14px; font-size: 10px; letter-spacing: 1px; color: #c6b4a5; }
+}
+.crt { position: absolute; left: 225px; top: 123px; width: 710px; height: 464px; z-index: 2; }
+.viewport { position: absolute; inset: 0; overflow: hidden; contain: paint; border-radius: 45px / 30px; background: #080c13; color: #e8d49c;
+  &::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 8; background: repeating-linear-gradient(0deg, #0002 0 1px, transparent 1px 3px), radial-gradient(ellipse, transparent 45%, #01020775 100%); box-shadow: inset 0 0 32px 8px #0008; mix-blend-mode: multiply; }
+  &::before { content: ''; position: absolute; inset: 0; z-index: 9; pointer-events: none; background: linear-gradient(125deg, #ffffde08 0%, transparent 45%); }
+}
+.romContent { width: 100%; height: 100%; transform-origin: center; }
+.screenScale { width: 734px; height: 524px; transform: scale(0.9673, 0.8855); transform-origin: top left; }
+.powerEffect { position: absolute; inset: 0; z-index: 10; pointer-events: none;
+  &::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 3px; margin-top: -1.5px; background: #faffec; box-shadow: 0 0 12px 4px #c9f6e0; opacity: 0; }
+}
+.scene:not([data-power-state='on']) .powerEffect { pointer-events: auto; }
+.scene[data-power-state='shuttingDown'] { .romContent { animation: collapse var(--shutdown-duration) linear forwards; } .powerEffect::after { animation: shutdownLine var(--shutdown-duration) linear forwards; } }
+.scene[data-power-state='off'] .romContent { visibility: hidden; }
+.scene[data-power-state='booting'] { .romContent { animation: wakeImage var(--wake-duration) ease-out both; } .powerEffect::after { animation: wakeLine var(--wake-duration) ease-out both; } }
+.scene[data-power-state='resetting'] .romContent { animation: reset 180ms steps(2) both; }
+@keyframes collapse { 0% { transform: scaleY(1); filter: brightness(1); } 40% { transform: scaleY(.006); filter: brightness(3); opacity: 1; } 60%,100% { transform: scaleY(0); opacity: 0; } }
+@keyframes shutdownLine { 0%,32% { opacity: 0; transform: scaleX(1); } 42%,62% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(0); } }
+@keyframes wakeImage { 0%,35% { opacity: 0; transform: scaleY(.008); } 100% { opacity: 1; transform: scaleY(1); } }
+@keyframes wakeLine { 0% { opacity: 0; transform: scaleX(0); } 35% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1); } }
+@keyframes reset { 0%,65% { opacity: .35; transform: translateX(3px); filter: hue-rotate(30deg); } 30%,100% { opacity: 1; transform: translateX(0); } }
+
+.console,.controller { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.controllerButton { position: absolute; padding: 0; font: 11px 'Courier New', monospace; letter-spacing: 1px; color: #eee7d1; background: transparent; border: 0; cursor: pointer; pointer-events: auto; user-select: none; -webkit-user-drag: none; transition: filter 80ms, background 80ms;
+  &:active, &[data-key-pressed] {  background: #0003; box-shadow: inset 0 2px 4px #0007; filter: brightness(.85); }
+  &:focus-visible { outline: 2px solid #f6da8d; outline-offset: 4px; }
+  &[aria-disabled='true'] { cursor: default; }
+}
+
+.powerButton { left: 742px; top: 858px; width: 88px; height: 25px; border-radius: 45%; transform: rotate(2deg); }
+.resetButton { left: 1004px; top: 877px; width: 92px; height: 27px; border-radius: 45%; transform: rotate(2deg); }
+.powerLed { position: absolute; left: 904px; top: 873px; width: 4px; height: 4px; border-radius: 100%; background: #d4ed9e; box-shadow: 0 0 6px 2px #b7f068; }
+.scene[data-power-state='off'] .powerLed { background: #535842; box-shadow: none; }
+.up { left: 143px; top: 843px; width: 32px; height: 34px; transform: rotate(9deg); }
+.down { left: 132px; top: 898px; width: 33px; height: 34px; transform: rotate(9deg); }
+.left { left: 111px; top: 874px; width: 34px; height: 30px; transform: rotate(9deg); }
+.right { left: 171px; top: 881px; width: 34px; height: 30px; transform: rotate(9deg); }
+.a,.b,.c { width: 40px; height: 43px; border-radius: 50%; }
+.a { left: 338px; top: 934px; }
+.b { left: 390px; top: 922px; }
+.c { left: 446px; top: 913px; }
+.x,.y,.z { width: 38px; height: 39px; border-radius: 50%; }
+.x { left: 333px; top: 884px; }
+.y { left: 381px; top: 870px; }
+.z { left: 430px; top: 865px; }
+.start { left: 254px; top: 887px; width: 46px; height: 21px; border-radius: 9px; transform: rotate(5deg); }
+.activeCartridge { position: absolute; left: 897px; top: 649px; width: 222px; height: 103px; z-index: 4; pointer-events: none; transform: skewY(3deg); overflow: hidden; background: #080e29; }
+.insertedLabel { display: block; width: 100%; height: 100%; object-fit: fill; user-select: none; -webkit-user-drag: none; }
+.inputLegend { position: absolute; left: 80px; top: 375px; font-size: 11px; line-height: 2.1; color: #c6b4a5; white-space: pre-line; }
+@media (prefers-reduced-motion: reduce) { .scene[data-power-state='shuttingDown'] .romContent { animation: none; visibility: hidden; } .scene[data-power-state='booting'] .romContent { animation: none; } .scene[data-power-state] .powerEffect::after { animation: none; opacity: 0; } }

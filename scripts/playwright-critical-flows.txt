@@ -21,15 +21,16 @@ async (page) => {
   check(await page.locator('[data-hardware="active-cartridge"] button').count() === 0, 'Cartridge is decorative');
   check(await page.locator('[data-controller-input]').count() === 11, 'All controller controls exist');
   check(await page.locator('[data-controller-input], [data-console-control]').evaluateAll(els => els.every(el => el.textContent.trim() === '' && el.getAttribute('aria-label'))), 'Transparent accessible hardware hitboxes');
-  check(await page.locator('[data-hardware="controller"] img').evaluate(el => !el.draggable && getComputedStyle(el).userSelect === 'none' && getComputedStyle(el).webkitUserDrag === 'none'), 'Controller cannot select or drag');
+  check(await page.locator('[data-hardware-art]').count() === 1, 'One authoritative hardware composite');
+  check(await page.locator('[data-hardware-art]').evaluate(el => !el.draggable && getComputedStyle(el).userSelect === 'none' && getComputedStyle(el).webkitUserDrag === 'none'), 'Composite cannot select or drag');
   check(await crt.locator('[aria-label="CRT viewport"]').evaluate(el => getComputedStyle(el, '::after').backgroundImage.includes('repeating-linear-gradient')), 'Scanlines retained');
   // Audit every hitbox in controller-local coordinates against measured PNG cap centers.
-  const coordinates = { up:[108,171],down:[109,227],left:[82,196],right:[136,196],a:[310,233],b:[362,216],c:[410,205],x:[300,187],y:[343,169],z:[387,162],start:[223,192] };
+  const coordinates = { up:[159,860],down:[148.5,915],left:[128,889],right:[188,896],a:[358,955.5],b:[410,943.5],c:[466,934.5],x:[352,903.5],y:[400,889.5],z:[449,884.5],start:[277,897.5] };
   for (const [id,[x,y]] of Object.entries(coordinates)) {
     const delta = await page.locator(`[data-controller-input="${id}"]`).evaluate((el, point) => Math.hypot(el.offsetLeft + el.offsetWidth/2-point[0],el.offsetTop+el.offsetHeight/2-point[1]),[x,y]);
     check(delta < 2, `Hitbox alignment: ${id}`);
   }
-  await page.screenshot({ path: 'output/playwright/lantern-desktop-en.png' });
+  await page.screenshot({ path: 'output/playwright/comet-desktop-en.png' });
   // Temporary inspection outlines are browser-only and never shipped.
   await page.addStyleTag({ content: '[data-controller-input], [data-console-control] { outline: 1px solid #ffcb70 !important; background: #ffc87022 !important; }' });
   await page.screenshot({ path: 'output/playwright/hitbox-audit.png' });
@@ -47,8 +48,8 @@ async (page) => {
   await choices().nth(0).click(); await choices().nth(1).click();
   check(await page.locator('html').getAttribute('lang') === 'ru', 'RU');
   await back(); await back(); await main();
-  await page.screenshot({ path: 'output/playwright/lantern-desktop-ru.png' });
-  for(const i of [0,1,2,3]) { await choices().nth(i).click(); await page.screenshot({ path: `output/playwright/lantern-ru-screen-${i}.png` }); await back(); }
+  await page.screenshot({ path: 'output/playwright/comet-desktop-ru.png' });
+  for(const i of [0,1,2,3]) { await choices().nth(i).click(); await page.screenshot({ path: `output/playwright/comet-ru-screen-${i}.png` }); await back(); }
   await page.keyboard.press('o'); await choices().nth(0).click(); await choices().nth(0).click(); await back(); await back();
   await choices().nth(0).focus();
   for(const [control,screen] of [['a','about'],['x','about'],['z','options']]) {
@@ -69,6 +70,7 @@ async (page) => {
   await power.click(); await wait('shuttingDown'); check((await animation()).includes('collapse'), 'Power collapse retained'); check((await lineAnimation()).includes('shutdownLine'), 'Shutdown line retained');
   await wait('off'); await power.click(); await wait('booting'); check((await lineAnimation()).includes('wakeLine'), 'Power wake retained'); await wait('on');
   await page.emulateMedia({ reducedMotion: 'reduce' });
+  check(await page.locator('[data-frame]').evaluateAll(frames => frames.every(el => getComputedStyle(el).animationName === 'none') && getComputedStyle(frames[0]).opacity === '1' && frames.slice(1).every(el => getComputedStyle(el).opacity === '0')), 'Reduced motion uses one neutral hero frame');
   await power.click(); check(await animation() === 'none', 'Reduced motion collapse disabled'); await wait('off'); await power.click(); check(await lineAnimation() === 'none', 'Reduced motion wake disabled'); await wait('on');
   for(const [width,height] of [[390,844],[1080,1920],[900,700],[1600,500]]) {
     await page.setViewportSize({width,height}); await page.locator('[data-hardware]').first().waitFor({state:'detached'});
@@ -79,7 +81,15 @@ async (page) => {
   await page.setViewportSize({width:1600,height:900}); await main(); await page.emulateMedia({ reducedMotion: 'no-preference' });
   check(await page.evaluate(() => document.documentElement.scrollHeight === innerHeight && document.documentElement.scrollWidth === innerWidth), 'Desktop no overflow');
   check(await rom.evaluate(el => [...el.querySelectorAll('button')].every(b => b.getBoundingClientRect().bottom <= el.getBoundingClientRect().bottom)), 'Menu fits CRT');
-  await page.route('**/assets/rom/*', route => route.abort()); await page.reload(); await wait('on'); await choices().nth(0).click(); check(await rom.getAttribute('data-screen') === 'about', 'Missing art does not block navigation'); await page.unroute('**/assets/rom/*');
+  // Inspect the supplied composition at the required desktop sizes after React has resized.
+  for(const [width,height] of [[1920,1080],[1600,900],[1366,768]]) {
+    await page.setViewportSize({width,height});
+    await page.waitForFunction(() => Math.abs(document.querySelector('[data-power-state]').getBoundingClientRect().height - Math.min(innerHeight, innerWidth / 1600 * 900)) < 1);
+    await page.screenshot({path:`output/playwright/comet-${width}x${height}.png`});
+    check(await page.locator('[data-hardware-art]').evaluate(el => {const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight;}), 'Whole hardware fits desktop');
+    check(await crt.locator('[data-frame]').count() === 4, 'Four supplied hero poses');
+  }
+  await page.route('**/*crt-main-background*', route => route.request().resourceType() === 'image' ? route.abort() : route.continue()); await page.reload(); await wait('on'); await choices().nth(0).click(); check(await rom.getAttribute('data-screen') === 'about', 'Missing art does not block navigation'); await page.unroute('**/*crt-main-background*');
   check(issues.length === 0, `Runtime errors: ${issues.join(', ')}`);
   return { projectDetails:4, toolkitCategories:5, controllerHitboxes:11, resetStates:states, runtimeErrors:issues, passed:['single cartridge','no swapping/readable view','keyboard/mouse/controller','EN/RU','powered ROM reset without line','power line/collapse','scanlines','reduced motion','minimal mobile fallback','no overflow','asset failure'] };
 }

@@ -1,0 +1,20 @@
+{
+  "starfall": {
+    "boot": "ROM 01",
+    "main": "FOLLOW THE COMET",
+    "about": "EXPLORER DOSSIER",
+    "projects": "CHOOSE A DESTINATION",
+    "detail": "MISSION RECORD",
+    "toolkit": "EXPLORER INVENTORY",
+    "contact": "BEACON FREQUENCY",
+    "options": "TRAVEL SETTINGS",
+    "optionsLanguage": "TRAVEL LANGUAGE",
+    "optionsControls": "TRAVEL GUIDE",
+    "stages": [
+      "SKYWAY DOCK",
+      "LEDGER CITADEL",
+      "FOUNDRY WORKSHOP",
+      "SIGNAL SPIRE"
+    ]
+  }
+}

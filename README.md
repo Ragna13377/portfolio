@@ -1,12 +1,10 @@
 # Interactive CRT Portfolio
 
-Ivan Dmitrievich · Frontend Developer. A desktop portfolio inside supplied CRT, console and six-button controller artwork, with one fixed **LANTERN TRAIL** cartridge.
-
-The exterior uses warm taupe, tobacco and charcoal around the dark hardware. A compact identity and one controls legend leave the CRT as the focal point. The original star-adventure scenery, tiny lantern traveller and triangular menu cursor share a warm late-16-bit direction. Projects use a compact vertical stage list; Toolkit uses flexible category navigation; Contact uses structured channels. Existing portfolio content, shared reducer and EN/RU localization remain intact.
+Ivan Dmitrievich · Frontend Developer. A desktop portfolio in a physical retro console scene with one fixed **COMET TRAIL** cartridge. The supplied dark room surrounds one transparent hardware composite containing the CRT, console, controller, cables and cartridge. A colorful game world runs behind its screen opening. Portfolio content and EN/RU navigation retain their existing behavior.
 
 ## Development
 
-Use Node and pnpm versions pinned in package.json.
+Use the Node and pnpm versions pinned in package.json.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -20,30 +18,50 @@ pnpm preview
 
 Development: http://localhost:5173/portfolio/. Production preview: http://localhost:4173/portfolio/.
 
+## Source organization (FSD)
+
+Dependencies flow downwards: app → pages → widgets → features → entities → shared. Each slice exposes a public index.ts; code within a slice uses local imports.
+
+| Layer | Responsibility |
+| --- | --- |
+| src/app | Entry composition, error boundary, global styles, integration tests |
+| src/pages/portfolio | The single desktop page, viewport sizing and hardware power lifecycle |
+| src/widgets/hardware-scene | Composite artwork, CRT effects and calibrated physical controls |
+| src/widgets/rom | ROM boot/input orchestration and its internal screen panels |
+| src/features/rom-navigation | Navigation reducer, screen transitions and remembered selections |
+| src/entities | Cartridge assets/metadata, project, toolkit and contact models |
+| src/shared | Input/power contracts, navigation constants, i18n, desktop fallback and runtime assets |
+
+ABOUT/PROJECTS/TOOLKIT/CONTACT/OPTIONS are panels inside the single ROM widget, not separate routed pages. Keeping them within its slice avoids imports between page slices or imports from widgets to pages. src/main.tsx is the Vite entry point. src/assets is the untouched input artwork pack; application code imports its optimized derivatives from src/shared/assets/scene.
+
 ## Lifecycle and input
 
-App owns hardware power; Rom owns navigation and its independent boot sequence. Hardware stays mounted through screen changes and power cycles. Power shuts down with a 550 ms CRT collapse and wakes with a horizontal line. Reset produces a 180 ms flicker, returns hardware directly to `on`, and lets the ROM finish its 1200 ms boot independently. Reset never enters hardware `booting` or `shuttingDown`.
+PortfolioPage owns hardware power; Rom owns navigation and its independent boot sequence. Hardware stays mounted through screen changes and power cycles. Power shuts down with a 550 ms CRT collapse and wakes with a horizontal line. Reset produces a 180 ms flicker, returns hardware directly to on, and lets the ROM finish its 1200 ms boot independently. Reset never enters hardware booting or shuttingDown.
 
-Arrow keys / W/S navigate, Enter/Space selects, Escape/Backspace returns, and O opens Options. Controller A/X selects, B/Y returns, Start/Z opens Options, and C remains reserved. Left/Right permits bounded decorative mascot movement. Transparent native button hitboxes retain accessible labels, focus and tactile mouse/keyboard feedback. Hardware images cannot be selected or dragged. CRT text remains selectable. Reduced motion disables visual animation while preserving lifecycle behavior.
+Arrow keys / W/S navigate, Enter/Space selects, Escape/Backspace returns, and O opens Options. Controller A/X selects, B/Y returns, Start/Z opens Options, and C remains reserved. Left/Right permits bounded decorative mascot movement. Transparent native button hitboxes retain accessible labels, focus and tactile mouse/keyboard feedback without shifting the supplied button caps. The external legend communicates mappings; button lettering is omitted to preserve the artwork.
 
-One cartridge stays inserted with no eject, swap or empty-slot path. No alternate desktop readable mode exists. Unsupported widths below 1000, heights below 600, or portrait/square viewports show a minimal desktop-experience message. Runtime failures show a minimal reload message. No-JavaScript contact links remain in index.html.
+One cartridge stays inserted with no eject, swap or empty-slot path. Unsupported widths below 1000, heights below 600, or portrait/square viewports show the existing minimal desktop message. Runtime failures show a minimal reload message. No-JavaScript contact links remain in index.html.
 
-## Assets
+## Assets and animation
 
-Supplied original hardware and reference PNGs remain under public/assets. Vite deploys only public/runtime: optimized hardware WebP, one Lantern Trail world and local Tiny5 WOFF2 subsets with their license. Obsolete second-world and spare-cartridge production assets have been removed. The internal `starfall` ID is retained solely to avoid unrelated churn.
+All scene artwork derives from the twelve supplied PNGs in src/assets. Vite imports and hashes only referenced runtime WebP files; its base path remains /portfolio/. Old public images, generated landscape, placeholders and separate hardware pieces have been removed after checking references and confirming Git recovery. Tiny5 font subsets, original font and OFL license are retained in src/shared/assets/fonts. The internal starfall cartridge ID remains to preserve existing state/i18n contracts.
 
-The original world was generated with the built-in imagegen tool. Source: `public/assets/rom/lantern-trail.png`; runtime: `public/runtime/assets/rom/lantern-trail.webp`. Generation prompt: `scripts/lantern-trail-art-prompt.txt`. The supplied hardware raster artwork was not changed in this pass. The cable and small controller plug use SVG, with the continuation beginning at the rotated controller image's actual tail endpoint and terminating at the front port.
+The room uses viewport cover without tiling or stretching. Hardware uses one uniformly scaled 1448 × 1086 canvas within the responsive artboard, with a soft grounding shadow. The separately clipped cartridge poster covers its blank face; the game and CRT effects remain behind the raster screen opening.
+
+Hero images are cropped against alpha > 128 to exclude stray transparent-edge noise, resized into a fixed 240 × 260 canvas and aligned to the same bottom anchor. CSS shows poses 1 → 2 → 3 → 4 → 3 → 2 over 2.4 seconds. The hero and island share a restrained 4 px, seven-second vertical drift. The mid-cloud layer repeats horizontally over 110 seconds at low opacity. Near and foreground clouds are deliberately unused: their large shapes obscure the landscape and menu. Their originals remain available. Reduced motion stops all movement and shows the first hero pose.
+
+MAIN layers and all four hero frames preload during boot and remain in memory. Lossless WebP preserves hardware/pixel-art edges and alpha; the already blurred room uses quality 92 WebP. The small cartridge face and island are resized for their actual display size. Runtime artwork totals approximately 3.6 MB. Original PNGs are never modified or copied into production. To rebuild runtime artwork, run scripts/prepare-scene-assets.py with Python + Pillow.
 
 ## Verification
 
-TypeScript, Biome, 86 Vitest tests across seven files and the production build pass. Browser acceptance checks keyboard/mouse/controller navigation, all four projects and five toolkit categories, EN/RU, fixed cartridge, absent obsolete UX, all eleven hitboxes, unselectable controller artwork, Reset without power effects, Power with line effects, scanlines, reduced motion, minimal fallback, viewport overflow and navigation with failed artwork requests.
+Run TypeScript, Biome, Vitest and production build before publishing. The existing 86 behavioral tests cover navigation, clipboard, keyboard/mouse/controller input, localization, Power/Reset, accessibility and the unsupported-device fallback.
 
-Visual inspection at 1600 × 900 includes English/Russian menus and content screens, plus temporary browser-only hitbox outlines. Evidence is saved under ignored `output/playwright/`.
-
-`scripts/playwright-critical-flows.txt` is a CLI function expression. Open the preview in a dedicated Playwright CLI session, inspect its snapshot, then run:
+The browser acceptance function is scripts/playwright-critical-flows.txt. It checks all four projects and five toolkit categories, EN/RU, all eleven controller hitboxes, unified hardware, scanlines, reset without power effects, shutdown/wake, reduced motion, fallback, overflow and failed artwork requests. It captures MAIN at 1920 × 1080, 1600 × 900 and 1366 × 768, plus English/Russian screens and temporary hitbox outlines, in ignored output/playwright/.
 
 ```sh
-playwright-cli -s=portfolio-polish run-code --filename=scripts/playwright-critical-flows.txt
+npx --yes --package @playwright/cli playwright-cli -s=portfolio open http://localhost:5173/portfolio/
+npx --yes --package @playwright/cli playwright-cli -s=portfolio snapshot
+npx --yes --package @playwright/cli playwright-cli -s=portfolio run-code --filename=scripts/playwright-critical-flows.txt
 ```
 
-The existing GitHub Pages workflow verifies pushes and publishes verified main through an explicit publish dispatch. The history is consolidated to a complete implementation baseline followed by this focused visual correction; the baseline retains the full prior repository tree.
+The GitHub Pages workflow verifies pushes and publishes verified main through an explicit publish dispatch.
