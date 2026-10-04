@@ -1,5 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
+import { useMediaQuery } from '../../../shared/lib/media-query';
 import {
   type PowerState,
   RESET_DURATION,
@@ -11,16 +18,14 @@ import HardwareScene from '../../../widgets/hardware-scene';
 import Rom from '../../../widgets/rom';
 import styles from './PortfolioPage.module.scss';
 
-// A uniformly scaled landscape scene needs enough room for readable CRT content.
-const DESKTOP_MINIMUM = { width: 1000, height: 600 };
-
-function readViewport() {
-  return { width: window.innerWidth, height: window.innerHeight };
-}
+// Browser chrome, docked tools and zoom can leave a desktop window quite short.
+// Height affects the scene's scale, never whether a wide window is supported.
+const DESKTOP_QUERY = '(min-width: 1000px) and (orientation: landscape)';
 
 export default function PortfolioPage() {
   const { t, i18n } = useTranslation('common');
-  const [viewport, setViewport] = useState(readViewport);
+  const supported = useMediaQuery(DESKTOP_QUERY);
+  const artboard = useRef<HTMLDivElement>(null);
   const romInput = useRef<RomInputHandle>(null);
   const [powerState, setPowerState] = useState<PowerState>('booting');
   const onBootComplete = useCallback(() => {
@@ -54,29 +59,38 @@ export default function PortfolioPage() {
     document.documentElement.lang = i18n.resolvedLanguage ?? 'en';
   }, [i18n.resolvedLanguage]);
 
-  useEffect(() => {
-    const resize = () => setViewport(readViewport());
+  useLayoutEffect(() => {
+    if (!supported) return;
+    let frame: number | undefined;
+    const updateScale = () => {
+      frame = undefined;
+      const scale = Math.min(
+        window.innerWidth / 1600,
+        window.innerHeight / 900,
+      );
+      if (artboard.current) {
+        artboard.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      }
+    };
+    const resize = () => {
+      if (frame === undefined)
+        frame = window.requestAnimationFrame(updateScale);
+    };
+    updateScale();
     window.addEventListener('resize', resize);
-    resize();
-    return () => window.removeEventListener('resize', resize);
-  }, []);
-
-  const supported =
-    viewport.width >= DESKTOP_MINIMUM.width &&
-    viewport.height >= DESKTOP_MINIMUM.height &&
-    viewport.width > viewport.height;
+    return () => {
+      window.removeEventListener('resize', resize);
+      if (frame !== undefined) window.cancelAnimationFrame(frame);
+    };
+  }, [supported]);
 
   if (!supported) {
     return <DesktopFallback />;
   }
 
-  const scale = Math.min(viewport.width / 1600, viewport.height / 900);
   return (
     <main className={styles.desktop} aria-label={t('portfolio')}>
-      <div
-        className={styles.artboard}
-        style={{ transform: `translate(-50%, -50%) scale(${scale})` }}
-      >
+      <div className={styles.artboard} ref={artboard}>
         <HardwareScene
           powerState={powerState}
           onPower={togglePower}

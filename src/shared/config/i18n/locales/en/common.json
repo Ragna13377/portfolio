@@ -15,7 +15,7 @@
   "copied": "COPIED!",
   "mainMenu": "ROM main menu",
   "portfolio": "Interactive CRT Portfolio",
-  "fallback": "This experience is built for desktop.",
+  "fallback": "This scene needs a wide landscape window. Widen your browser window to view the portfolio.",
   "contactLinks": "Contact links",
   "controller": {
     "b": "B — Back",

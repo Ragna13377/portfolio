@@ -40,7 +40,7 @@ PortfolioPage owns hardware power; Rom owns navigation and its independent boot 
 
 Arrow keys / W/S navigate, Enter/Space selects, Escape/Backspace returns, and O opens Options. Controller A/X selects, B/Y returns, Start/Z opens Options, and C remains reserved. Left/Right permits bounded decorative mascot movement. Transparent native button hitboxes retain accessible labels, focus and tactile mouse/keyboard feedback without shifting the supplied button caps. The external legend communicates mappings; button lettering is omitted to preserve the artwork.
 
-One cartridge stays inserted with no eject, swap or empty-slot path. Unsupported widths below 1000, heights below 600, or portrait/square viewports show the existing minimal desktop message. Runtime failures show a minimal reload message. No-JavaScript contact links remain in index.html.
+One cartridge stays inserted with no eject, swap or empty-slot path. Windows below 1000 CSS pixels wide or portrait/square windows show a wide-window message. Height only controls scene scale; short landscape desktop windows remain supported. Mode changes use matchMedia through useSyncExternalStore; resize bursts update the artboard at most once per animation frame without React rerenders. Runtime failures show a minimal reload message. No-JavaScript contact links remain in index.html.
 
 ## Assets and animation
 
@@ -54,9 +54,9 @@ MAIN layers and all four hero frames preload during boot and remain in memory. L
 
 ## Verification
 
-Run TypeScript, Biome, Vitest and production build before publishing. The existing 86 behavioral tests cover navigation, clipboard, keyboard/mouse/controller input, localization, Power/Reset, accessibility and the unsupported-device fallback.
+Run TypeScript, Biome, Vitest and production build before publishing. The 87 behavioral tests cover navigation, clipboard, keyboard/mouse/controller input, localization, Power/Reset, accessibility and the unsupported-device fallback.
 
-The browser acceptance function is scripts/playwright-critical-flows.txt. It checks all four projects and five toolkit categories, EN/RU, all eleven controller hitboxes, unified hardware, scanlines, reset without power effects, shutdown/wake, reduced motion, fallback, overflow and failed artwork requests. It captures MAIN at 1920 × 1080, 1600 × 900 and 1366 × 768, plus English/Russian screens and temporary hitbox outlines, in ignored output/playwright/.
+The browser acceptance function is scripts/playwright-critical-flows.txt. It checks all four projects and five toolkit categories, EN/RU, all eleven controller hitboxes, unified hardware, scanlines, reset without power effects, shutdown/wake, reduced motion, fallback, overflow and failed artwork requests. It captures MAIN at 1920 × 1080, 1600 × 900, 1366 × 768, 1600 × 500 and 1366 × 550, plus English/Russian screens and temporary hitbox outlines, in ignored output/playwright/.
 
 ```sh
 npx --yes --package @playwright/cli playwright-cli -s=portfolio open http://localhost:5173/portfolio/

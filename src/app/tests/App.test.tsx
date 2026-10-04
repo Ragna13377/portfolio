@@ -15,6 +15,7 @@ function setViewport(width: number, height: number) {
   vi.stubGlobal('innerWidth', width);
   vi.stubGlobal('innerHeight', height);
   window.dispatchEvent(new Event('resize'));
+  vi.advanceTimersToNextFrame();
 }
 
 beforeEach(() => {
@@ -66,14 +67,13 @@ test('desktop renders one hardware composite around a live CRT viewport', async 
     container.querySelectorAll('[data-hardware="controller"] button'),
   ).toHaveLength(11);
   expect(container.textContent).not.toContain(
-    'This experience is built for desktop.',
+    'This scene needs a wide landscape window. Widen your browser window to view the portfolio.',
   );
 });
 
 test.each([
   [390, 844],
   [900, 700],
-  [1600, 500],
   [1080, 1920],
   [1000, 1000],
 ])(
@@ -87,7 +87,7 @@ test.each([
     expect(container.querySelector('h1')?.textContent).toBe('Ivan Dmitrievich');
     expect(container.textContent).toContain('Frontend Developer');
     expect(container.textContent).toContain(
-      'This experience is built for desktop.',
+      'This scene needs a wide landscape window. Widen your browser window to view the portfolio.',
     );
     expect(container.querySelectorAll('details, a, button')).toHaveLength(0);
   },
@@ -114,6 +114,45 @@ test('desktop resizing scales one artboard and keeps the hardware mounted', asyn
   ).toBeNull();
   await act(async () => setViewport(1600, 900));
   expect(container.querySelector('[aria-label="CRT viewport"]')).not.toBeNull();
+});
+
+test('wide desktop window stays usable below 600px height and recovers after resizing', async () => {
+  setViewport(1600, 500);
+  await act(async () => root.render(<App />));
+  expect(container.querySelector('[aria-label="CRT viewport"]')).not.toBeNull();
+  await act(async () => setViewport(900, 700));
+  expect(container.querySelector('[aria-label="CRT viewport"]')).toBeNull();
+  await act(async () => setViewport(1366, 550));
+  expect(container.querySelector('[aria-label="CRT viewport"]')).not.toBeNull();
+});
+
+test('resize bursts update the scene once per frame using the latest dimensions', async () => {
+  await act(async () => root.render(<App />));
+  const scene = container.querySelector('[data-power-state]');
+  const artboard = scene?.parentElement;
+  const requestFrame = vi.spyOn(window, 'requestAnimationFrame');
+  const cancelFrame = vi.spyOn(window, 'cancelAnimationFrame');
+  try {
+    await act(async () => {
+      for (const height of [700, 650, 500]) {
+        vi.stubGlobal('innerHeight', height);
+        window.dispatchEvent(new Event('resize'));
+      }
+    });
+    expect(requestFrame).toHaveBeenCalledTimes(1);
+    expect(artboard?.style.transform).toBe('translate(-50%, -50%) scale(1)');
+    await act(async () => vi.advanceTimersToNextFrame());
+    expect(artboard?.style.transform).toBe(
+      'translate(-50%, -50%) scale(0.5555555555555556)',
+    );
+    expect(container.querySelector('[data-power-state]')).toBe(scene);
+    await act(async () => window.dispatchEvent(new Event('resize')));
+    await act(async () => root.unmount());
+    expect(cancelFrame).toHaveBeenCalledTimes(1);
+  } finally {
+    requestFrame.mockRestore();
+    cancelFrame.mockRestore();
+  }
 });
 
 test('replacing CRT content preserves the hardware shell and viewport', async () => {
