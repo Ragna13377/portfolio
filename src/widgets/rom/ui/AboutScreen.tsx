@@ -97,7 +97,7 @@ export default function AboutScreen({
     if (!enabled || complete) return;
     const timer = window.setTimeout(
       () => setRevealed((count) => Math.min(totalLines, count + 1)),
-      revealed === 0 ? 200 : 160,
+      revealed === 0 ? 200 : 450,
     );
     return () => window.clearTimeout(timer);
   }, [enabled, complete, revealed, totalLines]);
@@ -137,20 +137,43 @@ export default function AboutScreen({
                       0,
                       Math.min(lineCounts[index], revealed - precedingLines),
                     );
+                const instant =
+                  reducedMotion || revealed === Number.POSITIVE_INFINITY;
+                const settledLines = instant
+                  ? visibleLines
+                  : Math.max(0, visibleLines - 1);
                 return (
                   <li
                     key={beat}
                     data-about-beat={beat}
                     data-visible={visibleLines > 0}
                     data-revealed-lines={visibleLines}
-                    style={{
-                      clipPath:
-                        visibleLines >= lineCounts[index]
-                          ? undefined
-                          : `inset(0 0 max(0px, calc(100% - ${visibleLines * 1.3}em)) 0)`,
-                    }}
                   >
-                    {t(`dialogue.${beat}`)}
+                    <span
+                      className={styles.settledLines}
+                      data-about-text
+                      style={{
+                        clipPath:
+                          settledLines >= lineCounts[index]
+                            ? undefined
+                            : `inset(0 0 max(0px, calc(100% - ${settledLines * 1.3}em)) 0)`,
+                      }}
+                    >
+                      {t(`dialogue.${beat}`)}
+                    </span>
+                    {!instant && visibleLines > 0 && (
+                      <span
+                        key={visibleLines}
+                        className={styles.revealingLine}
+                        data-about-line
+                        aria-hidden="true"
+                        style={{
+                          clipPath: `inset(${(visibleLines - 1) * 1.3}em 0 max(0px, calc(100% - ${visibleLines * 1.3}em)) 0)`,
+                        }}
+                      >
+                        {t(`dialogue.${beat}`)}
+                      </span>
+                    )}
                   </li>
                 );
               })}

@@ -494,10 +494,10 @@ test('About reveals text, can skip with Enter or controller A, and replays on en
   expect(container.textContent).toContain('English up to B2');
   await act(async () => vi.advanceTimersByTime(200));
   expect(visible()).toHaveLength(1);
-  expect(visible()[0].textContent).toBe(
+  expect(visible()[0].querySelector('[data-about-text]')?.textContent).toBe(
     "Hi, I'm a frontend developer. I usually live somewhere between React, Next.js and TypeScript.",
   );
-  await act(async () => vi.advanceTimersByTime(160));
+  await act(async () => vi.advanceTimersByTime(450));
   expect(visible()).toHaveLength(2);
   await act(async () =>
     press('Enter', container.querySelector('h2') as HTMLElement),
@@ -524,7 +524,7 @@ test('About reveals text, can skip with Enter or controller A, and replays on en
       ?.click(),
   );
   await open();
-  for (const delay of [200, 160, 160, 160, 160, 160])
+  for (const delay of [200, 450, 450, 450, 450, 450])
     await act(async () => vi.advanceTimersByTime(delay));
   expect(visible()).toHaveLength(6);
 });
@@ -541,12 +541,14 @@ test('About reveals wrapped paragraphs one rendered line at a time', async () =>
   await act(async () => vi.advanceTimersByTime(200));
   expect(paragraphs[0].getAttribute('data-revealed-lines')).toBe('1');
   expect(paragraphs[1].getAttribute('data-visible')).toBe('false');
-  await act(async () => vi.advanceTimersByTime(160));
+  await act(async () => vi.advanceTimersByTime(250));
+  expect(paragraphs[0].getAttribute('data-revealed-lines')).toBe('1');
+  await act(async () => vi.advanceTimersByTime(200));
   expect(paragraphs[0].getAttribute('data-revealed-lines')).toBe('2');
   expect(paragraphs[1].getAttribute('data-visible')).toBe('false');
-  await act(async () => vi.advanceTimersByTime(160));
+  await act(async () => vi.advanceTimersByTime(450));
   expect(paragraphs[0].getAttribute('data-revealed-lines')).toBe('3');
-  await act(async () => vi.advanceTimersByTime(160));
+  await act(async () => vi.advanceTimersByTime(450));
   expect(paragraphs[1].getAttribute('data-revealed-lines')).toBe('1');
   await act(async () => press('Enter'));
   expect(
