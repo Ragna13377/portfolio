@@ -206,11 +206,7 @@ export default function ToolkitScreen({
       </div>
       <footer className={styles.footer}>
         <RomBackButton onBack={onBack} variant="game" />
-        <span className={styles.hints}>
-          {t('moveHint')}
-          <br />
-          {t('backHint')}
-        </span>
+        <span className={styles.hints}>{t('moveHint')}</span>
       </footer>
     </>
   );

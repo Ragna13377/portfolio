@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { TOOLKIT_COLLECTIBLES } from '../../../entities/toolkit';
 import { takeRandomPending } from './toolkitCollection';
 import {
-  advancePickup,
+  advancePickups,
   HERO_WIDTH,
   overlapsHero,
   type Pickup,
@@ -57,9 +57,10 @@ export function useToolkitScene(
     ).matches;
     const pause = () => controls.current.release();
     const stage = tiles.current[0]?.parentElement;
-    const stageAspect = stage
-      ? stage.clientWidth / Math.max(1, stage.clientHeight)
-      : 1.25;
+    const stageAspect =
+      stage && stage.clientWidth > 0 && stage.clientHeight > 0
+        ? stage.clientWidth / stage.clientHeight
+        : 1.25;
     const tick = (now: number) => {
       const dt = document.hidden
         ? 0
@@ -76,7 +77,7 @@ export function useToolkitScene(
       if (direction) facing = direction;
       if (hero.current) {
         hero.current.style.left = `${heroX}%`;
-        hero.current.style.transform = `translate(-50%, 18.5%) scaleX(${facing})`;
+        hero.current.style.transform = `translate(-50%, 14%) scaleX(${facing})`;
         const frames = direction ? runFrames : idleFrames;
         const src =
           frames[
@@ -101,8 +102,8 @@ export function useToolkitScene(
           });
         nextSpawn = elapsed + 1.1 + Math.random() * 0.8;
       }
+      advancePickups(active, dt, stageAspect);
       active = active.filter((item) => {
-        advancePickup(item, dt);
         const node = tiles.current[item.index];
         if (overlapsHero(item, heroX)) {
           if (node) node.hidden = true;

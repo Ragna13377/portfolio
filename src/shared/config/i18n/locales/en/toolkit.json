@@ -10,7 +10,6 @@
   "pending": "Available to collect",
   "complete": "STACK COMPLETE!",
   "moveHint": "← → (A, D) — Move",
-  "backHint": "B (Esc) — Back",
   "backend": "BACKEND",
   "milestone": "{{count}} SKILLS COLLECTED!"
 }

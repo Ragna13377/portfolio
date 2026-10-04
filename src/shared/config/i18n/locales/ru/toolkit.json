@@ -10,7 +10,6 @@
   "pending": "Доступно для сбора",
   "complete": "СТЕК СОБРАН!",
   "moveHint": "← → (A, D) — Движение",
-  "backHint": "B (Esc) — Назад",
   "backend": "БЭКЕНД",
   "milestone": "{{count}} НАВЫКОВ СОБРАНО!"
 }
