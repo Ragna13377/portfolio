@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   base: '/portfolio/',
-  publicDir: false,
+  publicDir: 'src/assets/favicon',
   plugins: [react()],
   test: {
     environment: 'jsdom',
