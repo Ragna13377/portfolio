@@ -1,14 +1,12 @@
 {
   "role": "Frontend Developer",
-  "education": "Higher education",
-  "english": "English B2",
   "dialogueLabel": "My story",
   "dialogue": {
-    "tools": "I build admin panels and internal tools.",
-    "interfaces": "Data, forms, maps — I enjoy complex interfaces.",
-    "states": "Especially when everything updates in real time.",
-    "projects": "Small ideas tend to become elaborate side projects.",
-    "hobbies": "Off duty: board games, dark fantasy, figures and hardware.",
-    "bicycle": "Sometimes I remember my bicycle exists."
+    "intro": "Hi, I'm a frontend developer. I usually live somewhere between React, Next.js and TypeScript.",
+    "interfaces": "I build admin panels and complex interfaces. The more tables, filters, forms, maps and strange states they have, the more interesting it gets.",
+    "experience": "I've worked on transport services, fintech, builders, real-time systems, payments and even legacy code that was better left undisturbed.",
+    "craft": "Most of all, I enjoy building things from scratch: from UI kits and architecture to screens that people actually use.",
+    "projects": "When commercial interfaces aren't enough, I make my own projects — games and anything that lets me go beyond yet another form with a Save button.",
+    "education": "Somewhere along the way, I earned a university degree and brought my English up to B2. The rest is easier to show than to list."
   }
 }

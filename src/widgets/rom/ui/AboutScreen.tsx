@@ -1,18 +1,26 @@
-import { type Ref, useEffect, useImperativeHandle, useState } from 'react';
+import {
+  type Ref,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { heroFrames } from '../../../shared/assets/scene';
 import { useMediaQuery } from '../../../shared/lib/media-query';
-import { RomBackButton } from '../../../shared/ui/rom-back-button';
 import styles from './AboutScreen.module.scss';
 
-export type AboutDialogueHandle = { revealAll: () => void };
+export type AboutDialogueHandle = {
+  revealAll: () => void;
+  scroll: (direction: 'up' | 'down') => boolean;
+};
 const beats = [
-  'tools',
+  'intro',
   'interfaces',
-  'states',
+  'experience',
+  'craft',
   'projects',
-  'hobbies',
-  'bicycle',
+  'education',
 ] as const;
 
 export default function AboutScreen({
@@ -26,6 +34,7 @@ export default function AboutScreen({
 }) {
   const { t } = useTranslation('about');
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  const story = useRef<HTMLOListElement>(null);
   const [revealed, setRevealed] = useState(() =>
     reducedMotion ? beats.length : 0,
   );
@@ -33,13 +42,26 @@ export default function AboutScreen({
   const revealAll = () => {
     if (enabled) setRevealed(beats.length);
   };
-  useImperativeHandle(ref, () => ({ revealAll }));
+  useImperativeHandle(ref, () => ({
+    revealAll,
+    scroll: (direction) => {
+      const element = story.current;
+      if (!enabled || !element) return false;
+      const bottom = Math.max(0, element.scrollHeight - element.clientHeight);
+      if (direction === 'down' && element.scrollTop >= bottom - 1) return false;
+      element.scrollTop = Math.max(
+        0,
+        Math.min(bottom, element.scrollTop + (direction === 'down' ? 64 : -64)),
+      );
+      return true;
+    },
+  }));
 
   useEffect(() => {
     if (!enabled || complete) return;
     const timer = window.setTimeout(
       () => setRevealed((count) => Math.min(beats.length, count + 1)),
-      revealed === 0 ? 350 : 1100,
+      revealed === 0 ? 200 : 550,
     );
     return () => window.clearTimeout(timer);
   }, [enabled, complete, revealed]);
@@ -48,11 +70,6 @@ export default function AboutScreen({
     <>
       <h2 tabIndex={-1}>{t('common:menu.about')}</h2>
       <div className={styles.scene} data-about-scene>
-        <div className={styles.profile}>
-          <span>{t('role')}</span>
-          <small>{t('education')}</small>
-          <small>{t('english')}</small>
-        </div>
         <div
           className={styles.hero}
           data-speaking={!complete}
@@ -77,7 +94,7 @@ export default function AboutScreen({
             <path d="M54 3 Q37 39 5 60 Q27 57 39 47 Q46 52 54 56" />
           </svg>
           <div className={styles.dialogueBody}>
-            <ol>
+            <ol ref={story} data-about-scroll aria-label={t('dialogueLabel')}>
               {beats.map((beat, index) => (
                 <li
                   key={beat}
@@ -89,13 +106,23 @@ export default function AboutScreen({
               ))}
             </ol>
             <span className={styles.end} aria-hidden="true">
-              {complete ? '▼' : '···'}
+              ▼
             </span>
           </div>
         </section>
       </div>
       <footer className={styles.footer}>
-        <RomBackButton onBack={onBack} className={styles.back} />
+        <button
+          type="button"
+          data-rom-back
+          className={styles.back}
+          onClick={onBack}
+        >
+          <span className={styles.keycap} aria-hidden="true">
+            B
+          </span>
+          {t('common:back')}
+        </button>
       </footer>
     </>
   );

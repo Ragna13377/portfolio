@@ -107,7 +107,11 @@ export default function PortfolioPage() {
   }
 
   return (
-    <main className={styles.desktop} aria-label={t('portfolio')}>
+    <main
+      className={styles.desktop}
+      aria-label={t('portfolio')}
+      onDragStart={(event) => event.preventDefault()}
+    >
       <ControllerHints />
       <div className={styles.artboard} ref={artboard}>
         <HardwareScene

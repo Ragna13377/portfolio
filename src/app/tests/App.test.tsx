@@ -423,11 +423,10 @@ test('automatic boot and About navigation preserve every hardware element', asyn
   await act(async () => press('Enter'));
   expect(container.querySelector('h2')?.textContent).toBe('ABOUT');
   for (const text of [
-    'Frontend Developer',
-    'Higher education',
-    'English B2',
-    'I build admin panels and internal tools.',
-    'Off duty: board games, dark fantasy, figures and hardware.',
+    "Hi, I'm a frontend developer.",
+    'I build admin panels and complex interfaces.',
+    'university degree',
+    'English up to B2',
   ]) {
     expect(container.textContent).toContain(text);
   }
@@ -491,14 +490,14 @@ test('About reveals whole beats, can skip with Enter or controller A, and replay
   await open();
   expect(container.querySelectorAll('[data-about-beat]')).toHaveLength(6);
   expect(visible()).toHaveLength(0);
-  expect(container.textContent).toContain('Higher education');
-  expect(container.textContent).toContain('English B2');
-  await act(async () => vi.advanceTimersByTime(350));
+  expect(container.textContent).toContain('university degree');
+  expect(container.textContent).toContain('English up to B2');
+  await act(async () => vi.advanceTimersByTime(200));
   expect(visible()).toHaveLength(1);
   expect(visible()[0].textContent).toBe(
-    'I build admin panels and internal tools.',
+    "Hi, I'm a frontend developer. I usually live somewhere between React, Next.js and TypeScript.",
   );
-  await act(async () => vi.advanceTimersByTime(1100));
+  await act(async () => vi.advanceTimersByTime(550));
   expect(visible()).toHaveLength(2);
   await act(async () =>
     press('Enter', container.querySelector('h2') as HTMLElement),
@@ -525,9 +524,57 @@ test('About reveals whole beats, can skip with Enter or controller A, and replay
       ?.click(),
   );
   await open();
-  for (const delay of [350, 1100, 1100, 1100, 1100, 1100])
+  for (const delay of [200, 550, 550, 550, 550, 550])
     await act(async () => vi.advanceTimersByTime(delay));
   expect(visible()).toHaveLength(6);
+});
+
+test('About scrolls before selecting Back and Up restores story navigation', async () => {
+  await boot();
+  await act(async () => press('Enter'));
+  const story = container.querySelector<HTMLElement>(
+    '[data-about-scroll]',
+  ) as HTMLElement;
+  const back = container.querySelector<HTMLButtonElement>(
+    '[data-rom-back]',
+  ) as HTMLButtonElement;
+  Object.defineProperties(story, {
+    clientHeight: { value: 176 },
+    scrollHeight: { value: 720 },
+  });
+  await act(async () => press('ArrowDown'));
+  expect(story.scrollTop).toBe(64);
+  expect(back.hasAttribute('data-rom-selected')).toBe(false);
+  for (let step = 0; step < 8; step++)
+    await act(async () => press('ArrowDown'));
+  expect(story.scrollTop).toBe(544);
+  expect(back.hasAttribute('data-rom-selected')).toBe(false);
+  await act(async () => press('ArrowDown'));
+  expect(back.hasAttribute('data-rom-selected')).toBe(true);
+  expect(document.activeElement).toBe(back);
+  await act(async () => press('ArrowUp'));
+  expect(story.scrollTop).toBe(480);
+  expect(back.hasAttribute('data-rom-selected')).toBe(false);
+  expect(document.activeElement).not.toBe(back);
+  await act(async () => press('Enter'));
+  expect(
+    container.querySelector('[data-screen]')?.getAttribute('data-screen'),
+  ).toBe('about');
+  const down = container.querySelector<HTMLButtonElement>(
+    '[data-controller-input="down"]',
+  ) as HTMLButtonElement;
+  await act(async () => down.click());
+  expect(back.hasAttribute('data-rom-selected')).toBe(false);
+  await act(async () => down.click());
+  expect(back.hasAttribute('data-rom-selected')).toBe(true);
+  await act(async () =>
+    container
+      .querySelector<HTMLButtonElement>('[data-controller-input="a"]')
+      ?.click(),
+  );
+  expect(
+    container.querySelector('[data-screen]')?.getAttribute('data-screen'),
+  ).toBe('main');
 });
 
 test('About shows every beat immediately with reduced motion and updates the preference live', async () => {

@@ -431,17 +431,18 @@ test('all portfolio namespaces translate through Options while project IDs, tech
   });
   await boot();
   await clickChoice(0);
-  expect(container.textContent).toContain(resources.en.about.dialogue.tools);
+  expect(container.textContent).toContain(resources.en.about.dialogue.intro);
   await press('o');
   await clickChoice(0);
   await clickChoice(1);
   await back();
   await back();
   expect(heading()).toBe('ОБО МНЕ');
-  expect(container.textContent).toContain(resources.ru.about.role);
-  expect(container.textContent).toContain(resources.ru.about.education);
-  expect(container.textContent).toContain(resources.ru.about.dialogue.tools);
-  expect(container.textContent).toContain(resources.ru.about.dialogue.hobbies);
+  expect(container.textContent).toContain(resources.ru.about.dialogue.intro);
+  expect(container.textContent).toContain(
+    resources.ru.about.dialogue.education,
+  );
+  expect(container.textContent).toContain(resources.ru.about.dialogue.projects);
   expect(container.textContent).not.toContain('Ivan Dmitrievich');
   await back();
   expect(choices()[1].textContent).toContain('ПРОЕКТЫ');

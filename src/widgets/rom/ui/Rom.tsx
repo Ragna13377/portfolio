@@ -169,6 +169,29 @@ export default function Rom({
       if (!inputEnabled || state.screen === 'boot') return;
       switch (input.type) {
         case 'navigate':
+          if (state.screen === 'about') {
+            if (input.direction === 'down') {
+              if (aboutDialogue.current?.scroll('down')) {
+                clearToolkitAction();
+              } else {
+                const button =
+                  content.current?.querySelector<HTMLButtonElement>(
+                    '[data-rom-back]',
+                  ) ?? null;
+                markAction(button);
+                if (
+                  !document.activeElement?.closest(
+                    '[data-hardware="controller"]',
+                  )
+                )
+                  button?.focus({ preventScroll: true });
+              }
+            } else {
+              clearToolkitAction();
+              if (input.direction === 'up') aboutDialogue.current?.scroll('up');
+            }
+            return;
+          }
           if (state.screen === 'toolkit') {
             if (input.direction === 'down') {
               const backButton =
@@ -234,7 +257,9 @@ export default function Rom({
           return;
         case 'confirm':
           if (state.screen === 'about') {
-            aboutDialogue.current?.revealAll();
+            if (selectedAction.current?.matches('[data-rom-back]'))
+              selectedAction.current.click();
+            else aboutDialogue.current?.revealAll();
             return;
           }
           if (state.screen === 'toolkit' && !selectedAction.current) return;
