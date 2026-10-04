@@ -31,8 +31,16 @@
   &[aria-disabled='true'] { cursor: default; }
 }
 
-.powerButton { left: 742px; top: 858px; width: 88px; height: 25px; border-radius: 45%; transform: rotate(2deg); }
-.resetButton { left: 1004px; top: 877px; width: 92px; height: 27px; border-radius: 45%; transform: rotate(2deg); }
+.powerButton { left: 742px; top: 854px; width: 88px; height: 28px; border-radius: 14px;
+  &::before { clip-path: path('M18 3 C9 3 3 7 2 13 C0 19 4 23 14 23 L68 26 C79 26 85 22 86 17 C86 11 82 7 73 6 Z'); }
+}
+.resetButton { left: 1001px; top: 873px; width: 94px; height: 28px; border-radius: 14px;
+  &::before { clip-path: path('M17 3 C8 3 3 8 2 14 C1 21 6 24 16 24 L74 26 C85 26 92 23 92 17 C92 11 87 7 78 6 Z'); }
+}
+.powerButton,.resetButton {
+  &::before { content: ''; position: absolute; inset: 0; background: #0004; opacity: 0; transition: opacity 80ms; pointer-events: none; }
+  &:active, &[data-key-pressed] { background: transparent; box-shadow: none; filter: none; &::before { opacity: 1; } }
+}
 .powerLed { position: absolute; left: 904px; top: 873px; width: 4px; height: 4px; border-radius: 100%; background: #d4ed9e; box-shadow: 0 0 6px 2px #b7f068; }
 .scene[data-power-state='off'] .powerLed { background: #535842; box-shadow: none; }
 .up { left: 143px; top: 843px; width: 32px; height: 34px; transform: rotate(9deg); }
@@ -48,6 +56,8 @@
 .y { left: 381px; top: 870px; }
 .z { left: 430px; top: 865px; }
 .start { left: 254px; top: 887px; width: 46px; height: 21px; border-radius: 9px; transform: rotate(5deg); }
-.activeCartridge { position: absolute; left: 897px; top: 649px; width: 222px; height: 103px; z-index: 4; pointer-events: none; transform: skewY(3deg); overflow: hidden; background: #080e29; }
-.insertedLabel { display: block; width: 100%; height: 100%; object-fit: fill; user-select: none; -webkit-user-drag: none; }
+.activeCartridge { position: absolute; left: 897px; top: 650px; width: 224px; height: 102px; z-index: 4; pointer-events: none; transform: skewY(3.2deg); transform-origin: top left; overflow: hidden; background: #080e29;
+  &::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, #0001, transparent 65%, #0004); }
+}
+.insertedLabel { display: block; width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
 @media (prefers-reduced-motion: reduce) { .scene[data-power-state='shuttingDown'] .romContent { animation: none; visibility: hidden; } .scene[data-power-state='booting'] .romContent { animation: none; } .scene[data-power-state] .powerEffect::after { animation: none; opacity: 0; } }

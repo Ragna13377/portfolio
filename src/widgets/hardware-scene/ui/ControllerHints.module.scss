@@ -1,10 +1,11 @@
-.hints { position: absolute; z-index: 6; left: 4.5vw; top: 50%; width: clamp(220px, 21vw, 360px); padding: clamp(16px, 1.5vw, 26px); color: #f4eee3; font: clamp(16px, 1.15vw, 22px)/1.5 Arial, sans-serif; border: 1px solid #f3ead52b; border-radius: 14px; background: linear-gradient(135deg, #071322e8, #071322b8); box-shadow: 0 12px 40px #0004; backdrop-filter: blur(12px); }
-.title { margin: 0 0 16px; font-size: 1.1em; font-weight: 600; }
-.hints dl { margin: 0; display: grid; gap: 12px; }
-.hints dl > div { display: flex; justify-content: space-between; gap: 12px; }
-.hints dt { white-space: nowrap; font-weight: 600; }
-.hints dt span { color: #c1ccd5; font-size: .85em; font-weight: 400; }
-.hints dd { margin: 0; color: #e3d7c5; }
-.arrow { position: absolute; right: -18%; top: calc(100% + 10px); width: clamp(90px, 8vw, 140px); height: auto; color: #f4eee3; filter: drop-shadow(0 2px 4px #000); pointer-events: none; }
-@media (max-width: 1100px) { .hints { left: 12px; width: 190px; padding: 12px; } .hints dl > div { gap: 6px; } .hints dt { font-size: 14px; } .hints dt span { display: block; } .arrow { top: 75%; right: -45%; width: 90px; transform: scaleY(-1); } }
-@media (max-height: 600px) { .hints { top: 30%; padding: 12px; } .hints dl { gap: 6px; } .arrow { width: 75px; } }
+.hints { position: absolute; z-index: 6; left: 6vw; top: 60%; width: clamp(180px, 14vw, 240px); padding: 8px 0; color: #ddd8cd; font: clamp(14px, .85vw, 16px)/1.45 Arial, sans-serif; text-shadow: 0 1px 5px #000b; isolation: isolate; }
+.hints::before { content: ''; position: absolute; inset: -16px -22px; z-index: -1; background: #030b1866; backdrop-filter: blur(5px); mask-image: radial-gradient(ellipse, #000 25%, transparent 72%); pointer-events: none; }
+.title { margin: 0 0 10px; font-size: .9em; font-weight: 400; letter-spacing: .06em; color: #bab9b1; }
+.hints dl { margin: 0; display: grid; gap: 7px; }
+.hints dl > div { display: flex; justify-content: space-between; gap: 10px; }
+.hints dt { white-space: nowrap; font-weight: 500; }
+.hints dt span { color: #aeb6bd; font-size: .85em; font-weight: 400; }
+.hints dd { margin: 0; color: #d0c7b8; }
+.arrow { position: absolute; right: -20%; top: calc(100% + 8px); width: clamp(65px, 5vw, 90px); height: auto; color: #ede8de; opacity: .75; filter: drop-shadow(0 2px 4px #000); pointer-events: none; }
+@media (max-width: 1100px) { .hints { left: 18px; width: 175px; top: 57%; } .hints dl > div { gap: 6px; } .arrow { top: 70%; right: -8%; width: 45px; transform: scaleY(-1); } }
+@media (max-height: 600px) { .hints { top: 38%; } .hints dl { gap: 5px; } .arrow { width: 55px; } }

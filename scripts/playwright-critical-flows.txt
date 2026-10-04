@@ -16,6 +16,11 @@ async (page) => {
   const animation = () => crt.locator('[aria-label="CRT viewport"] > div').first().evaluate(el => getComputedStyle(el).animationName);
   const lineAnimation = () => crt.locator('[aria-label="CRT viewport"] > div').last().evaluate(el => getComputedStyle(el, '::after').animationName);
   await wait('on');
+  check(await page.locator('[data-hardware="active-cartridge"] img').evaluate(el => {
+    const aspect = el.naturalWidth / el.naturalHeight;
+    return Math.abs(el.offsetWidth / el.offsetHeight - aspect) < .02 && el.offsetHeight > el.parentElement.offsetHeight && getComputedStyle(el.parentElement).overflow === 'hidden';
+  }), 'Cartridge label preserves aspect ratio and crops below the visible face');
+  check(await page.locator('[data-console-control]').evaluateAll(buttons => buttons.every(button => getComputedStyle(button,'::before').clipPath.startsWith('path('))), 'Console pressed shading uses individual cap contours');
   check(await rom.getAttribute('data-world-label') === null, 'World captions removed');
   check(await crt.locator('main, [aria-hidden="true"]').allTextContents().then(texts => texts.every(text => !text.includes('✦ ✦ ✦') && !text.includes(' / HOME') && !text.includes(' / ARCHIVE'))), 'Decorative CRT HUD removed');
   const heroOrder = await crt.locator('[data-frame]').evaluateAll(frames => {
@@ -108,7 +113,7 @@ async (page) => {
     await page.screenshot({path:`output/playwright/comet-${width}x${height}.png`});
     check(await page.locator('[data-hardware-art]').evaluate(el => {const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight;}), 'Whole hardware fits desktop');
     check(await crt.locator('[data-frame]').count() === 3, 'Three approved hero poses');
-    check(await page.locator('[data-controller-hints]').evaluate(el => Number.parseFloat(getComputedStyle(el).fontSize) >= 16), 'Hints remain readable without scene scaling');
+    check(await page.locator('[data-controller-hints]').evaluate(el => {const s = getComputedStyle(el); return Number.parseFloat(s.fontSize) >= 14 && Number.parseFloat(s.fontSize) <= 16 && s.borderTopWidth === '0px' && s.boxShadow === 'none';}), 'Compact readable hints without a panel border');
     const hintBounds = await page.locator('[data-controller-hints]').boundingBox();
     check(await page.locator('[data-controller-input], [data-console-control]').evaluateAll((buttons, hint) => buttons.every(button => {
       const r = button.getBoundingClientRect();

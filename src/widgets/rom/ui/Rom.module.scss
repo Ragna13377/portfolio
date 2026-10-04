@@ -23,7 +23,8 @@
 .cursor { display: inline-flex; flex: 0 0 18px; justify-content: center; margin-right: 18px; }
 .rom[data-screen='main'] nav button { display: flex; align-items: center; }
 .menuPlayer { position: absolute !important; left: calc(300px + var(--offset) * .05px); top: 299px; width: 76px; height: 82px; transform-origin: center bottom; z-index: 2; transition: left 300ms ease-out; animation: heroBreathe 5s ease-in-out infinite; }
-.heroFrame { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; animation: heroFirst 2.7s steps(1, end) infinite; pointer-events: none; }
+.heroFrame { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; animation: heroFirst 2.7s steps(1, end) infinite; pointer-events: none; filter: drop-shadow(2px 2px 2px #101b36a8); }
+.menuPlayer::before { content: ''; position: absolute; left: 12%; right: 9%; bottom: 1px; height: 8px; border-radius: 50%; background: #10162f80; filter: blur(2px); transform: rotate(-3deg); }
 .heroFrame[data-frame='0'] { animation-name: heroFirst; }
 .heroFrame[data-frame='2'] { animation-name: heroThird; }
 .heroFrame[data-frame='3'] { animation-name: heroFourth; }
