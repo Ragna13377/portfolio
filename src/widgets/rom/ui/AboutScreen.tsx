@@ -12,6 +12,7 @@ import talkSecond from '../../../assets/about_sprites/talk_2.webp';
 import talkThird from '../../../assets/about_sprites/talk_3.webp';
 import talkFourth from '../../../assets/about_sprites/talk_4.webp';
 import { useMediaQuery } from '../../../shared/lib/media-query';
+import { RomBackButton } from '../../../shared/ui/rom-back-button';
 import styles from './AboutScreen.module.scss';
 
 export type AboutDialogueHandle = {
@@ -185,22 +186,7 @@ export default function AboutScreen({
         </section>
       </div>
       <footer className={styles.footer}>
-        <button
-          type="button"
-          data-rom-back
-          className={styles.back}
-          onClick={onBack}
-        >
-          <span className={styles.keycap} aria-hidden="true">
-            <svg viewBox="0 0 14 16" focusable="false" aria-hidden="true">
-              <path
-                fillRule="evenodd"
-                d="M3 2h6v2h2v3H9v2h2v3H9v2H3V2zm2 2v3h4V4H5zm0 5v3h4V9H5z"
-              />
-            </svg>
-          </span>
-          {t('common:back')}
-        </button>
+        <RomBackButton onBack={onBack} variant="game" />
       </footer>
     </>
   );

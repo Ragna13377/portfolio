@@ -2,3 +2,10 @@
   &::before { content: '◀'; width: 18px; margin-right: 16px; opacity: .45; }
   &:hover, &:focus-visible, &[data-rom-selected] { color: #fff1bf; background: linear-gradient(90deg,#a66c3a80,#49362b33); box-shadow: inset 3px 0 #e3d080; outline: none; border-color: transparent; &::before { opacity: 1; } }
 }
+
+.game.game { display: inline-flex; align-items: center; gap: 10px; padding: 5px 12px 5px 6px; border: 2px solid currentColor; border-radius: 10px; background: #111932; color: #f6e7c5; font: 20px/1 Tiny5, monospace;
+  &:hover, &:focus-visible, &[data-rom-selected] { background: #252d52; color: #f6e7c5; border-color: currentColor; box-shadow: none; outline: none; }
+}
+.keycap { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: 0 0 26px; border-radius: 50%; border: 2px solid #d95b64; background: #a52632; color: #fff3d4; box-shadow: 1px 2px #070e2a;
+  svg { display: block; width: 18px; height: 20px; fill: currentColor; }
+}

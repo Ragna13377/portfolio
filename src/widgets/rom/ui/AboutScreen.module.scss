@@ -23,12 +23,6 @@
 .revealingLine { position: absolute; inset: 0; pointer-events: none; animation: lineAppear 260ms ease-out both; }
 .end { position: absolute; bottom: 7px; right: 16px; font: 24px Tiny5, monospace; color: inherit; }
 .footer { display: flex; align-items: center; padding-top: 8px; transform: translate(16px, -10px); }
-.back.back { display: inline-flex; align-items: center; gap: 10px; padding: 5px 12px 5px 6px; border: 2px solid currentColor; border-radius: 10px; background: #111932; color: #f6e7c5; font: 20px/1 Tiny5, monospace;
-  &:hover, &:focus-visible, &[data-rom-selected] { background: #252d52; color: #f6e7c5; border-color: currentColor; box-shadow: none; outline: none; }
-}
-.keycap { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: 0 0 26px; border-radius: 50%; border: 2px solid #d95b64; background: #a52632; color: #fff3d4; box-shadow: 1px 2px #070e2a;
-  svg { display: block; width: 18px; height: 20px; fill: currentColor; }
-}
 @keyframes dialogueOpen { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
 @keyframes lineAppear { from { opacity: 0; } to { opacity: 1; } }
 @keyframes talkPose { 0%, 24.999% { opacity: 1; } 25%, 100% { opacity: 0; } }

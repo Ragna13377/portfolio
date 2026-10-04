@@ -85,7 +85,6 @@ export default function ToolkitScreen({
       </header>
       <div className={styles.scene}>
         <div className={styles.playfield} role="img" aria-label={t('scene')}>
-          <div className={styles.floor} />
           {TOOLKIT_COLLECTIBLES.map((item, index) => (
             <div
               key={item.id}
@@ -193,7 +192,7 @@ export default function ToolkitScreen({
         </aside>
       </div>
       <footer className={styles.footer}>
-        <RomBackButton onBack={onBack} />
+        <RomBackButton onBack={onBack} variant="game" />
         <span className={styles.hints}>
           {t('moveHint')}
           <br />
