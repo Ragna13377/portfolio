@@ -6,7 +6,10 @@ import {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { heroFrames } from '../../../shared/assets/scene';
+import talkFirst from '../../../assets/about_sprites/talk_1.webp';
+import talkSecond from '../../../assets/about_sprites/talk_2.webp';
+import talkThird from '../../../assets/about_sprites/talk_3.webp';
+import talkFourth from '../../../assets/about_sprites/talk_4.webp';
 import { useMediaQuery } from '../../../shared/lib/media-query';
 import styles from './AboutScreen.module.scss';
 
@@ -14,6 +17,7 @@ export type AboutDialogueHandle = {
   revealAll: () => void;
   scroll: (direction: 'up' | 'down') => boolean;
 };
+const talkFrames = [talkFirst, talkSecond, talkThird, talkFourth] as const;
 const beats = [
   'intro',
   'interfaces',
@@ -70,12 +74,8 @@ export default function AboutScreen({
     <>
       <h2 tabIndex={-1}>{t('common:menu.about')}</h2>
       <div className={styles.scene} data-about-scene>
-        <div
-          className={styles.hero}
-          data-speaking={!complete}
-          aria-hidden="true"
-        >
-          {heroFrames.map((src, index) => (
+        <div className={styles.hero} aria-hidden="true">
+          {talkFrames.map((src, index) => (
             <img
               key={src}
               src={src}

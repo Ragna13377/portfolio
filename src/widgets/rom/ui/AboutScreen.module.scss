@@ -1,7 +1,6 @@
 .scene { position: relative; height: 338px; isolation: isolate; }
 .hero { position: absolute; left: 22px; bottom: 18px; width: 142px; height: 164px; filter: drop-shadow(0 4px 2px #0b173588);
-  img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; opacity: 0; animation: idlePose 2.7s steps(1, end) calc(var(--pose) * -.9s) infinite; }
-  &[data-speaking='true'] img { animation-duration: 1.8s; animation-delay: calc(var(--pose) * -.6s); }
+  img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; transform: translateY(12px); opacity: 0; animation: talkPose 1.2s steps(1, end) calc(var(--pose) * .3s) infinite; }
 }
 .dialogue { position: absolute; top: 28px; left: 190px; width: 400px; max-width: calc(100% - 200px); transform-origin: left bottom; animation: dialogueOpen 140ms ease-out both; }
 .tail { position: absolute; z-index: 1; left: -52px; bottom: 30px; width: 56px; height: 66px; overflow: visible;
@@ -20,5 +19,5 @@
 }
 .keycap { display: inline-grid; place-items: center; width: 24px; height: 24px; border: 2px solid currentColor; box-shadow: 2px 2px #070e2a; font: 22px/1 Tiny5, monospace; }
 @keyframes dialogueOpen { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
-@keyframes idlePose { 0%, 33.332% { opacity: 1; } 33.333%, 100% { opacity: 0; } }
+@keyframes talkPose { 0%, 24.999% { opacity: 1; } 25%, 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .dialogue { animation: none; } .dialogueBody li { transition: none; transform: none; } .hero img { animation: none; } .hero img:first-child { opacity: 1; } }
