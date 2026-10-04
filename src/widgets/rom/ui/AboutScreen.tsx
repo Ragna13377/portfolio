@@ -11,6 +11,9 @@ import talkFirst from '../../../assets/about_sprites/talk_1.webp';
 import talkSecond from '../../../assets/about_sprites/talk_2.webp';
 import talkThird from '../../../assets/about_sprites/talk_3.webp';
 import talkFourth from '../../../assets/about_sprites/talk_4.webp';
+import talkFifth from '../../../assets/about_sprites/talk_5.webp';
+import talkSixth from '../../../assets/about_sprites/talk_6.webp';
+import talkSeventh from '../../../assets/about_sprites/talk_7.webp';
 import { useMediaQuery } from '../../../shared/lib/media-query';
 import { RomBackButton } from '../../../shared/ui/rom-back-button';
 import styles from './AboutScreen.module.scss';
@@ -19,7 +22,15 @@ export type AboutDialogueHandle = {
   revealAll: () => void;
   scroll: (direction: 'up' | 'down') => boolean;
 };
-const talkFrames = [talkFirst, talkSecond, talkThird, talkFourth] as const;
+const talkFrames = [
+  talkFirst,
+  talkSecond,
+  talkThird,
+  talkFourth,
+  talkFifth,
+  talkSixth,
+  talkSeventh,
+] as const;
 const beats = [
   'intro',
   'interfaces',
