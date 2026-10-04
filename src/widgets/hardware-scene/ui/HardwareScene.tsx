@@ -40,6 +40,16 @@ export default function HardwareScene({
       }
     >
       <div className={styles.hardware}>
+        <div
+          className={styles.contactShadows}
+          data-contact-shadows
+          aria-hidden="true"
+        >
+          <i className={styles.tvShadow} />
+          <i className={styles.controllerShadow} />
+          <i className={styles.consoleShadow} />
+        </div>
+        <div className={styles.tableGlow} data-table-glow aria-hidden="true" />
         <img
           data-hardware-art
           className={styles.hardwareArt}
@@ -47,6 +57,14 @@ export default function HardwareScene({
           alt=""
           draggable={false}
           fetchPriority="high"
+        />
+        <div
+          className={styles.hardwareLighting}
+          data-hardware-lighting
+          aria-hidden="true"
+          style={
+            { '--hardware-mask': `url("${hardwareArt}")` } as CSSProperties
+          }
         />
         <div className={styles.crt} data-hardware="crt">
           <section className={styles.viewport} aria-label="CRT viewport">

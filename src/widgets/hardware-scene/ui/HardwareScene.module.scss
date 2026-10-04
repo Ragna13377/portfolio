@@ -1,8 +1,16 @@
 .scene { position: relative; width: 100%; height: 100%; color: #cfbeb0; font-family: 'Courier New', monospace; }
-.hardware { position: absolute; left: 340px; top: 10px; width: 1448px; height: 1086px; transform: scale(.8); transform-origin: top left; isolation: isolate;
-  &::before { content: ''; position: absolute; left: 7%; right: 4%; bottom: 2%; height: 9%; background: #020609b0; border-radius: 50%; filter: blur(22px); z-index: -1; }
+.hardware { position: absolute; left: 340px; top: 10px; width: 1448px; height: 1086px; transform: scale(.8); transform-origin: top left; isolation: isolate; }
+.contactShadows { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.contactShadows i { position: absolute; border-radius: 50%; background: #0103059c; }
+.tvShadow { left: 180px; top: 744px; width: 790px; height: 54px; filter: blur(13px); }
+.controllerShadow { left: 62px; top: 1012px; width: 475px; height: 42px; filter: blur(9px); }
+.consoleShadow { left: 580px; top: 1022px; width: 810px; height: 50px; filter: blur(12px); }
+.hardwareArt { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; user-select: none; -webkit-user-drag: none; filter: brightness(.93) contrast(.97) blur(.2px) drop-shadow(8px 12px 14px #0005); }
+.hardwareLighting { position: absolute; inset: 0; z-index: 4; pointer-events: none; mask-image: var(--hardware-mask); mask-size: 100% 100%; mask-repeat: no-repeat; background: linear-gradient(105deg, #79a9e409, transparent 38%, transparent 58%, #edb87832); mix-blend-mode: soft-light;
+  &::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 42% 38%, #6a9ee52b, transparent 56%); opacity: 0; transition: opacity 400ms; }
 }
-.hardwareArt { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; user-select: none; -webkit-user-drag: none; }
+.tableGlow { position: absolute; left: 80px; top: 730px; width: 1120px; height: 300px; z-index: 1; pointer-events: none; background: radial-gradient(ellipse, #5592d71c, transparent 65%); opacity: 0; transition: opacity 400ms; }
+.scene[data-power-state='on'] { .tableGlow { opacity: .7; } .hardwareLighting::after { opacity: .8; } }
 .crt { position: absolute; left: 225px; top: 123px; width: 710px; height: 464px; z-index: 2; }
 .viewport { position: absolute; inset: 0; overflow: hidden; contain: paint; border-radius: 45px / 30px; background: #080c13; color: #e8d49c;
   &::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 8; background: repeating-linear-gradient(0deg, #0002 0 1px, transparent 1px 3px), radial-gradient(ellipse, transparent 45%, #01020775 100%); box-shadow: inset 0 0 32px 8px #0008; mix-blend-mode: multiply; }
