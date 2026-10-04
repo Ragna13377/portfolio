@@ -479,7 +479,7 @@ test('keyboard Main selection wraps across four available destinations', async (
   expect(selected()).toBe('▶ABOUT');
 });
 
-test('About reveals whole beats, can skip with Enter or controller A, and replays on entry', async () => {
+test('About reveals text, can skip with Enter or controller A, and replays on entry', async () => {
   await boot();
   const open = async () =>
     act(async () =>
@@ -497,7 +497,7 @@ test('About reveals whole beats, can skip with Enter or controller A, and replay
   expect(visible()[0].textContent).toBe(
     "Hi, I'm a frontend developer. I usually live somewhere between React, Next.js and TypeScript.",
   );
-  await act(async () => vi.advanceTimersByTime(550));
+  await act(async () => vi.advanceTimersByTime(160));
   expect(visible()).toHaveLength(2);
   await act(async () =>
     press('Enter', container.querySelector('h2') as HTMLElement),
@@ -524,9 +524,36 @@ test('About reveals whole beats, can skip with Enter or controller A, and replay
       ?.click(),
   );
   await open();
-  for (const delay of [200, 550, 550, 550, 550, 550])
+  for (const delay of [200, 160, 160, 160, 160, 160])
     await act(async () => vi.advanceTimersByTime(delay));
   expect(visible()).toHaveLength(6);
+});
+
+test('About reveals wrapped paragraphs one rendered line at a time', async () => {
+  vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockImplementation(
+    function (this: HTMLElement) {
+      return this.matches('[data-about-beat]') ? 59 : 0;
+    },
+  );
+  await boot();
+  await act(async () => press('Enter'));
+  const paragraphs = container.querySelectorAll('[data-about-beat]');
+  await act(async () => vi.advanceTimersByTime(200));
+  expect(paragraphs[0].getAttribute('data-revealed-lines')).toBe('1');
+  expect(paragraphs[1].getAttribute('data-visible')).toBe('false');
+  await act(async () => vi.advanceTimersByTime(160));
+  expect(paragraphs[0].getAttribute('data-revealed-lines')).toBe('2');
+  expect(paragraphs[1].getAttribute('data-visible')).toBe('false');
+  await act(async () => vi.advanceTimersByTime(160));
+  expect(paragraphs[0].getAttribute('data-revealed-lines')).toBe('3');
+  await act(async () => vi.advanceTimersByTime(160));
+  expect(paragraphs[1].getAttribute('data-revealed-lines')).toBe('1');
+  await act(async () => press('Enter'));
+  expect(
+    Array.from(paragraphs, (paragraph) =>
+      paragraph.getAttribute('data-revealed-lines'),
+    ),
+  ).toEqual(['3', '3', '3', '3', '3', '3']);
 });
 
 test('About scrolls before selecting Back and Up restores story navigation', async () => {

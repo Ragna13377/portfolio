@@ -2,6 +2,7 @@ import {
   type Ref,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -39,13 +40,44 @@ export default function AboutScreen({
   const { t } = useTranslation('about');
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const story = useRef<HTMLOListElement>(null);
-  const [revealed, setRevealed] = useState(() =>
-    reducedMotion ? beats.length : 0,
+  const [lineCounts, setLineCounts] = useState<number[]>(() =>
+    beats.map(() => 1),
   );
-  const complete = reducedMotion || revealed === beats.length;
+  const totalLines = lineCounts.reduce((sum, count) => sum + count, 0);
+  const [revealed, setRevealed] = useState(() =>
+    reducedMotion ? Number.POSITIVE_INFINITY : 0,
+  );
+  const complete = reducedMotion || revealed >= totalLines;
   const revealAll = () => {
-    if (enabled) setRevealed(beats.length);
+    if (enabled) setRevealed(Number.POSITIVE_INFINITY);
   };
+  useLayoutEffect(() => {
+    const element = story.current;
+    if (!element) return;
+    const measure = () => {
+      const counts = Array.from(element.children, (paragraph) => {
+        const lineHeight =
+          Number.parseFloat(getComputedStyle(paragraph).lineHeight) || 19.5;
+        return Math.max(1, Math.round(paragraph.clientHeight / lineHeight));
+      });
+      setLineCounts((previous) =>
+        counts.every((count, index) => count === previous[index])
+          ? previous
+          : counts,
+      );
+    };
+    measure();
+    const observer =
+      typeof ResizeObserver === 'undefined'
+        ? null
+        : new ResizeObserver(measure);
+    observer?.observe(element);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
   useImperativeHandle(ref, () => ({
     revealAll,
     scroll: (direction) => {
@@ -64,11 +96,11 @@ export default function AboutScreen({
   useEffect(() => {
     if (!enabled || complete) return;
     const timer = window.setTimeout(
-      () => setRevealed((count) => Math.min(beats.length, count + 1)),
-      revealed === 0 ? 200 : 550,
+      () => setRevealed((count) => Math.min(totalLines, count + 1)),
+      revealed === 0 ? 200 : 160,
     );
     return () => window.clearTimeout(timer);
-  }, [enabled, complete, revealed]);
+  }, [enabled, complete, revealed, totalLines]);
 
   return (
     <>
@@ -95,15 +127,33 @@ export default function AboutScreen({
           </svg>
           <div className={styles.dialogueBody}>
             <ol ref={story} data-about-scroll aria-label={t('dialogueLabel')}>
-              {beats.map((beat, index) => (
-                <li
-                  key={beat}
-                  data-about-beat={beat}
-                  data-visible={reducedMotion || index < revealed}
-                >
-                  {t(`dialogue.${beat}`)}
-                </li>
-              ))}
+              {beats.map((beat, index) => {
+                const precedingLines = lineCounts
+                  .slice(0, index)
+                  .reduce((sum, count) => sum + count, 0);
+                const visibleLines = reducedMotion
+                  ? lineCounts[index]
+                  : Math.max(
+                      0,
+                      Math.min(lineCounts[index], revealed - precedingLines),
+                    );
+                return (
+                  <li
+                    key={beat}
+                    data-about-beat={beat}
+                    data-visible={visibleLines > 0}
+                    data-revealed-lines={visibleLines}
+                    style={{
+                      clipPath:
+                        visibleLines >= lineCounts[index]
+                          ? undefined
+                          : `inset(0 0 max(0px, calc(100% - ${visibleLines * 1.3}em)) 0)`,
+                    }}
+                  >
+                    {t(`dialogue.${beat}`)}
+                  </li>
+                );
+              })}
             </ol>
             <span className={styles.end} aria-hidden="true">
               ▼
