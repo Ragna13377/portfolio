@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { type CartridgeId, cartridge } from '../../../entities/cartridge';
 import {
+  cloudsForeground,
   cloudsMid,
+  cloudsNear,
   floatingIsland,
   heroFrames,
 } from '../../../shared/assets/scene';
@@ -32,11 +34,25 @@ export default function MainScreen({
         <i />
         <i />
       </div>
-      <div
-        className={styles.clouds}
-        aria-hidden="true"
-        style={{ backgroundImage: `url("${cloudsMid}")` }}
-      />
+      {(
+        [
+          ['mid', cloudsMid],
+          ['near', cloudsNear],
+          ['foreground', cloudsForeground],
+        ] as const
+      ).map(([depth, src]) => (
+        <div
+          key={depth}
+          className={styles.clouds}
+          data-cloud-layer={depth}
+          aria-hidden="true"
+        >
+          <div
+            className={styles.cloudTrack}
+            style={{ backgroundImage: `url("${src}")` }}
+          />
+        </div>
+      ))}
       <div className={styles.island} aria-hidden="true">
         <img src={floatingIsland} alt="" draggable={false} />
       </div>

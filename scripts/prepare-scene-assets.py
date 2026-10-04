@@ -11,7 +11,8 @@ TARGET = SOURCE.parent / 'shared' / 'assets' / 'scene'
 TARGET.mkdir(parents=True, exist_ok=True)
 
 for name in ('site-background', 'hardware-composite', 'crt-main-background',
-             'comet-trail-label', 'floating-island', 'clouds-mid'):
+             'comet-trail-label', 'floating-island', 'clouds-mid',
+             'clouds-near', 'clouds-foreground'):
     image = Image.open(SOURCE / f'{name}.png')
     if name == 'comet-trail-label':
         # Remove the supplied poster's transparent margin before fitting its face.
@@ -20,7 +21,7 @@ for name in ('site-background', 'hardware-composite', 'crt-main-background',
         image.thumbnail((512, 384), Image.Resampling.LANCZOS)
     elif name == 'floating-island':
         image.thumbnail((392, 512), Image.Resampling.NEAREST)
-    elif name == 'clouds-mid':
+    elif name.startswith('clouds-'):
         image.thumbnail((1468, 490), Image.Resampling.NEAREST)
     if name == 'site-background':
         image.save(TARGET / f'{name}.webp', 'WEBP', quality=92, method=6)

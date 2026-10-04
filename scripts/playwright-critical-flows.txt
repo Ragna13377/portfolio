@@ -41,6 +41,23 @@ async (page) => {
     return hero.left > menu.right;
   }), 'Hero stands clear of the menu');
   check(await crt.locator('[data-screen="main"] i').evaluateAll(stars => stars.length === 4 && stars.every(star => Number.parseFloat(getComputedStyle(star).animationDuration) >= 8)), 'Only a few stars pulse slowly');
+  const cloudSpeeds = await crt.locator('[data-cloud-layer] > div').evaluateAll(tracks => tracks.map(track => {
+    const animation = track.getAnimations()[0];
+    const duration = Number(animation.effect.getTiming().duration);
+    const delay = Number(animation.effect.getTiming().delay);
+    const original = animation.currentTime;
+    animation.pause();
+    animation.currentTime = duration + delay;
+    const start = new DOMMatrix(getComputedStyle(track).transform).m41;
+    animation.currentTime = delay + duration * 1.5;
+    const end = new DOMMatrix(getComputedStyle(track).transform).m41;
+    const span = Number.parseFloat(getComputedStyle(track).getPropertyValue('--cloud-span'));
+    animation.currentTime = original;
+    animation.play();
+    return {duration, span, movement:end-start};
+  }));
+  check(cloudSpeeds.length === 3 && cloudSpeeds.every(layer => Math.abs(layer.movement - layer.span / 2) < 1), `Three repeating cloud tracks drift left to right: ${JSON.stringify(cloudSpeeds)}`);
+  check(cloudSpeeds[0].duration > cloudSpeeds[1].duration && cloudSpeeds[1].duration > cloudSpeeds[2].duration && cloudSpeeds[2].duration >= 200000, 'Slow cloud parallax increases towards the foreground');
   check(await page.locator('[data-hardware="active-cartridge"]').count() === 1, 'Exactly one fixed cartridge');
   check(await page.locator('[data-cartridge-action], [data-cartridge-id], [data-readable-toggle], [data-hardware="inactive-cartridge"]').count() === 0, 'Obsolete interactions absent');
   check(await page.locator('[data-hardware="active-cartridge"] button').count() === 0, 'Cartridge is decorative');
@@ -95,6 +112,7 @@ async (page) => {
   await power.click(); await wait('shuttingDown'); check((await animation()).includes('collapse'), 'Power collapse retained'); check((await lineAnimation()).includes('shutdownLine'), 'Shutdown line retained');
   await wait('off'); await power.click(); await wait('booting'); check((await lineAnimation()).includes('wakeLine'), 'Power wake retained'); await wait('on');
   await page.emulateMedia({ reducedMotion: 'reduce' });
+  check(await crt.locator('[data-cloud-layer] > div').evaluateAll(tracks => tracks.length === 3 && tracks.every(track => getComputedStyle(track).animationName === 'none')), 'Cloud parallax respects reduced motion');
   check(await page.locator('[data-frame]').evaluateAll(frames => frames.every(el => getComputedStyle(el).animationName === 'none') && getComputedStyle(frames[0]).opacity === '1' && frames.slice(1).every(el => getComputedStyle(el).opacity === '0')), 'Reduced motion uses one neutral hero frame');
   await power.click(); check(await animation() === 'none', 'Reduced motion collapse disabled'); await wait('off'); await power.click(); check(await lineAnimation() === 'none', 'Reduced motion wake disabled'); await wait('on');
   for(const [width,height] of [[390,844],[767,700]]) {
@@ -113,7 +131,12 @@ async (page) => {
     await page.screenshot({path:`output/playwright/comet-${width}x${height}.png`});
     check(await page.locator('[data-hardware-art]').evaluate(el => {const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight;}), 'Whole hardware fits desktop');
     check(await crt.locator('[data-frame]').count() === 3, 'Three approved hero poses');
-    check(await page.locator('[data-controller-hints]').evaluate(el => {const s = getComputedStyle(el); return Number.parseFloat(s.fontSize) >= 14 && Number.parseFloat(s.fontSize) <= 16 && s.borderTopWidth === '0px' && s.boxShadow === 'none';}), 'Compact readable hints without a panel border');
+    check(await page.locator('[data-controller-hints]').evaluate(el => {const s = getComputedStyle(el); return Number.parseFloat(s.fontSize) >= 10 && Number.parseFloat(s.fontSize) <= 13 && s.borderTopWidth === '0px' && s.boxShadow === 'none';}), 'Quiet compact hints without a panel border');
+    const arrow = page.locator('[data-controller-hints] svg');
+    check(await arrow.evaluate(el => getComputedStyle(el).transform === 'none'), 'Arrow keeps its downward curve at every window size');
+    const arrowBounds = await arrow.boundingBox();
+    const controllerLeft = await page.locator('[data-controller-input]').evaluateAll(buttons => Math.min(...buttons.map(button => button.getBoundingClientRect().left)));
+    check(arrowBounds.x + arrowBounds.width * 125 / 140 < controllerLeft - 10, 'Curved arrow stops before the controller');
     const hintBounds = await page.locator('[data-controller-hints]').boundingBox();
     check(await page.locator('[data-controller-input], [data-console-control]').evaluateAll((buttons, hint) => buttons.every(button => {
       const r = button.getBoundingClientRect();
@@ -134,5 +157,5 @@ async (page) => {
   await page.setViewportSize({width:1920,height:1200});
   await page.route('**/*crt-main-background*', route => route.request().resourceType() === 'image' ? route.abort() : route.continue()); await page.reload(); await wait('on'); await choices().nth(0).click(); check(await rom.getAttribute('data-screen') === 'about', 'Missing art does not block navigation'); await page.unroute('**/*crt-main-background*');
   check(issues.length === 0, `Runtime errors: ${issues.join(', ')}`);
-  return { heroOrder, projectDetails:4, toolkitCategories:5, controllerHitboxes:11, resetStates:states, runtimeErrors:issues, passed:['single cartridge','no swapping/readable view','keyboard/mouse/controller','EN/RU','powered ROM reset without line','power line/collapse','scanlines','reduced motion','minimal mobile fallback','no overflow','asset failure','readable hints clear of controls','three-pose hero clear of menu','slow star pulses','no decorative CRT HUD'] };
+  return { heroOrder, cloudSpeeds, projectDetails:4, toolkitCategories:5, controllerHitboxes:11, resetStates:states, runtimeErrors:issues, passed:['single cartridge','no swapping/readable view','keyboard/mouse/controller','EN/RU','powered ROM reset without line','power line/collapse','scanlines','reduced motion','minimal mobile fallback','no overflow','asset failure','readable hints clear of controls','three-pose hero clear of menu','slow star pulses','no decorative CRT HUD'] };
 }

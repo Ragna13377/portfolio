@@ -73,6 +73,21 @@ export default function PortfolioPage() {
       );
       if (artboard.current) {
         artboard.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        // Keep the hint's curved arrow just left of the projected controller.
+        // Coordinates refer to the same 1600 × 900 hardware composition.
+        const controllerLeft =
+          (window.innerWidth - 1600 * scale) / 2 + 368 * scale;
+        const controllerTop =
+          (window.innerHeight - 900 * scale) / 2 + 730 * scale;
+        const scene = artboard.current.parentElement;
+        scene?.style.setProperty(
+          '--hint-x',
+          `${Math.max(16, controllerLeft - 156)}px`,
+        );
+        scene?.style.setProperty(
+          '--hint-y',
+          `${Math.max(16, controllerTop - 170)}px`,
+        );
       }
     };
     const resize = () => {

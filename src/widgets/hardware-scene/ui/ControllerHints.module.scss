@@ -1,11 +1,9 @@
-.hints { position: absolute; z-index: 6; left: 6vw; top: 60%; width: clamp(180px, 14vw, 240px); padding: 8px 0; color: #ddd8cd; font: clamp(14px, .85vw, 16px)/1.45 Arial, sans-serif; text-shadow: 0 1px 5px #000b; isolation: isolate; }
-.hints::before { content: ''; position: absolute; inset: -16px -22px; z-index: -1; background: #030b1866; backdrop-filter: blur(5px); mask-image: radial-gradient(ellipse, #000 25%, transparent 72%); pointer-events: none; }
-.title { margin: 0 0 10px; font-size: .9em; font-weight: 400; letter-spacing: .06em; color: #bab9b1; }
-.hints dl { margin: 0; display: grid; gap: 7px; }
-.hints dl > div { display: flex; justify-content: space-between; gap: 10px; }
-.hints dt { white-space: nowrap; font-weight: 500; }
-.hints dt span { color: #aeb6bd; font-size: .85em; font-weight: 400; }
-.hints dd { margin: 0; color: #d0c7b8; }
-.arrow { position: absolute; right: -20%; top: calc(100% + 8px); width: clamp(65px, 5vw, 90px); height: auto; color: #ede8de; opacity: .75; filter: drop-shadow(0 2px 4px #000); pointer-events: none; }
-@media (max-width: 1100px) { .hints { left: 18px; width: 175px; top: 57%; } .hints dl > div { gap: 6px; } .arrow { top: 70%; right: -8%; width: 45px; transform: scaleY(-1); } }
-@media (max-height: 600px) { .hints { top: 38%; } .hints dl { gap: 5px; } .arrow { width: 55px; } }
+.hints { position: absolute; z-index: 6; left: var(--hint-x); top: var(--hint-y); width: 145px; padding: 4px 0; color: #c5c2b8; font: clamp(10px, .65vw, 13px)/1.4 Arial, sans-serif; text-shadow: 0 1px 4px #0009; isolation: isolate; }
+.hints::before { content: ''; position: absolute; inset: -12px -16px; z-index: -1; background: #030b1844; backdrop-filter: blur(3px); mask-image: radial-gradient(ellipse, #000 20%, transparent 72%); pointer-events: none; }
+.title { margin: 0 0 7px; font-size: .9em; font-weight: 400; letter-spacing: .03em; color: #a6aaa7; }
+.hints dl { margin: 0; display: grid; grid-template-columns: max-content max-content; gap: 5px 10px; }
+.hints dl > div { display: contents; }
+.hints dt { white-space: nowrap; font-weight: 400; }
+.hints dt span { color: #9ca8b0; font-size: .9em; }
+.hints dd { margin: 0; color: #bdb8ae; }
+.arrow { position: absolute; right: -20px; top: calc(100% - 2px); width: 80px; height: auto; color: #e0dcd3; opacity: .55; filter: drop-shadow(0 1px 3px #000); pointer-events: none; }

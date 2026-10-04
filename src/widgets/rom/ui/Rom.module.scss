@@ -31,8 +31,14 @@
 @keyframes heroFirst { 0%, 100% { opacity: 1; } 33.333% { opacity: 0; } }
 @keyframes heroThird { 0%, 66.666%, 100% { opacity: 0; } 33.333% { opacity: 1; } }
 @keyframes heroFourth { 0%, 100% { opacity: 0; } 66.666% { opacity: 1; } }
-.rom .clouds { position: absolute; left: 0; right: 0; top: 61%; height: 20%; pointer-events: none; background-repeat: repeat-x; background-size: 734px auto; opacity: .28; animation: cloudDrift 110s linear infinite; }
-@keyframes cloudDrift { to { background-position-x: -734px; } }
+.rom .clouds { position: absolute; left: 0; right: 0; overflow: hidden; pointer-events: none; z-index: 0; mask-image: linear-gradient(90deg, transparent 34%, #000 64%); animation: cloudBob 7s ease-in-out infinite; }
+.clouds[data-cloud-layer='mid'] { top: 43%; height: 29%; opacity: .22; --cloud-span: 734px; --cloud-duration: 300s; --cloud-delay: -80s; }
+.clouds[data-cloud-layer='near'] { top: 64%; height: 33%; opacity: .24; --cloud-span: 900px; --cloud-duration: 240s; --cloud-delay: -130s; animation-delay: -2s; }
+.clouds[data-cloud-layer='foreground'] { top: 83%; height: 24%; opacity: .35; --cloud-span: 1060px; --cloud-duration: 200s; --cloud-delay: -55s; animation-delay: -4s; }
+.cloudTrack { position: absolute; top: 0; bottom: 0; left: calc(-1 * var(--cloud-span)); width: calc(var(--cloud-span) * 2); background-repeat: repeat-x; background-size: var(--cloud-span) auto; background-position: left center; animation: cloudDrift var(--cloud-duration) linear infinite; animation-delay: var(--cloud-delay); }
+@keyframes cloudDrift { to { transform: translateX(var(--cloud-span)); } }
+@keyframes cloudBob { 50% { transform: translateY(-3px); } }
+.rom[data-screen='main'] nav, .gameTitle { z-index: 2; }
 .rom .island { position: absolute; right: 3%; bottom: 2%; width: 17%; pointer-events: none; animation: islandFloat 7s ease-in-out infinite; img { display: block; width: 100%; } }
 @keyframes islandFloat { 50% { transform: translateY(-7px); } }
 @keyframes heroBreathe { 50% { transform: scaleY(.985) rotate(.4deg); } }
