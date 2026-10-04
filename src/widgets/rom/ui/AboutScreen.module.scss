@@ -1,4 +1,9 @@
-.scene { position: relative; height: 338px; isolation: isolate; }
+.sky.sky { position: absolute; inset: 0 0 auto; height: 150px; overflow: hidden; pointer-events: none; z-index: 0; mask-image: linear-gradient(#000 72%, transparent); }
+.cloudsNear,.cloudsMid { position: absolute; left: 0; width: 200%; background-repeat: repeat-x; background-size: 50% 100%; will-change: transform; animation: cloudDrift linear infinite; }
+.cloudsNear { top: -72px; height: 244px; opacity: .28; animation-duration: 100s; animation-delay: -37s; }
+.cloudsMid { top: -68px; height: 220px; opacity: .45; animation-duration: 65s; animation-delay: -15s; }
+.heading { z-index: 2; }
+.scene { position: relative; z-index: 1; height: 338px; isolation: isolate; }
 .hero { position: absolute; left: 22px; bottom: 18px; width: 142px; height: 164px; filter: drop-shadow(0 4px 2px #0b173588);
   img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; transform: translateY(12px); opacity: 0; animation: talkPose 2.45s steps(1, end) calc(var(--pose) * .35s) infinite; }
 }
@@ -22,8 +27,9 @@
 .settledLines { display: block; }
 .revealingLine { position: absolute; inset: 0; pointer-events: none; animation: lineAppear 200ms ease-out both; }
 .end { position: absolute; bottom: 7px; right: 30px; font: 24px Tiny5, monospace; color: inherit; }
-.footer { display: flex; align-items: center; padding-top: 8px; transform: translate(16px, -10px); }
+.footer { display: flex; align-items: center; z-index: 1; padding-top: 8px; transform: translate(16px, -10px); }
+@keyframes cloudDrift { from { transform: translateX(-50%); } to { transform: translateX(0); } }
 @keyframes dialogueOpen { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
 @keyframes lineAppear { from { opacity: 0; } to { opacity: 1; } }
 @keyframes talkPose { 0%, 14.2857% { opacity: 1; } 14.2858%, 100% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .dialogue { animation: none; } .dialogueBody li { transition: none; transform: none; } .hero img { animation: none; } .hero img:first-child { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .cloudsNear,.cloudsMid { animation: none; will-change: auto; } .dialogue { animation: none; } .dialogueBody li { transition: none; transform: none; } .hero img { animation: none; } .hero img:first-child { opacity: 1; } }

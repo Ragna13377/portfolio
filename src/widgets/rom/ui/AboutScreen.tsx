@@ -14,6 +14,8 @@ import talkFourth from '../../../assets/about_sprites/talk_4.webp';
 import talkFifth from '../../../assets/about_sprites/talk_5.webp';
 import talkSixth from '../../../assets/about_sprites/talk_6.webp';
 import talkSeventh from '../../../assets/about_sprites/talk_7.webp';
+import cloudsMid from '../../../assets/clouds-mid.webp';
+import cloudsNear from '../../../assets/clouds-near.webp';
 import { useMediaQuery } from '../../../shared/lib/media-query';
 import { RomBackButton } from '../../../shared/ui/rom-back-button';
 import styles from './AboutScreen.module.scss';
@@ -155,7 +157,19 @@ export default function AboutScreen({
 
   return (
     <>
-      <h2 tabIndex={-1}>{t('common:menu.about')}</h2>
+      <div className={styles.sky} aria-hidden="true" data-about-clouds>
+        <div
+          className={styles.cloudsNear}
+          style={{ backgroundImage: `url(${cloudsNear})` }}
+        />
+        <div
+          className={styles.cloudsMid}
+          style={{ backgroundImage: `url(${cloudsMid})` }}
+        />
+      </div>
+      <h2 className={styles.heading} tabIndex={-1}>
+        {t('common:menu.about')}
+      </h2>
       <div className={styles.scene} data-about-scene>
         <div className={styles.hero} aria-hidden="true">
           {talkFrames.map((src, index) => (
