@@ -1,7 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { TOOLKIT_COLLECTIBLES } from '../../../entities/toolkit';
 import { takeRandomPending } from './toolkitCollection';
-import { advancePickup, overlapsHero, type Pickup } from './toolkitPhysics';
+import {
+  advancePickup,
+  HERO_WIDTH,
+  overlapsHero,
+  type Pickup,
+} from './toolkitPhysics';
 
 export type ToolkitMovement = {
   move: (direction: -1 | 1, held?: boolean) => void;
@@ -63,7 +68,11 @@ export function useToolkitScene(
       elapsed += dt;
       const direction =
         now < movement.current.until ? movement.current.direction : 0;
-      heroX = Math.max(9, Math.min(91, heroX + direction * 42 * dt));
+      const heroInset = HERO_WIDTH / 2 + 0.5;
+      heroX = Math.max(
+        heroInset,
+        Math.min(100 - heroInset, heroX + direction * 42 * dt),
+      );
       if (direction) facing = direction;
       if (hero.current) {
         hero.current.style.left = `${heroX}%`;

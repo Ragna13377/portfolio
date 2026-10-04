@@ -1089,7 +1089,7 @@ test('Toolkit pauses spawning at three pickups and resumes when they are collect
         container.querySelectorAll<HTMLElement>('[data-pickup]:not([hidden])'),
       );
     expect(active()).toHaveLength(3);
-    expect(active().every((node) => node.style.top === '74%')).toBe(true);
+    expect(active().every((node) => node.style.top === '75.5%')).toBe(true);
     const ids = active().map((node) => node.dataset.pickup);
     await act(async () => vi.advanceTimersByTime(20000));
     expect(active().map((node) => node.dataset.pickup)).toEqual(ids);

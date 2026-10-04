@@ -21,6 +21,7 @@ import {
   type ToolkitCollectible,
 } from '../../../entities/toolkit';
 import { RomBackButton } from '../../../shared/ui/rom-back-button';
+import { HERO_HEIGHT, HERO_WIDTH, TILE_HEIGHT } from '../model/toolkitPhysics';
 import {
   type ToolkitMovement,
   useToolkitScene,
@@ -84,7 +85,19 @@ export default function ToolkitScreen({
         <h2 tabIndex={-1}>{t('common:menu.toolkit')}</h2>
       </header>
       <div className={styles.scene}>
-        <div className={styles.playfield} role="img" aria-label={t('scene')}>
+        <div
+          className={styles.playfield}
+          role="img"
+          aria-label={t('scene')}
+          style={
+            {
+              '--hero-width': `${HERO_WIDTH}%`,
+              '--hero-height': `${HERO_HEIGHT}%`,
+              '--tile-height': `${TILE_HEIGHT}%`,
+              '--tile-size': `${TILE_HEIGHT}cqh`,
+            } as CSSProperties
+          }
+        >
           {TOOLKIT_COLLECTIBLES.map((item, index) => (
             <div
               key={item.id}

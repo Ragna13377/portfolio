@@ -1,7 +1,8 @@
 // Positions use percentages of the playfield. The artwork's platform is at 79%.
 export const FLOOR = 79;
-export const HERO_HEIGHT = 24;
-export const TILE_HEIGHT = 10;
+export const HERO_HEIGHT = 30;
+export const HERO_WIDTH = 23;
+export const TILE_HEIGHT = 7;
 export type Pickup = {
   index: number;
   x: number;
@@ -30,7 +31,7 @@ export function advancePickup(item: Pickup, dt: number) {
 
 export function overlapsHero(item: Pickup, heroX: number) {
   return (
-    Math.abs(item.x - heroX) < 9 &&
+    Math.abs(item.x - heroX) < HERO_WIDTH / 2 &&
     item.y + TILE_HEIGHT / 2 > FLOOR - HERO_HEIGHT + 3 &&
     item.y - TILE_HEIGHT / 2 < FLOOR
   );
