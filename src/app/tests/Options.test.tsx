@@ -203,10 +203,12 @@ test('O during boot, modified O, prevented/composing events and editable/unrelat
   expect(heading()).toBe('OPTIONS');
 });
 
-test('O works on a focused native Contact link without hijacking its other shortcuts', async () => {
+test('O works on a focused native Contact copy button without hijacking its other shortcuts', async () => {
   await boot();
   await clickChoice(3);
-  const link = container.querySelector('a') as HTMLAnchorElement;
+  const link = container.querySelector(
+    '[aria-label="Copy Telegram handle"]',
+  ) as HTMLButtonElement;
   await act(async () => link.focus());
   expect((await press('Enter', link)).defaultPrevented).toBe(false);
   await press('O', link);
@@ -468,14 +470,14 @@ test('all portfolio namespaces translate through Options while project IDs, tech
   await back();
   expect(heading()).toBe('КОНТАКТЫ');
   expect(container.textContent).toContain('ПОЧТА');
-  expect(container.textContent).toContain('Открыть');
+  expect(container.textContent).not.toContain('Открыть');
   expect(container.textContent).toContain('Копировать');
   for (const literal of [
     '@vedal988',
     'Ragna13377',
     'koseki.bijou987@gmail.com',
   ])
-    expect(container.textContent).toContain(literal);
+    expect(container.textContent).not.toContain(literal);
   expect(Array.from(container.querySelectorAll('a'), (a) => a.href)).toEqual(
     links,
   );

@@ -1,10 +1,7 @@
 {
   "channels": "Способы связи",
   "telegram": "ТЕЛЕГРАМ",
-  "github": "GITHUB",
   "email": "ПОЧТА",
-  "openTelegram": "Открыть Telegram",
-  "openGithub": "Открыть GitHub",
   "copyTelegram": "Копировать имя в Telegram",
   "copyEmail": "Копировать адрес почты"
 }

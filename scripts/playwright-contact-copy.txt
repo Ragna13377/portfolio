@@ -1,0 +1,30 @@
+async (page) => {
+  const check = (condition, message) => { if (!condition) throw new Error(message); };
+  await page.setViewportSize({width: 1600, height: 900});
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  for (const locale of ['en', 'ru']) {
+    await page.evaluate(locale => localStorage.setItem('portfolio-locale', locale), locale);
+    await page.reload();
+    await page.locator('[data-screen="main"]').waitFor();
+    await page.locator('[data-hardware="crt"] nav button').nth(3).click();
+    const screen = page.locator('[data-screen="contact"]');
+    const rows = screen.locator('ul > li');
+    check(await rows.count() === 2, 'Two channels');
+    check(await screen.locator('a').count() === 0, 'No Open links');
+    const text = await screen.textContent();
+    for (const value of ['@vedal988', 'koseki.bijou987@gmail.com', 'Ragna13377', 'GITHUB']) check(!text.includes(value), 'No exposed contact identity');
+    for (const [index, value] of ['@vedal988', 'koseki.bijou987@gmail.com'].entries()) {
+      const button = rows.nth(index).getByRole('button');
+      await button.focus();
+      await page.keyboard.press('Enter');
+      await screen.getByRole('status').filter({hasText: locale === 'ru' ? 'СКОПИРОВАНО!' : 'COPIED!'}).waitFor();
+      check(await page.evaluate(() => navigator.clipboard.readText()) === value, 'Exact copied value');
+    }
+    await page.screenshot({path: `output/playwright/contact-${locale}.png`});
+    await page.keyboard.press('Tab');
+    check(await screen.locator('[data-rom-back]').evaluate(el => document.activeElement === el), 'Tab reaches Back');
+    await page.keyboard.press('Enter');
+    await page.locator('[data-screen="main"]').waitFor();
+  }
+  return 'Contact EN/RU: hidden identities, two native copy actions, actual clipboard, keyboard and Back passed';
+}

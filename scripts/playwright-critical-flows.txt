@@ -68,7 +68,7 @@ async (page) => {
   await back(); await choices().nth(0).click(); check(await crt.locator('h2').textContent() === 'ABOUT', 'About'); await back();
   await choices().nth(2).click();
   for(let i=0;i<5;i++) { await choices().nth(i).click(); check(await crt.locator('[aria-label="Technologies"] li').count() > 0, 'Toolkit'); }
-  await back(); await choices().nth(3).click(); check(await crt.locator('a').count() === 2, 'Contact'); await back();
+  await back(); await choices().nth(3).click(); check(await crt.locator('a').count() === 0 && await crt.getByRole('button', {name: /^Copy /}).count() === 2, 'Contact has only two copy actions'); await back();
   await page.locator('[data-controller-input="start"]').click();
   await choices().nth(1).click(); check(await crt.locator('h2').textContent() === 'CONTROLS', 'Options controls'); await back();
   await choices().nth(0).click(); await choices().nth(1).click();

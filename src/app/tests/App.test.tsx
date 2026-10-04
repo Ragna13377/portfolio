@@ -246,40 +246,28 @@ function stubClipboard(writeText = vi.fn().mockResolvedValue(undefined)) {
   return writeText;
 }
 
-test('Contact has exactly three visible channels and only the required native actions', async () => {
+test('Contact shows two copy-only channels without exposing handles or addresses', async () => {
   await openContact();
   expect(document.activeElement).toBe(container.querySelector('h2'));
   const channels = container.querySelectorAll(
     '[aria-label="Contact channels"] > li',
   );
-  expect(channels).toHaveLength(3);
-  for (const [index, label, value, links, buttons] of [
-    [0, 'TELEGRAM', '@vedal988', 1, 1],
-    [1, 'GITHUB', 'Ragna13377', 1, 0],
-    [2, 'EMAIL', 'koseki.bijou987@gmail.com', 0, 1],
-  ] as const) {
+  expect(channels).toHaveLength(2);
+  for (const [index, label] of ['TELEGRAM', 'EMAIL'].entries()) {
     const row = channels[index];
     expect(row.querySelector('h3')?.textContent).toBe(label);
-    expect(row.querySelector('p')?.textContent).toBe(value);
-    expect(row.querySelectorAll('a')).toHaveLength(links);
-    expect(row.querySelectorAll('button')).toHaveLength(buttons);
-    expect(row.querySelector('a')?.textContent).toBe(
-      links ? 'Open' : undefined,
-    );
-    expect(row.querySelector('button')?.textContent).toBe(
-      buttons ? 'Copy' : undefined,
-    );
+    expect(row.querySelectorAll('button')).toHaveLength(1);
+    expect(row.querySelector('button')?.textContent).toBe('Copy');
   }
-  const links = container.querySelectorAll('a');
-  expect(Array.from(links, (link) => link.getAttribute('href'))).toEqual([
-    'https://t.me/vedal988',
-    'https://github.com/Ragna13377',
-  ]);
-  for (const link of links) {
-    expect(link.target).toBe('_blank');
-    expect(link.rel.split(' ')).toEqual(
-      expect.arrayContaining(['noopener', 'noreferrer']),
-    );
+  expect(container.querySelectorAll('a')).toHaveLength(0);
+  for (const value of [
+    '@vedal988',
+    'Ragna13377',
+    'koseki.bijou987@gmail.com',
+    'GITHUB',
+    'Open',
+  ]) {
+    expect(container.textContent).not.toContain(value);
   }
 });
 
@@ -382,7 +370,7 @@ test.each(['Escape', 'Backspace', 'button'])(
     await act(async () => {
       if (method === 'button')
         container.querySelector<HTMLButtonElement>('[data-rom-back]')?.click();
-      else press(method, container.querySelector('a') as HTMLAnchorElement);
+      else press(method, copyButton('Telegram'));
     });
     expect(selected()).toBe('▶CONTACT');
     expect(document.activeElement).toBe(
@@ -394,7 +382,7 @@ test.each(['Escape', 'Backspace', 'button'])(
   },
 );
 
-test('Contact native links, Copy and Back keep activation and Tab without ROM double dispatch', async () => {
+test('Contact Copy and Back keep activation and Tab without ROM double dispatch', async () => {
   const writeText = stubClipboard();
   await openContact();
   for (const control of container.querySelectorAll<HTMLElement>('a, button')) {
