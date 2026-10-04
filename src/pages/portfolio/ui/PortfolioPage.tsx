@@ -80,13 +80,17 @@ export default function PortfolioPage() {
         const controllerTop =
           (window.innerHeight - 900 * scale) / 2 + 730 * scale;
         const scene = artboard.current.parentElement;
+        scene?.style.setProperty('--scene-scale', String(scale));
+        // Match the hint's clamped font size so its text and arrow keep their
+        // distance from the controller at both small and high resolutions.
+        const hintScale = Math.max(12, Math.min(56, 14 * scale)) / 14;
         scene?.style.setProperty(
           '--hint-x',
-          `${Math.max(16, controllerLeft - 172)}px`,
+          `${Math.max(16, controllerLeft - 232 * hintScale)}px`,
         );
         scene?.style.setProperty(
           '--hint-y',
-          `${Math.max(16, controllerTop - 186)}px`,
+          `${Math.max(16, controllerTop - 260 * hintScale)}px`,
         );
       }
     };
