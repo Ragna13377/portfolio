@@ -234,7 +234,14 @@ test('Options contains only Language/Controls, wraps with arrows and W/S, activa
     ['s', 1],
     ['w', 0],
   ] as const) {
+    if (index === 1 && ['ArrowUp', 'W'].includes(key)) {
+      await press(key);
+      expect(document.activeElement).toBe(
+        container.querySelector('[data-rom-back]'),
+      );
+    }
     await press(key);
+    if (document.activeElement?.hasAttribute('data-rom-back')) await press(key);
     expect(selectedIndex()).toBe(index);
     expectFocus(index);
   }
@@ -288,7 +295,14 @@ test('Language tracks active locale separately from cursor, changes immediately,
     ['S', 0],
     ['s', 1],
   ] as const) {
+    if (index === 1 && ['ArrowUp', 'W'].includes(key)) {
+      await press(key);
+      expect(document.activeElement).toBe(
+        container.querySelector('[data-rom-back]'),
+      );
+    }
     await press(key);
+    if (document.activeElement?.hasAttribute('data-rom-back')) await press(key);
     expectFocus(index);
   }
   expect(choices()[0].getAttribute('aria-pressed')).toBe('true');

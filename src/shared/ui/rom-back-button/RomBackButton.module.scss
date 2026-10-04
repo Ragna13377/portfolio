@@ -1,0 +1,4 @@
+.button.button { display: inline-flex; align-items: center; padding: 7px 12px 7px 4px; border: 1px solid transparent; background: transparent; font: 26px/1.25 Tiny5,monospace; letter-spacing: .7px; color: #e7cb9e; text-decoration: none;
+  &::before { content: '◀'; width: 18px; margin-right: 16px; opacity: .45; }
+  &:hover, &:focus-visible, &[data-rom-selected] { color: #fff1bf; background: linear-gradient(90deg,#a66c3a80,#49362b33); box-shadow: inset 3px 0 #e3d080; outline: none; border-color: transparent; &::before { opacity: 1; } }
+}

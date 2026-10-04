@@ -388,7 +388,7 @@ test('Contact Copy and Back keep activation and Tab without ROM double dispatch'
   for (const control of container.querySelectorAll<HTMLElement>('a, button')) {
     await act(async () => {
       control.focus();
-      for (const key of ['Enter', ' ', 'Tab', 'ArrowDown', 'ArrowUp']) {
+      for (const key of ['Enter', ' ', 'Tab']) {
         expect(press(key, control).defaultPrevented).toBe(false);
       }
     });
@@ -607,6 +607,17 @@ test('keyboard Projects flow wraps, restores selection/focus and preserves hardw
     ['ArrowDown', 0],
     ['w', 3],
   ] as const) {
+    if (
+      (index === 3 && ['ArrowUp', 'W', 'w'].includes(key)) ||
+      (index === 0 &&
+        ['ArrowDown', 'S'].includes(key) &&
+        selected()?.includes(projectCases[3].label))
+    ) {
+      await act(async () => press(key));
+      expect(document.activeElement).toBe(
+        container.querySelector('[data-rom-back]'),
+      );
+    }
     await act(async () => press(key));
     expect(selected()).toBe(`▶${projectCases[index].label}`);
     expect(document.activeElement).toBe(
@@ -617,11 +628,13 @@ test('keyboard Projects flow wraps, restores selection/focus and preserves hardw
   expect(container.querySelector('h2')?.textContent).toBe('REAL-TIME PLATFORM');
   expect(document.activeElement).toBe(container.querySelector('h2'));
   assertHardware();
-  // Direction/confirm keys cannot create a nested detail screen or change project.
+  // Direction keys select the shared Back action without changing the project.
   await act(async () => {
     press('ArrowDown');
-    press('Enter');
   });
+  expect(document.activeElement).toBe(
+    container.querySelector('[data-rom-back]'),
+  );
   expect(container.querySelectorAll('h2')).toHaveLength(1);
   expect(container.querySelector('h2')?.textContent).toBe('REAL-TIME PLATFORM');
   await act(async () => press('Backspace'));
@@ -838,6 +851,17 @@ test('Toolkit keyboard categories wrap, update contents, restore focus and prese
     ['ArrowDown', 0],
     ['w', 4],
   ] as const) {
+    if (
+      (index === 4 && ['ArrowUp', 'W', 'w'].includes(key)) ||
+      (index === 0 &&
+        ['ArrowDown', 'S'].includes(key) &&
+        selected()?.includes(toolkitCases[4].label))
+    ) {
+      await act(async () => press(key, document.activeElement as HTMLElement));
+      expect(document.activeElement).toBe(
+        container.querySelector('[data-rom-back]'),
+      );
+    }
     await act(async () => press(key, document.activeElement as HTMLElement));
     assertToolkit(index);
     assertHardware();
@@ -947,4 +971,27 @@ test('Toolkit keyboard safeguards protect unrelated controls and modified events
   } finally {
     for (const control of controls) control.remove();
   }
+});
+
+test('Contact arrows select both copy actions and Back, and confirmation copies the selected channel', async () => {
+  const writeText = stubClipboard();
+  await openContact();
+  await act(async () => press('ArrowDown'));
+  expect(document.activeElement).toBe(copyButton('Telegram'));
+  await act(async () => press('Enter'));
+  expect(writeText).toHaveBeenLastCalledWith('@vedal988');
+  await act(async () => press('ArrowDown'));
+  expect(document.activeElement).toBe(copyButton('email'));
+  await act(async () => press('Enter'));
+  expect(writeText).toHaveBeenLastCalledWith('koseki.bijou987@gmail.com');
+  await act(async () => press('ArrowDown'));
+  const back = container.querySelector<HTMLButtonElement>('[data-rom-back]');
+  expect(document.activeElement).toBe(back);
+  expect(back?.hasAttribute('data-rom-selected')).toBe(true);
+  await act(async () => press('ArrowDown'));
+  expect(document.activeElement).toBe(copyButton('Telegram'));
+  await act(async () => press('ArrowUp'));
+  expect(document.activeElement).toBe(back);
+  await act(async () => back?.click());
+  expect(selected()).toBe('▶CONTACT');
 });

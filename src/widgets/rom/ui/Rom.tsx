@@ -56,9 +56,19 @@ export default function Rom({
   const [state, dispatch] = useReducer(romReducer, initialRomState);
   const [playerOffset, setPlayerOffset] = useState(0);
   const content = useRef<HTMLDivElement>(null);
+  const actionScreen = useRef(state.screen);
+  const selectedAction = useRef<HTMLButtonElement | null>(null);
   const project = PROJECTS[state.selectedProjectIndex];
   const selectedKey = selectionKey(state.screen);
   const selectedIndex = selectedKey ? state[selectedKey] : undefined;
+
+  const markAction = useCallback((button: HTMLButtonElement | null) => {
+    content.current?.querySelectorAll('[data-rom-selected]').forEach((item) => {
+      item.removeAttribute('data-rom-selected');
+    });
+    selectedAction.current = button;
+    button?.setAttribute('data-rom-selected', '');
+  }, []);
 
   useEffect(() => {
     void preloadTheme(cartridgeId);
@@ -75,6 +85,10 @@ export default function Rom({
   }, [state.screen, onBootComplete]);
 
   useEffect(() => {
+    if (actionScreen.current !== state.screen) {
+      actionScreen.current = state.screen;
+      markAction(null);
+    }
     // Hardware keeps native focus across navigation, locale changes and power cycles.
     if (
       !inputEnabled ||
@@ -92,7 +106,7 @@ export default function Rom({
         ?.querySelector<HTMLHeadingElement>('h2')
         ?.focus({ preventScroll: true });
     }
-  }, [state.screen, selectedIndex, inputEnabled]);
+  }, [state.screen, selectedIndex, inputEnabled, markAction]);
 
   const changeLocale = useCallback(
     (locale: Locale) => {
@@ -142,14 +156,49 @@ export default function Rom({
               ),
             );
           }
-          if (input.direction === 'up' || input.direction === 'down')
-            dispatch({
-              type: 'move',
-              direction: input.direction === 'up' ? -1 : 1,
-            });
+          if (input.direction === 'up' || input.direction === 'down') {
+            const buttons = Array.from(
+              content.current?.querySelectorAll<HTMLButtonElement>(
+                'button:not(:disabled)',
+              ) ?? [],
+            );
+            if (!buttons.length) return;
+            const current =
+              selectedAction.current && buttons.includes(selectedAction.current)
+                ? buttons.indexOf(selectedAction.current)
+                : (selectedIndex ?? -1);
+            const direction = input.direction === 'up' ? -1 : 1;
+            const next =
+              current === -1
+                ? direction === 1
+                  ? 0
+                  : buttons.length - 1
+                : (current + direction + buttons.length) % buttons.length;
+            const button = buttons[next];
+            markAction(button);
+            const menuIndex = Array.from(
+              content.current?.querySelectorAll('nav button') ?? [],
+            ).indexOf(button);
+            if (menuIndex >= 0) dispatch({ type: 'select', index: menuIndex });
+            if (
+              !document.activeElement?.closest(
+                '[data-hardware="controller"], [data-console-control]',
+              )
+            )
+              button.focus({ preventScroll: true });
+          }
           return;
         case 'confirm':
-          activate();
+          if (
+            selectedAction.current &&
+            content.current?.contains(selectedAction.current)
+          )
+            selectedAction.current.click();
+          else if (selectedIndex === undefined)
+            content.current
+              ?.querySelector<HTMLButtonElement>('button')
+              ?.click();
+          else activate();
           return;
         case 'back':
           dispatch({ type: 'back' });
@@ -161,7 +210,7 @@ export default function Rom({
           return;
       }
     },
-    [state.screen, activate, inputEnabled],
+    [state.screen, selectedIndex, activate, inputEnabled, markAction],
   );
 
   useImperativeHandle(
@@ -214,11 +263,6 @@ export default function Rom({
           return;
       }
 
-      if (
-        state.screen === 'contact' &&
-        ['arrowup', 'arrowdown', 'w', 's'].includes(key)
-      )
-        return;
       if (key === 'o') {
         if (state.screen === 'boot' || isOptionsScreen(state.screen)) return;
         event.preventDefault();
@@ -295,6 +339,9 @@ export default function Rom({
       style={{ backgroundImage: `url("${themeAssetUrl(cartridgeId)}")` }}
       className={`${styles.rom} ${state.screen === 'about' ? styles.about : ''} ${state.screen === 'projectDetail' ? styles.detail : ''} ${state.screen === 'toolkit' ? styles.toolkit : ''} ${state.screen === 'contact' ? styles.contact : ''} ${state.screen === 'optionsControls' ? styles.controlsScreen : ''}`}
       ref={content}
+      onFocusCapture={(event) => {
+        if (event.target instanceof HTMLButtonElement) markAction(event.target);
+      }}
       onClickCapture={(event) => {
         if (!inputEnabled) {
           event.preventDefault();

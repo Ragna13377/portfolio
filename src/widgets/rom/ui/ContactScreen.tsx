@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CONTACT } from '../../../entities/contact';
+import { RomBackButton } from '../../../shared/ui/rom-back-button';
 import styles from './Rom.module.scss';
 
 type Props = { onBack: () => void };
@@ -59,9 +60,7 @@ export default function ContactScreen({ onBack }: Props) {
         </li>
       </ul>
       <div className={styles.contactFooter}>
-        <button type="button" data-rom-back onClick={onBack}>
-          {t('common:back')}
-        </button>
+        <RomBackButton onBack={onBack} />
         <span role="status">{copied ? t('common:copied') : ''}</span>
       </div>
     </>

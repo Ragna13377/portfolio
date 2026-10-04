@@ -1,0 +1,62 @@
+async (page) => {
+  const check = (condition, message) => { if (!condition) throw new Error(message); };
+  await page.setViewportSize({width:1600,height:900});
+  await page.context().grantPermissions(['clipboard-read','clipboard-write']);
+  await page.evaluate(() => localStorage.setItem('portfolio-locale','ru'));
+  await page.reload();
+  const screen = () => page.locator('[data-screen]');
+  const crt = page.locator('[data-hardware="crt"]');
+  const menu = () => crt.locator('nav button');
+  const back = () => crt.locator('[data-rom-back]');
+  const main = () => page.locator('[data-screen="main"]').waitFor();
+  const selected = () => crt.locator('button[data-rom-selected]');
+  await main();
+  await menu().nth(3).click();
+  for (const [index,value] of ['@vedal988','koseki.bijou987@gmail.com'].entries()) {
+    await page.keyboard.press('ArrowDown');
+    check(await selected().getAttribute('aria-label') === ['Копировать имя в Telegram','Копировать адрес почты'][index], 'Arrow selects correct copy action');
+    await page.keyboard.press('Enter');
+    await crt.getByRole('status').filter({hasText:'СКОПИРОВАНО!'}).waitFor();
+    check(await page.evaluate(() => navigator.clipboard.readText()) === value,'Keyboard copy');
+  }
+  await page.keyboard.press('ArrowDown');
+  check(await back().evaluate(el => document.activeElement === el && getComputedStyle(el).fontFamily.includes('Tiny5') && getComputedStyle(el).outlineStyle === 'none'),'Back selected, consistent font, no thin outline');
+  await page.screenshot({path:'output/playwright/contact-actions-ru.png'});
+  await page.keyboard.press('Enter'); await main();
+  for (const index of [0,1,2]) {
+    await menu().nth(index).click();
+    if (index === 1) { await menu().nth(0).click(); }
+    await page.keyboard.press('ArrowUp');
+    check(await back().evaluate(el => document.activeElement === el),'Back reachable on content screen');
+    await page.keyboard.press('Enter');
+    if (index === 1) {
+      check(await screen().getAttribute('data-screen') === 'projects','Project detail returns to list');
+      await page.keyboard.press('ArrowUp');
+      check(await back().evaluate(el => document.activeElement === el),'Project list includes Back');
+      await page.keyboard.press('Enter');
+    }
+    await main();
+  }
+  await page.keyboard.press('o');
+  await page.keyboard.press('ArrowUp');
+  check(await back().evaluate(el => document.activeElement === el),'Options includes Back');
+  await page.keyboard.press('ArrowUp'); await page.keyboard.press('Enter');
+  check(await screen().getAttribute('data-screen') === 'optionsControls','Controls');
+  await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
+  await menu().nth(0).click();
+  await page.keyboard.press('ArrowDown');
+  check(await back().evaluate(el => document.activeElement === el),'Language includes Back');
+  await page.keyboard.press('Enter'); await back().click(); await main();
+  // Hardware retains its native focus while the CRT independently tracks the chosen action.
+  await menu().nth(3).click();
+  for (const [index,value] of ['@vedal988','koseki.bijou987@gmail.com'].entries()) {
+    await page.locator('[data-controller-input="down"]').click();
+    check(await selected().getAttribute('aria-label') === ['Копировать имя в Telegram','Копировать адрес почты'][index],'D-pad selects correct copy action');
+    await page.locator('[data-controller-input="a"]').click();
+    check(await page.evaluate(() => navigator.clipboard.readText()) === value,'Controller copy');
+  }
+  await page.locator('[data-controller-input="down"]').click();
+  check(await back().getAttribute('data-rom-selected') !== null,'D-pad selects Back');
+  await page.locator('[data-controller-input="a"]').click(); await main();
+  return 'Keyboard and D-pad copy/back passed on Contact, About, project list/detail, Toolkit, Options, Controls and Language';
+}

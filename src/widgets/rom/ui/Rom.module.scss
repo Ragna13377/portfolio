@@ -12,7 +12,6 @@
     &:focus-visible { outline: 2px solid #f6db99; outline-offset: 3px; }
     &:hover { color: #fff1bf; }
   }
-  [data-rom-back] { border: 1px solid #c7a77766; padding: 5px 12px; font-size: 22px; color: #e7cb9e; background: #292d39bb; }
   &[data-screen='main'] { padding: 76px 50px; h1 { font-family: 'Courier New',monospace; font-size: 12px; margin: 12px 0 28px; letter-spacing: 2px; color: #d9c5ac; } nav { width: 245px; } nav button { width: 100%; padding-block: 8px; } }
   &:not([data-screen='main']):not([data-screen='boot']) { background-size: auto 115%; background-position: 82% center;
     &::before { background: linear-gradient(90deg,#252b36f5,#252b36ed 62%,#252b36be); }
@@ -59,7 +58,7 @@
 .channels { list-style: none; padding: 0; margin: 28px 0 0; width: 410px; max-width: 100%; display: grid; gap: 10px;
   li { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 12px 0; border-bottom: 1px solid #c7b29230; }
   h3 { margin: 0; font: normal 26px Tiny5,monospace; color: #edd1a6; letter-spacing: .7px; }
-  button { padding: 6px 0 6px 10px; font: 22px Tiny5,monospace; color: #c4b49b; text-decoration: underline; text-decoration-color: #c7a77755; text-underline-offset: 5px; &:hover { text-decoration-color: #fff1bf; } }
+  button { padding: 6px 0 6px 10px; font: 22px Tiny5,monospace; color: #c4b49b; text-decoration: underline; text-decoration-color: #c7a77755; text-underline-offset: 7px; &:hover { text-decoration-color: #fff1bf; } }
 }
 .contactFooter { display: flex; align-items: center; gap: 24px; margin-top: 28px; font-size: 15px; }
 .activeLocale { color: #f3d8a7; margin-left: 16px; width: 1ch; flex: 0 0 1ch; }
@@ -77,3 +76,6 @@
 .about p:nth-of-type(1) { border-left: 3px solid #dcaf71; padding-left: 13px; }
 .about { p:nth-of-type(4),p:nth-of-type(5) { line-height: 1.45; } }
 .rom[data-screen='projectDetail'] h2::after { display: block; margin-top: 7px; font: 10px 'Courier New',monospace; letter-spacing: 1px; color: #c4b69f; }
+
+.rom button[data-rom-selected]:not([data-rom-back]) { color: #fff1bf; background: linear-gradient(90deg,#a66c3a80,#49362b66); box-shadow: inset 3px 0 #e3d080; outline: none; }
+.rom:has(button[data-rom-selected]:not(nav button)) nav button[aria-current='true'] { background: transparent; border-color: transparent; box-shadow: none; color: inherit; .cursor { visibility: hidden; } }

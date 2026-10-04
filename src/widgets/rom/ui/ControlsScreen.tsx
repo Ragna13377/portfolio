@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { RomBackButton } from '../../../shared/ui/rom-back-button';
 import styles from './Rom.module.scss';
 
 export default function ControlsScreen({ onBack }: { onBack: () => void }) {
@@ -16,14 +17,7 @@ export default function ControlsScreen({ onBack }: { onBack: () => void }) {
           ),
         )}
       </dl>
-      <button
-        className={styles.back}
-        type="button"
-        data-rom-back
-        onClick={onBack}
-      >
-        {t('common:back')}
-      </button>
+      <RomBackButton onBack={onBack} className={styles.back} />
     </>
   );
 }

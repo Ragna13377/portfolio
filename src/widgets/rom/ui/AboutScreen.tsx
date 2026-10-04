@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { RomBackButton } from '../../../shared/ui/rom-back-button';
 
 type Props = { onBack: () => void };
 
@@ -12,9 +13,7 @@ export default function AboutScreen({ onBack }: Props) {
       <p>{t('education')}</p>
       <p>{t('work')}</p>
       <p>{t('interests')}</p>
-      <button type="button" data-rom-back onClick={() => onBack()}>
-        {t('common:back')}
-      </button>
+      <RomBackButton onBack={onBack} />
     </>
   );
 }

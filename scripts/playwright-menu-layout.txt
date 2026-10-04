@@ -24,7 +24,7 @@ async (page) => {
     check(await page.locator('[data-theme] h2').evaluate(el => document.activeElement === el && getComputedStyle(el).outlineStyle === 'none'), 'Controls heading is announced without a focus rectangle');
     await page.screenshot({path:`output/playwright/controls-heading-${locale}.png`});
     await page.keyboard.press('Tab');
-    check(await page.locator('[data-rom-back]').evaluate(el => document.activeElement === el && getComputedStyle(el).outlineStyle !== 'none'), 'Back retains its visible keyboard focus');
+    check(await page.locator('[data-rom-back]').evaluate(el => document.activeElement === el && getComputedStyle(el).boxShadow !== 'none'), 'Back retains its visible keyboard focus');
     await page.keyboard.press('Escape');
     await page.keyboard.press('ArrowUp');
     await page.keyboard.press('Enter');

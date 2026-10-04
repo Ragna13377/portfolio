@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { LOCALES, type Locale } from '../../../shared/config/i18n';
+import { RomBackButton } from '../../../shared/ui/rom-back-button';
 import styles from './Rom.module.scss';
 
 type Props = {
@@ -49,14 +50,7 @@ export default function LanguageScreen({
           ))}
         </ul>
       </nav>
-      <button
-        className={styles.back}
-        type="button"
-        data-rom-back
-        onClick={onBack}
-      >
-        {t('common:back')}
-      </button>
+      <RomBackButton onBack={onBack} className={styles.back} />
     </>
   );
 }

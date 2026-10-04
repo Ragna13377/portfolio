@@ -136,20 +136,30 @@ test('D-pad wraps Main selection and A/B follow Projects detail hierarchy', asyn
   await click('up');
   expect(selected()).toBe(3);
   await click('down');
+  if (container.querySelector('[data-rom-back][data-rom-selected]'))
+    await click('down');
   expect(selected()).toBe(0);
   await click('down');
   await click('a');
   expect(heading()).toBe('PROJECTS SELECT');
   await click('up');
+  expect(
+    container
+      .querySelector('[data-rom-back]')
+      ?.hasAttribute('data-rom-selected'),
+  ).toBe(true);
+  await click('up');
   expect(selected()).toBe(choices().length - 1);
   await click('down');
+  if (container.querySelector('[data-rom-back][data-rom-selected]'))
+    await click('down');
   expect(selected()).toBe(0);
   await click('down');
   const projectName = choices()[1].textContent?.replace('▶', '').trim();
   await click('a');
   expect(heading()).toBe(projectName);
   const detail = heading();
-  for (const control of ['a', 'up', 'down', 'left', 'right', 'c'])
+  for (const control of ['up', 'down', 'left', 'right', 'c'])
     await click(control);
   expect(heading()).toBe(detail);
   await click('b');
@@ -177,13 +187,14 @@ test.each([0, 1, 2, 3])(
       await click('up');
       expect(selected()).toBe(0);
       await click('up');
+      await click('up');
       expect(selected()).toBe(choices().length - 1);
     }
     const screen = container.querySelector(
       '[data-hardware="crt"]',
     )?.textContent;
     const selection = selected();
-    if (index !== 1) {
+    if (index === 2 || index === 3) {
       await click('a');
       expect(
         container.querySelector('[data-hardware="crt"]')?.textContent,
@@ -219,20 +230,28 @@ test('Options and Language share selection, confirmation, persistence and Back s
   await click('start');
   expect(heading()).toBe('OPTIONS');
   await click('up');
+  if (container.querySelector('[data-rom-back][data-rom-selected]'))
+    await click('up');
   expect(selected()).toBe(1);
   await click('a');
   expect(heading()).toBe('CONTROLS');
-  for (const control of ['a', 'up', 'down', 'start']) await click(control);
+  for (const control of ['up', 'down', 'start']) await click(control);
   expect(heading()).toBe('CONTROLS');
   await click('b');
   expect(heading()).toBe('OPTIONS');
   await click('down');
+  if (container.querySelector('[data-rom-back][data-rom-selected]'))
+    await click('down');
   expect(selected()).toBe(0);
   await click('a');
   expect(heading()).toBe('LANGUAGE');
   await click('up');
+  if (container.querySelector('[data-rom-back][data-rom-selected]'))
+    await click('up');
   expect(selected()).toBe(1);
   await click('down');
+  if (container.querySelector('[data-rom-back][data-rom-selected]'))
+    await click('down');
   expect(selected()).toBe(0);
   await click('down');
   expect(selected()).toBe(1);
