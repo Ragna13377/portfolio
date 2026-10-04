@@ -9,7 +9,7 @@
   "pickedUp": "Собрано",
   "pending": "Доступно для сбора",
   "complete": "СТЕК СОБРАН!",
-  "moveHint": "← → (A, D) — Движение",
+  "moveHint": "Движение",
   "backend": "БЭКЕНД",
   "milestone": "{{count}} НАВЫКОВ СОБРАНО!"
 }

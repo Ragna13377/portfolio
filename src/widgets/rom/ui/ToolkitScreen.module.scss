@@ -26,8 +26,13 @@
 }
 .check { font-size: 11px; }
 .footer.footer { position: absolute; left: 48px; right: 12px; top: 452.8px; height: 40px; z-index: 4; display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  > .hints { width: max-content; max-width: 234px; padding: 8px 10px; text-align: left; font-size: 14px; line-height: 1.6; color: #f6e7c5; background: #111c30ed; border: 1px solid #b4b9cc66; border-radius: 8px; }
+  > .hints { display: inline-flex; align-items: center; gap: 10px; width: max-content; max-width: 234px; padding: 6px 10px; text-align: left; font: 20px/1 Tiny5, monospace; color: #f6e7c5; background: #111c30ed; border: 1px solid #b4b9cc66; border-radius: 8px; }
 }
+.movementKeys { display: inline-flex; gap: 5px; }
+.movementKey { display: inline-grid; place-items: center; width: 26px; height: 26px; border: 2px solid #8795b1; border-radius: 50%; background: #293852;
+  svg { display: block; width: 18px; height: 20px; fill: currentColor; }
+}
+.rightArrow { transform: scaleX(-1); }
 .complete { position: absolute; top: 35%; left: 0; right: 0; text-align: center; color: #fff2c2; font: 28px Tiny5, monospace; text-shadow: 2px 3px #17284a; }
 @media (prefers-reduced-motion: reduce) { .trail { display: none; } .stack ul li { transition: none; } }
 

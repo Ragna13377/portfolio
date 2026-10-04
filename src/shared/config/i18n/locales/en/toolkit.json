@@ -9,7 +9,7 @@
   "pickedUp": "Collected",
   "pending": "Available to collect",
   "complete": "STACK COMPLETE!",
-  "moveHint": "← → (A, D) — Move",
+  "moveHint": "Move",
   "backend": "BACKEND",
   "milestone": "{{count}} SKILLS COLLECTED!"
 }

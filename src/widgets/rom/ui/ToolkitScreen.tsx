@@ -206,7 +206,24 @@ export default function ToolkitScreen({
       </div>
       <footer className={styles.footer}>
         <RomBackButton onBack={onBack} variant="game" />
-        <span className={styles.hints}>{t('moveHint')}</span>
+        <span className={styles.hints}>
+          <span className={styles.movementKeys} aria-hidden="true">
+            {['left', 'right'].map((direction) => (
+              <span className={styles.movementKey} key={direction}>
+                <svg
+                  viewBox="0 0 14 16"
+                  aria-hidden="true"
+                  className={
+                    direction === 'right' ? styles.rightArrow : undefined
+                  }
+                >
+                  <path d="M8 2H6v2H4v2H2v4h2v2h2v2h2v-4h4V6H8V2z" />
+                </svg>
+              </span>
+            ))}
+          </span>
+          {t('moveHint')}
+        </span>
       </footer>
     </>
   );
