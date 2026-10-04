@@ -1,6 +1,6 @@
 .scene { position: relative; height: 338px; isolation: isolate; }
 .hero { position: absolute; left: 22px; bottom: 18px; width: 142px; height: 164px; filter: drop-shadow(0 4px 2px #0b173588);
-  img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; transform: translateY(12px); opacity: 0; animation: talkPose 2s steps(1, end) calc(var(--pose) * .5s) infinite; }
+  img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; transform: translateY(12px); opacity: 0; animation: talkPose 3s steps(1, end) calc(var(--pose) * .75s) infinite; }
 }
 .dialogue { position: absolute; top: 28px; left: 190px; width: 400px; max-width: calc(100% - 200px); transform-origin: left bottom; animation: dialogueOpen 140ms ease-out both; }
 .tail { position: absolute; z-index: 1; left: -52px; bottom: 30px; width: 56px; height: 66px; overflow: visible;
@@ -24,7 +24,9 @@
 .back.back { display: inline-flex; align-items: center; gap: 10px; padding: 5px 12px 5px 6px; border: 2px solid currentColor; border-radius: 10px; background: #111932; color: #f6e7c5; font: 20px/1 Tiny5, monospace;
   &:hover, &:focus-visible, &[data-rom-selected] { background: #252d52; color: #f6e7c5; border-color: currentColor; box-shadow: none; outline: none; }
 }
-.keycap { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: 0 0 26px; border-radius: 50%; border: 2px solid #d95b64; background: #a52632; color: #fff3d4; text-shadow: 1px 1px #5c1019; box-shadow: 1px 2px #070e2a; font: 22px/1 Tiny5, monospace; }
+.keycap { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: 0 0 26px; border-radius: 50%; border: 2px solid #d95b64; background: #a52632; color: #fff3d4; box-shadow: 1px 2px #070e2a;
+  svg { display: block; width: 18px; height: 20px; fill: currentColor; }
+}
 @keyframes dialogueOpen { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
 @keyframes talkPose { 0%, 24.999% { opacity: 1; } 25%, 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .dialogue { animation: none; } .dialogueBody li { transition: none; transform: none; } .hero img { animation: none; } .hero img:first-child { opacity: 1; } }

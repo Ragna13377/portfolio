@@ -169,7 +169,12 @@ export default function AboutScreen({
           onClick={onBack}
         >
           <span className={styles.keycap} aria-hidden="true">
-            B
+            <svg viewBox="0 0 14 16" focusable="false" aria-hidden="true">
+              <path
+                fillRule="evenodd"
+                d="M3 2h6v2h2v3H9v2h2v3H9v2H3V2zm2 2v3h4V4H5zm0 5v3h4V9H5z"
+              />
+            </svg>
           </span>
           {t('common:back')}
         </button>
