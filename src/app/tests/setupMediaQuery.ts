@@ -1,12 +1,18 @@
 import { beforeEach } from 'vitest';
 
 let desktopInput = true;
+let reducedMotion = false;
+export function setReducedMotionPreference(available: boolean) {
+  reducedMotion = available;
+  window.dispatchEvent(new Event('resize'));
+}
 export function setDesktopInput(available: boolean) {
   desktopInput = available;
   window.dispatchEvent(new Event('resize'));
 }
 beforeEach(() => {
   desktopInput = true;
+  reducedMotion = false;
 });
 
 // jsdom does not implement matchMedia. Drive its change events from the same
@@ -14,6 +20,7 @@ beforeEach(() => {
 window.matchMedia = (query: string): MediaQueryList => {
   const target = new EventTarget();
   const readMatches = () => {
+    if (query.includes('prefers-reduced-motion')) return reducedMotion;
     const minimum = Number(query.match(/min-width:\s*(\d+)px/)?.[1] ?? 0);
     const landscape =
       !query.includes('orientation: landscape') ||

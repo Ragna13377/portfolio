@@ -1,5 +1,4 @@
 import { PROJECTS } from '../../../entities/project';
-import { TOOLKIT_CATEGORIES } from '../../../entities/toolkit';
 import { MENU } from '../../../shared/config/navigation';
 
 type PortfolioScreen =
@@ -19,7 +18,6 @@ export type RomState = {
   previousScreen: PortfolioScreen;
   selectedIndex: number;
   selectedProjectIndex: number;
-  selectedToolkitIndex: number;
   selectedOptionsIndex: number;
   selectedLanguageIndex: number;
 };
@@ -37,7 +35,6 @@ export const initialRomState: RomState = {
   previousScreen: 'main',
   selectedIndex: 0,
   selectedProjectIndex: 0,
-  selectedToolkitIndex: 0,
   selectedOptionsIndex: 0,
   selectedLanguageIndex: 0,
 };
@@ -56,8 +53,6 @@ export function selectionKey(screen: RomState['screen']) {
       return 'selectedIndex';
     case 'projects':
       return 'selectedProjectIndex';
-    case 'toolkit':
-      return 'selectedToolkitIndex';
     case 'options':
       return 'selectedOptionsIndex';
     case 'optionsLanguage':
@@ -101,9 +96,7 @@ export function romReducer(state: RomState, action: RomAction): RomState {
       ? MENU.length
       : state.screen === 'projects'
         ? PROJECTS.length
-        : state.screen === 'toolkit'
-          ? TOOLKIT_CATEGORIES.length
-          : 2;
+        : 2;
   switch (action.type) {
     case 'move':
       return {
@@ -114,8 +107,7 @@ export function romReducer(state: RomState, action: RomAction): RomState {
       return { ...state, [key]: action.index };
     case 'activate': {
       const index = action.index ?? state[key];
-      if (state.screen === 'toolkit' || state.screen === 'optionsLanguage')
-        return state;
+      if (state.screen === 'optionsLanguage') return state;
       if (state.screen === 'options')
         return {
           ...state,

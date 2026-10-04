@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import HardwareScene from '../../widgets/hardware-scene';
 import App from '../App';
-import { setDesktopInput } from './setupMediaQuery';
+import { setDesktopInput, setReducedMotionPreference } from './setupMediaQuery';
 
 const environment = globalThis as typeof globalThis & {
   IS_REACT_ACT_ENVIRONMENT?: boolean;
@@ -427,8 +427,8 @@ test('automatic boot and About navigation preserve every hardware element', asyn
     'Frontend Developer',
     'Higher education',
     'English B2',
-    'I spend most of my commercial work building the parts of products that live behind the scenes — admin panels, internal tools and interfaces with far too many states.',
-    'Outside work, small ideas have a habit of turning into unnecessarily elaborate side projects. Board games, dark fantasy, figures, hardware — and occasionally remembering that bicycles exist.',
+    'I build admin panels and internal tools.',
+    'Off duty: board games, dark fantasy, figures and hardware.',
   ]) {
     expect(container.textContent).toContain(text);
   }
@@ -479,6 +479,78 @@ test('keyboard Main selection wraps across four available destinations', async (
     press('Backspace');
   });
   expect(selected()).toBe('▶ABOUT');
+});
+
+test('About reveals whole beats, can skip with Enter or controller A, and replays on entry', async () => {
+  await boot();
+  const open = async () =>
+    act(async () =>
+      container.querySelector<HTMLButtonElement>('nav button')?.click(),
+    );
+  const visible = () =>
+    container.querySelectorAll('[data-about-beat][data-visible="true"]');
+  await open();
+  expect(container.querySelectorAll('[data-about-beat]')).toHaveLength(6);
+  expect(visible()).toHaveLength(0);
+  expect(container.textContent).toContain('Higher education · English B2');
+  await act(async () => vi.advanceTimersByTime(350));
+  expect(visible()).toHaveLength(1);
+  expect(visible()[0].textContent).toBe(
+    'I build admin panels and internal tools.',
+  );
+  await act(async () => vi.advanceTimersByTime(1100));
+  expect(visible()).toHaveLength(2);
+  await act(async () =>
+    press('Enter', container.querySelector('h2') as HTMLElement),
+  );
+  expect(visible()).toHaveLength(6);
+  expect(
+    container.querySelector('[data-screen]')?.getAttribute('data-screen'),
+  ).toBe('about');
+  await act(async () => press('b'));
+  await open();
+  expect(visible()).toHaveLength(0);
+  await act(async () =>
+    container
+      .querySelector<HTMLButtonElement>('[data-controller-input="a"]')
+      ?.click(),
+  );
+  expect(visible()).toHaveLength(6);
+  expect(
+    container.querySelector('[data-screen]')?.getAttribute('data-screen'),
+  ).toBe('about');
+  await act(async () =>
+    container
+      .querySelector<HTMLButtonElement>('[data-controller-input="b"]')
+      ?.click(),
+  );
+  await open();
+  for (const delay of [350, 1100, 1100, 1100, 1100, 1100])
+    await act(async () => vi.advanceTimersByTime(delay));
+  expect(visible()).toHaveLength(6);
+});
+
+test('About shows every beat immediately with reduced motion and updates the preference live', async () => {
+  setReducedMotionPreference(true);
+  await boot();
+  await act(async () =>
+    container.querySelector<HTMLButtonElement>('nav button')?.click(),
+  );
+  expect(
+    container.querySelectorAll('[data-about-beat][data-visible="true"]'),
+  ).toHaveLength(6);
+  await act(async () => press('Escape'));
+  setReducedMotionPreference(false);
+  await act(async () =>
+    container.querySelector<HTMLButtonElement>('nav button')?.click(),
+  );
+  expect(
+    container.querySelectorAll('[data-about-beat][data-visible="true"]'),
+  ).toHaveLength(0);
+  await act(async () => setReducedMotionPreference(true));
+  expect(
+    container.querySelectorAll('[data-about-beat][data-visible="true"]'),
+  ).toHaveLength(6);
 });
 
 test('mouse opens Contact and About directly', async () => {
@@ -762,158 +834,280 @@ test('keyboard leaves unrelated keys, shortcuts, and text inputs alone', async (
     input.remove();
   }
 });
-const toolkitCases = [
-  { label: 'CORE', items: ['React', 'Next.js', 'TypeScript', 'JavaScript'] },
-  {
-    label: 'DATA',
-    items: [
-      'TanStack Query',
-      'Zustand',
-      'Redux / Redux Toolkit',
-      'Zod',
-      'React Hook Form',
-    ],
-  },
-  { label: 'UI', items: ['Tailwind CSS', 'shadcn/ui', 'Radix UI', 'SCSS'] },
-  {
-    label: 'INTERACTION',
-    items: ['DnD Kit', 'WebSocket', 'TanStack Virtual', '2GIS'],
-  },
-  {
-    label: 'TOOLING',
-    items: ['Docker', 'Storybook', 'Biome', 'Git', 'Prisma'],
-  },
+const toolkitNames = [
+  'React',
+  'Next.js',
+  'TypeScript',
+  'JavaScript',
+  'TanStack Query',
+  'Zustand',
+  'Zod',
+  'React Hook Form',
+  'Tailwind CSS',
+  'shadcn/ui',
+  'Three.js / React Three Fiber',
+  'Prisma',
+  'Vite',
+  'Vitest',
+  'Docker',
+  'Git',
+  'Biome',
+  'Socket.IO',
+  'NestJS',
+  'Node.js',
+  'pnpm',
+  'XState',
+  'MUI',
+  'Storybook',
+  'Lefthook',
 ];
-
-function assertToolkit(index: number) {
+function assertToolkit() {
   expect(container.querySelector('h2')?.textContent).toBe('TOOLKIT');
   expect(
-    Array.from(container.querySelectorAll('nav button'), (button) =>
-      button.textContent?.replace(/^[▶\s]+/, ''),
-    ),
-  ).toEqual(toolkitCases.map((category) => category.label));
-  expect(selected()).toBe(`▶${toolkitCases[index].label}`);
-  expect(document.activeElement).toBe(
-    container.querySelectorAll('nav button')[index],
-  );
-  expect(
     Array.from(
-      container.querySelectorAll('[aria-label="Technologies"] li'),
-      (li) => li.textContent,
+      container.querySelectorAll('[data-tech-id] > span:nth-child(2)'),
+      (node) => node.textContent,
     ),
-  ).toEqual(toolkitCases[index].items);
+  ).toEqual(expect.arrayContaining(toolkitNames));
+  expect(container.querySelectorAll('[data-tech-id]')).toHaveLength(25);
+  expect(container.querySelector('[data-toolkit-hero]')).not.toBeNull();
   expect(
     container.querySelectorAll('[data-hardware="crt"] button'),
-  ).toHaveLength(6);
+  ).toHaveLength(1);
 }
 
-test('Toolkit keyboard categories wrap, update contents, restore focus and preserve exact hardware nodes', async () => {
-  await boot();
-  const hardware = Array.from(
-    container.querySelectorAll(
-      '[data-hardware], [aria-label="Desktop hardware scene"], [aria-label="CRT viewport"], [data-cartridge-position="reserved"]',
-    ),
-  );
-  const assertHardware = () => {
-    const current = Array.from(
-      container.querySelectorAll(
-        '[data-hardware], [aria-label="Desktop hardware scene"], [aria-label="CRT viewport"], [data-cartridge-position="reserved"]',
-      ),
+test('Toolkit movement, pickup, release, Back and hardware continuity', async () => {
+  vi.spyOn(Math, 'random').mockReturnValue(0.5);
+  try {
+    await boot();
+    const hardware = Array.from(container.querySelectorAll('[data-hardware]'));
+    await act(async () =>
+      container.querySelectorAll<HTMLButtonElement>('nav button')[2].click(),
     );
-    expect(current).toHaveLength(hardware.length);
-    current.forEach((node, index) => {
-      expect(node).toBe(hardware[index]);
+    assertToolkit();
+    expect(document.activeElement).toBe(container.querySelector('h2'));
+    const hero = container.querySelector<HTMLImageElement>(
+      '[data-toolkit-hero]',
+    );
+    await act(async () => {
+      press('ArrowLeft');
+      vi.advanceTimersByTime(300);
     });
-    expect(container.textContent).not.toContain('BOOTING...');
-  };
-  const toolkit = container.querySelectorAll('nav button')[2];
-  expect(toolkit.getAttribute('aria-disabled')).toBe('false');
-  expect(
-    container.querySelectorAll('nav button')[3].getAttribute('aria-disabled'),
-  ).toBe('false');
-  await act(async () => {
-    press('ArrowDown');
-    press('ArrowDown');
-  });
-  expect(document.activeElement).toBe(toolkit);
-  await act(async () => press('Enter', toolkit));
-  assertToolkit(0);
-  assertHardware();
-  for (const [key, index] of [
-    ['ArrowUp', 4],
-    ['ArrowDown', 0],
-    ['W', 4],
-    ['S', 0],
-    ['s', 1],
-    ['ArrowDown', 2],
-    ['ArrowDown', 3],
-    ['ArrowDown', 4],
-    ['ArrowDown', 0],
-    ['w', 4],
-  ] as const) {
-    if (
-      (index === 4 && ['ArrowUp', 'W', 'w'].includes(key)) ||
-      (index === 0 &&
-        ['ArrowDown', 'S'].includes(key) &&
-        selected()?.includes(toolkitCases[4].label))
-    ) {
-      await act(async () => press(key, document.activeElement as HTMLElement));
-      expect(document.activeElement).toBe(
-        container.querySelector('[data-rom-back]'),
-      );
-    }
-    await act(async () => press(key, document.activeElement as HTMLElement));
-    assertToolkit(index);
-    assertHardware();
+    expect(parseFloat(hero?.style.left ?? '50')).toBeLessThan(50);
+    expect(hero?.style.transform).toContain('scaleX(-1)');
+    expect(hero?.src).toContain('/toolkit_sprites/run_');
+    await act(async () =>
+      window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowLeft' })),
+    );
+    const stopped = hero?.style.left;
+    await act(async () => vi.advanceTimersByTime(300));
+    expect(hero?.style.left).toBe(stopped);
+    expect(hero?.src).toContain('/toolkit_sprites/idle_');
+    expect(hero?.style.transform).toContain('scaleX(-1)');
+    await act(async () => {
+      press('d');
+      vi.advanceTimersByTime(300);
+    });
+    await act(async () =>
+      window.dispatchEvent(new KeyboardEvent('keyup', { key: 'd' })),
+    );
+    await act(async () => vi.advanceTimersByTime(2500));
+    expect(hero?.src).toContain('/toolkit_sprites/idle_');
+    expect(hero?.style.transform).toContain('scaleX(1)');
+    expect(
+      container
+        .querySelector('[data-tech-id="vite"]')
+        ?.getAttribute('data-collected'),
+    ).toBe('true');
+    expect(
+      container.querySelector('[data-pickup="vite"]')?.hasAttribute('hidden'),
+    ).toBe(true);
+    await act(async () => press('o'));
+    await act(async () => press('Escape'));
+    expect(
+      container
+        .querySelector('[data-tech-id="vite"]')
+        ?.getAttribute('data-collected'),
+    ).toBe('true');
+    await act(async () => press('b'));
+    expect(selected()).toBe('▶TOOLKIT');
+    expect(document.activeElement).toBe(
+      container.querySelectorAll('nav button')[2],
+    );
+    Array.from(container.querySelectorAll('[data-hardware]')).forEach(
+      (node, index) => {
+        expect(node).toBe(hardware[index]);
+      },
+    );
+  } finally {
+    vi.restoreAllMocks();
   }
-  await act(async () => {
-    press('Enter');
-    press(' ');
-  });
-  assertToolkit(4);
-  await act(async () => press('Escape'));
-  expect(selected()).toBe('▶TOOLKIT');
-  expect(document.activeElement).toBe(
-    container.querySelectorAll('nav button')[2],
-  );
-  assertHardware();
-  await act(async () => press(' '));
-  assertToolkit(4);
-  await act(async () => press('Backspace'));
-  expect(selected()).toBe('▶TOOLKIT');
-  expect(document.activeElement).toBe(
-    container.querySelectorAll('nav button')[2],
-  );
-  assertHardware();
 });
 
-test('mouse opens Toolkit and selects every exact category inventory before returning to Main', async () => {
+test('Toolkit checkpoints expire and spawning ends after every skill is collected', async () => {
+  vi.spyOn(Math, 'random').mockReturnValue(0.5);
+  try {
+    await boot();
+    await act(async () =>
+      container.querySelectorAll<HTMLButtonElement>('nav button')[2].click(),
+    );
+    await act(async () => vi.advanceTimersByTime(9000));
+    expect(container.querySelectorAll('[data-collected="true"]')).toHaveLength(
+      5,
+    );
+    expect(container.textContent).toContain('5 SKILLS COLLECTED!');
+    await act(async () => vi.advanceTimersByTime(1000));
+    expect(container.querySelectorAll('[data-collected="true"]')).toHaveLength(
+      6,
+    );
+    expect(container.textContent).toContain('5 SKILLS COLLECTED!');
+    await act(async () => vi.advanceTimersByTime(2700));
+    expect(container.textContent).not.toContain('5 SKILLS COLLECTED!');
+    await act(async () => vi.advanceTimersByTime(60000));
+    expect(container.querySelectorAll('[data-collected="true"]')).toHaveLength(
+      25,
+    );
+    expect(
+      container.querySelectorAll('[data-pickup]:not([hidden])'),
+    ).toHaveLength(0);
+    expect(container.textContent).toContain('STACK COMPLETE!');
+    await act(async () => vi.advanceTimersByTime(2700));
+    expect(container.textContent).not.toContain('STACK COMPLETE!');
+    await act(async () => {
+      press('o');
+    });
+    await act(async () => {
+      press('Escape');
+      vi.advanceTimersByTime(10000);
+    });
+    expect(
+      container.querySelectorAll('[data-pickup]:not([hidden])'),
+    ).toHaveLength(0);
+    await act(async () => press('b'));
+    await act(async () => press('Enter'));
+    expect(container.querySelectorAll('[data-collected="true"]')).toHaveLength(
+      0,
+    );
+    expect(container.textContent).not.toContain('STACK COMPLETE!');
+  } finally {
+    vi.restoreAllMocks();
+  }
+});
+
+test('Toolkit pauses spawning at three pickups and resumes when they are collected', async () => {
+  vi.spyOn(Math, 'random').mockReturnValue(0.5);
+  try {
+    await boot();
+    await act(async () =>
+      container.querySelectorAll<HTMLButtonElement>('nav button')[2].click(),
+    );
+    await act(async () => {
+      press('ArrowLeft');
+      vi.advanceTimersByTime(20000);
+    });
+    await act(async () =>
+      window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowLeft' })),
+    );
+    const active = () =>
+      Array.from(
+        container.querySelectorAll<HTMLElement>('[data-pickup]:not([hidden])'),
+      );
+    expect(active()).toHaveLength(3);
+    expect(active().every((node) => node.style.top === '74%')).toBe(true);
+    const ids = active().map((node) => node.dataset.pickup);
+    await act(async () => vi.advanceTimersByTime(20000));
+    expect(active().map((node) => node.dataset.pickup)).toEqual(ids);
+    await act(async () => {
+      press('ArrowRight');
+      vi.advanceTimersByTime(800);
+    });
+    await act(async () =>
+      window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowRight' })),
+    );
+    expect(
+      container.querySelectorAll('[data-collected="true"]').length,
+    ).toBeGreaterThan(0);
+    expect(active().length).toBeLessThanOrEqual(3);
+    expect(active().some((node) => node.dataset.falling === 'true')).toBe(true);
+  } finally {
+    vi.restoreAllMocks();
+  }
+});
+
+test('Toolkit collection leaves the manually scrolled stack in place', async () => {
+  vi.spyOn(Math, 'random').mockReturnValue(0.5);
+  try {
+    await boot();
+    await act(async () =>
+      container.querySelectorAll<HTMLButtonElement>('nav button')[2].click(),
+    );
+    const stack = container.querySelector<HTMLElement>('[data-toolkit-stack]');
+    const row = container.querySelector('[data-tech-id="vite"]');
+    const scroll = vi.fn();
+    Object.defineProperty(stack, 'scrollTo', { value: scroll });
+    Object.defineProperty(stack, 'clientHeight', { value: 100 });
+    Object.defineProperty(row, 'offsetTop', { value: 500 });
+    if (stack) stack.scrollTop = 120;
+    await act(async () => vi.advanceTimersByTime(3000));
+    expect(row?.getAttribute('data-collected')).toBe('true');
+    expect(scroll).not.toHaveBeenCalled();
+    expect(stack?.scrollTop).toBe(120);
+  } finally {
+    vi.restoreAllMocks();
+  }
+});
+
+test('Toolkit Back requires deliberate selection and directional input cancels it', async () => {
   await boot();
   await act(async () =>
     container.querySelectorAll<HTMLButtonElement>('nav button')[2].click(),
   );
-  assertToolkit(0);
-  for (let index = 0; index < toolkitCases.length; index++) {
+  const back = container.querySelector('[data-rom-back]');
+  for (const key of ['ArrowUp', 'ArrowLeft', 'ArrowRight', 'a', 'd']) {
     await act(async () =>
-      container
-        .querySelectorAll<HTMLButtonElement>('nav button')
-        [index].click(),
+      press('ArrowDown', document.activeElement as HTMLElement),
     );
-    assertToolkit(index);
+    expect(document.activeElement).toBe(back);
+    expect(back?.hasAttribute('data-rom-selected')).toBe(true);
+    await act(async () => press(key, document.activeElement as HTMLElement));
+    expect(document.activeElement).toBe(container.querySelector('h2'));
+    expect(back?.hasAttribute('data-rom-selected')).toBe(false);
+    await act(async () =>
+      press('Enter', document.activeElement as HTMLElement),
+    );
+    assertToolkit();
+    await act(async () =>
+      window.dispatchEvent(new KeyboardEvent('keyup', { key })),
+    );
   }
-  const back = container.querySelector<HTMLButtonElement>('[data-rom-back]');
-  await act(async () => {
-    back?.focus();
-    expect(press('Enter', back as HTMLElement).defaultPrevented).toBe(false);
-    expect(press(' ', back as HTMLElement).defaultPrevented).toBe(false);
-    expect(press('Tab', back as HTMLElement).defaultPrevented).toBe(false);
-  });
-  await act(async () => back?.click());
-  expect(container.querySelector('h1')?.textContent).toBe('IVAN DMITRIEVICH');
+  const hardware = (id: string) =>
+    container.querySelector<HTMLButtonElement>(
+      `[data-controller-input="${id}"]`,
+    );
+  await act(async () => hardware('down')?.click());
+  await act(async () => hardware('left')?.click());
+  await act(async () => hardware('a')?.click());
+  assertToolkit();
+  await act(async () => hardware('down')?.click());
+  await act(async () => hardware('a')?.click());
   expect(selected()).toBe('▶TOOLKIT');
-  expect(document.activeElement).toBe(
-    container.querySelectorAll('nav button')[2],
+});
+
+test('Toolkit full inventory is readable before playing and Back keeps native keyboard behavior', async () => {
+  await boot();
+  await act(async () =>
+    container.querySelectorAll<HTMLButtonElement>('nav button')[2].click(),
   );
+  assertToolkit();
+  expect(container.querySelectorAll('[data-collected="true"]')).toHaveLength(0);
+  const stack = container.querySelector<HTMLElement>('[data-toolkit-stack]');
+  await act(async () => stack?.focus());
+  expect(press('ArrowDown', stack as HTMLElement).defaultPrevented).toBe(false);
+  expect(press('Tab', stack as HTMLElement).defaultPrevented).toBe(false);
+  const back = container.querySelector<HTMLButtonElement>('[data-rom-back]');
+  expect(press('Enter', back as HTMLElement).defaultPrevented).toBe(false);
+  await act(async () => back?.click());
+  expect(selected()).toBe('▶TOOLKIT');
 });
 
 test('Toolkit keyboard safeguards protect unrelated controls and modified events', async () => {
@@ -967,7 +1161,7 @@ test('Toolkit keyboard safeguards protect unrelated controls and modified events
       prevented.preventDefault();
       window.dispatchEvent(prevented);
     });
-    assertToolkit(0);
+    assertToolkit();
   } finally {
     for (const control of controls) control.remove();
   }

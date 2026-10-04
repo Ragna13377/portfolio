@@ -1,1 +1,1 @@
-export * from './model/toolkit';
+export * from './model/collectibles';

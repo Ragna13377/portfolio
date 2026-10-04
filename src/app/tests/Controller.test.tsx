@@ -182,19 +182,14 @@ test.each([0, 1, 2, 3])(
       await click('a');
     }
     if (index === 2) {
-      await click('down');
-      expect(selected()).toBe(1);
-      await click('up');
-      expect(selected()).toBe(0);
-      await click('up');
-      await click('up');
-      expect(selected()).toBe(choices().length - 1);
+      await click('right');
+      expect(container.querySelector('[data-toolkit-hero]')).not.toBeNull();
     }
     const screen = container.querySelector(
       '[data-hardware="crt"]',
     )?.textContent;
     const selection = selected();
-    if (index === 2 || index === 3) {
+    if (index === 3) {
       await click('a');
       expect(
         container.querySelector('[data-hardware="crt"]')?.textContent,

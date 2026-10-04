@@ -1,56 +1,205 @@
+import {
+  type CSSProperties,
+  Fragment,
+  type Ref,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
-import { TOOLKIT_CATEGORIES } from '../../../entities/toolkit';
+import idle1 from '../../../assets/toolkit_sprites/idle_1.webp';
+import idle2 from '../../../assets/toolkit_sprites/idle_2.webp';
+import idle3 from '../../../assets/toolkit_sprites/idle_3.webp';
+import run1 from '../../../assets/toolkit_sprites/run_1.webp';
+import run2 from '../../../assets/toolkit_sprites/run_2.webp';
+import run3 from '../../../assets/toolkit_sprites/run_3.webp';
+import run4 from '../../../assets/toolkit_sprites/run_4.webp';
+import {
+  TOOLKIT_COLLECTIBLES,
+  TOOLKIT_GROUPS,
+  type ToolkitCollectible,
+} from '../../../entities/toolkit';
 import { RomBackButton } from '../../../shared/ui/rom-back-button';
-import styles from './Rom.module.scss';
+import {
+  type ToolkitMovement,
+  useToolkitScene,
+} from '../model/useToolkitScene';
+import styles from './ToolkitScreen.module.scss';
 
-type Props = {
-  selectedIndex: number;
-  onSelect: (index: number) => void;
-  onBack: () => void;
-};
+const idleFrames = [idle1, idle2, idle3];
+const runFrames = [run1, run2, run3, run4];
+const trailLengths = [0.18, 0.4, 0.58, 0.83, 1, 0.78, 0.64, 0.36, 0.2];
+
+function TechIcon({ item }: { item: ToolkitCollectible }) {
+  return item.icon ? (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d={item.icon.path} />
+    </svg>
+  ) : (
+    <span className={styles.mark} aria-hidden="true">
+      {item.mark}
+    </span>
+  );
+}
 
 export default function ToolkitScreen({
-  selectedIndex,
-  onSelect,
+  ref,
+  enabled,
+  collected,
+  onCollect,
   onBack,
-}: Props) {
+}: {
+  ref?: Ref<ToolkitMovement>;
+  enabled: boolean;
+  collected: ReadonlySet<string>;
+  onCollect: (id: string) => void;
+  onBack: () => void;
+}) {
   const { t } = useTranslation('toolkit');
-  const category = TOOLKIT_CATEGORIES[selectedIndex];
+  const { hero, tiles, controls } = useToolkitScene(
+    enabled,
+    collected,
+    onCollect,
+    idleFrames,
+    runFrames,
+  );
+  const lastId = [...collected].at(-1);
+  const [milestone, setMilestone] = useState<number | null>(null);
+  const collectedStep = Math.floor(collected.size / 5);
+  const milestoneStep = useRef(collectedStep);
+  useEffect(() => {
+    const step = collectedStep;
+    if (step <= milestoneStep.current) return;
+    milestoneStep.current = step;
+    setMilestone(step * 5);
+    const timeout = window.setTimeout(() => setMilestone(null), 2600);
+    return () => window.clearTimeout(timeout);
+  }, [collectedStep]);
+  useImperativeHandle(ref, () => controls.current, [controls]);
 
   return (
     <>
-      <h2>{t('common:menu.toolkit')}</h2>
-      <div className={styles.inventory}>
-        <nav aria-label={t('categories')}>
-          <ul className={styles.menu}>
-            {TOOLKIT_CATEGORIES.map((item, index) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  aria-current={selectedIndex === index ? 'true' : undefined}
-                  onFocus={() => onSelect(index)}
-                  onClick={() => onSelect(index)}
-                >
-                  <span className={styles.cursor} aria-hidden="true">
-                    {selectedIndex === index ? '▶' : '\u00a0'}
-                  </span>
-                  {t(item.id)}
-                </button>
-              </li>
+      <header className={styles.header}>
+        <h2 tabIndex={-1}>{t('common:menu.toolkit')}</h2>
+      </header>
+      <div className={styles.scene}>
+        <div className={styles.playfield} role="img" aria-label={t('scene')}>
+          <div className={styles.floor} />
+          {TOOLKIT_COLLECTIBLES.map((item, index) => (
+            <div
+              key={item.id}
+              ref={(node) => {
+                tiles.current[index] = node;
+              }}
+              hidden
+              data-pickup={item.id}
+              className={styles.pickup}
+              style={
+                {
+                  '--brand': item.color,
+                  '--glyph': item.glyphColor,
+                } as CSSProperties
+              }
+            >
+              <span className={styles.trail} aria-hidden="true">
+                {trailLengths.map((length, index) => (
+                  <i
+                    key={length}
+                    style={
+                      {
+                        '--strand-height': `${length * 100}%`,
+                        '--strand-x': `${index * 12.5}%`,
+                        '--strand-delay': `${index * -0.13}s`,
+                      } as CSSProperties
+                    }
+                  />
+                ))}
+              </span>
+              <TechIcon item={item} />
+            </div>
+          ))}
+          <img
+            ref={hero}
+            className={styles.hero}
+            src={idle1}
+            alt=""
+            draggable={false}
+            data-toolkit-hero
+          />
+          {milestone !== null && (
+            <span
+              className={
+                milestone === TOOLKIT_COLLECTIBLES.length
+                  ? styles.complete
+                  : styles.milestone
+              }
+              role="status"
+              data-toolkit-notice
+            >
+              {milestone === TOOLKIT_COLLECTIBLES.length
+                ? t('complete')
+                : t('milestone', { count: milestone })}
+            </span>
+          )}
+        </div>
+        <aside className={styles.stack} aria-label={t('technologies')}>
+          <div className={styles.stackHeader}>
+            {t('collected', {
+              count: collected.size,
+              total: TOOLKIT_COLLECTIBLES.length,
+            })}
+          </div>
+          <ul
+            // biome-ignore lint/a11y/noNoninteractiveTabindex: Keyboard users need to scroll the full stack.
+            tabIndex={0}
+            data-toolkit-stack
+            aria-label={t('technologies')}
+          >
+            {TOOLKIT_GROUPS.map((group) => (
+              <Fragment key={group.id}>
+                <li className={styles.groupLabel}>{t(group.id)}</li>
+                {group.items.map((item) => (
+                  <li
+                    key={item.id}
+                    data-tech-id={item.id}
+                    data-collected={collected.has(item.id)}
+                    data-latest={item.id === lastId}
+                    style={
+                      {
+                        '--brand': item.color,
+                        '--glyph': item.glyphColor,
+                      } as CSSProperties
+                    }
+                  >
+                    <span className={styles.listIcon}>
+                      <TechIcon item={item} />
+                    </span>
+                    <span>{item.name}</span>
+                    <span
+                      role="img"
+                      className={styles.check}
+                      aria-label={
+                        collected.has(item.id) ? t('pickedUp') : t('pending')
+                      }
+                    >
+                      {collected.has(item.id) ? '✓' : '·'}
+                    </span>
+                  </li>
+                ))}
+              </Fragment>
             ))}
           </ul>
-        </nav>
-        <ul
-          className={styles.technologies}
-          aria-label={t('technologies')}
-          aria-live="polite"
-        >
-          {category.items.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
+        </aside>
       </div>
-      <RomBackButton onBack={onBack} className={styles.back} />
+      <footer className={styles.footer}>
+        <RomBackButton onBack={onBack} />
+        <span className={styles.hints}>
+          {t('moveHint')}
+          <br />
+          {t('backHint')}
+        </span>
+      </footer>
     </>
   );
 }

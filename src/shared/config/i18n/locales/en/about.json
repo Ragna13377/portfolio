@@ -1,6 +1,16 @@
 {
   "role": "Frontend Developer",
   "education": "Higher education · English B2",
-  "work": "I spend most of my commercial work building the parts of products that live behind the scenes — admin panels, internal tools and interfaces with far too many states.",
-  "interests": "Outside work, small ideas have a habit of turning into unnecessarily elaborate side projects. Board games, dark fantasy, figures, hardware — and occasionally remembering that bicycles exist."
+  "dialogueLabel": "My story",
+  "revealHint": "A (Enter) — Reveal all",
+  "replayHint": "A (Enter) — Dialogue complete",
+  "backHint": "B (Esc) — Back",
+  "dialogue": {
+    "tools": "I build admin panels and internal tools.",
+    "interfaces": "Data, forms, maps — I enjoy complex interfaces.",
+    "states": "Especially when everything updates in real time.",
+    "projects": "Small ideas tend to become elaborate side projects.",
+    "hobbies": "Off duty: board games, dark fantasy, figures and hardware.",
+    "bicycle": "Sometimes I remember my bicycle exists."
+  }
 }

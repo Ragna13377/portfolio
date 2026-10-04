@@ -118,7 +118,6 @@ test.each([
       );
     if (screen === 'projectDetail') await clickChoice(2);
     if (screen === 'projects') await press('ArrowDown');
-    if (screen === 'toolkit') await clickChoice(3);
     if (screen === 'main') await press('ArrowUp');
     const previousHeading = container.querySelector('h1,h2')?.textContent;
     const previousIndex = selectedIndex();
@@ -432,7 +431,7 @@ test('all portfolio namespaces translate through Options while project IDs, tech
   });
   await boot();
   await clickChoice(0);
-  expect(container.textContent).toContain(resources.en.about.work);
+  expect(container.textContent).toContain(resources.en.about.dialogue.tools);
   await press('o');
   await clickChoice(0);
   await clickChoice(1);
@@ -441,8 +440,8 @@ test('all portfolio namespaces translate through Options while project IDs, tech
   expect(heading()).toBe('ОБО МНЕ');
   expect(container.textContent).toContain(resources.ru.about.role);
   expect(container.textContent).toContain(resources.ru.about.education);
-  expect(container.textContent).toContain(resources.ru.about.work);
-  expect(container.textContent).toContain(resources.ru.about.interests);
+  expect(container.textContent).toContain(resources.ru.about.dialogue.tools);
+  expect(container.textContent).toContain(resources.ru.about.dialogue.hobbies);
   expect(container.textContent).toContain('Ivan Dmitrievich');
   await back();
   expect(choices()[1].textContent).toContain('ПРОЕКТЫ');
@@ -462,9 +461,8 @@ test('all portfolio namespaces translate through Options while project IDs, tech
   }
   await back();
   await clickChoice(2);
-  await clickChoice(4);
   expect(heading()).toBe('ИНСТРУМЕНТЫ');
-  expect(choices()[4].textContent).toContain('РАЗРАБОТКА');
+  expect(container.querySelectorAll('[data-tech-id]')).toHaveLength(25);
   expect(container.textContent).toContain('Docker');
   expect(container.textContent).toContain('Prisma');
   await press('o');
@@ -473,7 +471,7 @@ test('all portfolio namespaces translate through Options while project IDs, tech
   await back();
   await back();
   expect(heading()).toBe('TOOLKIT');
-  expectFocus(4);
+  expect(document.activeElement).toBe(container.querySelector('h2'));
   await back();
   await clickChoice(3);
   const links = Array.from(container.querySelectorAll('a'), (a) => a.href);

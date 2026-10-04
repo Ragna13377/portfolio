@@ -243,7 +243,7 @@ test('fresh boots discard Main, Projects, Toolkit, Options selections and previo
   await clickControl('b');
   await clickControl('b');
   await choice(2);
-  await choice(3);
+  await clickControl('right');
   await clickControl('start');
   await clickControl('down');
   expect(selected()).toBe(1);
@@ -253,7 +253,7 @@ test('fresh boots discard Main, Projects, Toolkit, Options selections and previo
   expect(selected()).toBe(0);
   await clickControl('b');
   await choice(2);
-  expect(selected()).toBe(0);
+  expect(container.querySelectorAll('[data-collected="true"]')).toHaveLength(0);
   await clickControl('start');
   expect(selected()).toBe(0);
   await cycle();

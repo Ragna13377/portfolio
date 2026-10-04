@@ -50,7 +50,6 @@
 @media (prefers-reduced-motion: reduce) { .heroFrame { opacity: 0; } .heroFrame[data-frame='0'] { opacity: 1; } }
 .back { margin-top: 18px; }
 .about,.detail,.toolkit,.contact,.controlsScreen { padding: 72px 40px 24px; font-family: 'Courier New',monospace; font-size: 18px; line-height: 1.4; letter-spacing: 0; h2 { font-family: Tiny5,monospace; } }
-.about { p:nth-of-type(1) { font-family: Tiny5,monospace; font-size: 30px; color: #f4d59b; margin: 4px 0; } p:nth-of-type(2) { color: #d2bda5; margin-bottom: 16px; } p:nth-of-type(3) { color: #bbaea3; font-size: 14px; } p:nth-of-type(4),p:nth-of-type(5) { max-width: 580px; font-size: 16px; } }
 .highlights { margin: 13px 0; padding-left: 22px; li + li { margin-top: 7px; } li::marker { color: #e1b878; } }
 .detail { font-size: 17px; h2 { font-size: 30px; } p:last-of-type { font-size: 14px; line-height: 1.5; color: #cebaa4; } }
 .inventory { display: grid; grid-template-columns: 218px minmax(0,1fr); gap: 24px; nav { font-family: Tiny5,monospace; font-size: 25px; } nav button { width: 100%; } }
@@ -73,9 +72,10 @@
 .rom .inventory { grid-template-columns: 1fr; gap: 18px; }
 .rom .inventory nav ul { display: flex; flex-wrap: wrap; gap: 6px; li { margin: 0; } button { padding: 6px; font-size: 22px; } }
 .rom .technologies { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 18px; li { margin: 0; padding: 8px; border-bottom: 1px solid #c7b2923f; } }
-.about p:nth-of-type(1) { border-left: 3px solid #dcaf71; padding-left: 13px; }
-.about { p:nth-of-type(4),p:nth-of-type(5) { line-height: 1.45; } }
 .rom[data-screen='projectDetail'] h2::after { display: block; margin-top: 7px; font: 10px 'Courier New',monospace; letter-spacing: 1px; color: #c4b69f; }
 
 .rom button[data-rom-selected]:not([data-rom-back]) { color: #fff1bf; background: linear-gradient(90deg,#a66c3a80,#49362b66); box-shadow: inset 3px 0 #e3d080; outline: none; }
 .rom:has(button[data-rom-selected]:not(nav button)) nav button[aria-current='true'] { background: transparent; border-color: transparent; box-shadow: none; color: inherit; .cursor { visibility: hidden; } }
+.rom.toolkit { padding: 48px 32px 24px; }
+
+.rom.about { padding: 48px 32px 24px; h2 { margin-bottom: 12px; } }

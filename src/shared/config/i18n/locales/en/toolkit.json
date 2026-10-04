@@ -1,9 +1,16 @@
 {
-  "categories": "Toolkit categories",
   "technologies": "Technologies",
   "core": "CORE",
   "data": "DATA",
   "ui": "UI",
-  "interaction": "INTERACTION",
-  "tooling": "TOOLING"
+  "tooling": "TOOLING",
+  "collected": "COLLECTED {{count}} OF {{total}}",
+  "scene": "Star mascot collecting falling technology tiles on a flat platform",
+  "pickedUp": "Collected",
+  "pending": "Available to collect",
+  "complete": "STACK COMPLETE!",
+  "moveHint": "← → (A, D) — Move",
+  "backHint": "B (Esc) — Back",
+  "backend": "BACKEND",
+  "milestone": "{{count}} SKILLS COLLECTED!"
 }
