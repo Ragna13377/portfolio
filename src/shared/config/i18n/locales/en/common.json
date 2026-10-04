@@ -15,7 +15,7 @@
   "copied": "COPIED!",
   "mainMenu": "ROM main menu",
   "portfolio": "Interactive CRT Portfolio",
-  "fallback": "This scene needs a wide landscape window. Widen your browser window to view the portfolio.",
+  "fallback": "Open the portfolio on a computer with a mouse or trackpad, in a window at least 768 px wide.",
   "contactLinks": "Contact links",
   "controller": {
     "b": "B — Back",

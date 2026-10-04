@@ -18,9 +18,10 @@ import HardwareScene from '../../../widgets/hardware-scene';
 import Rom from '../../../widgets/rom';
 import styles from './PortfolioPage.module.scss';
 
-// Browser chrome, docked tools and zoom can leave a desktop window quite short.
-// Height affects the scene's scale, never whether a wide window is supported.
-const DESKTOP_QUERY = '(min-width: 1000px) and (orientation: landscape)';
+// Scale to the available window regardless of height or orientation. Touch-only
+// tablets use the fallback; a desktop pointer also supports touch-enabled laptops.
+const DESKTOP_QUERY =
+  '(min-width: 768px) and (any-pointer: fine) and (any-hover: hover)';
 
 export default function PortfolioPage() {
   const { t, i18n } = useTranslation('common');

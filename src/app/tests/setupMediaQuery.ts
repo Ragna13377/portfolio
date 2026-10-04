@@ -1,3 +1,14 @@
+import { beforeEach } from 'vitest';
+
+let desktopInput = true;
+export function setDesktopInput(available: boolean) {
+  desktopInput = available;
+  window.dispatchEvent(new Event('resize'));
+}
+beforeEach(() => {
+  desktopInput = true;
+});
+
 // jsdom does not implement matchMedia. Drive its change events from the same
 // viewport fixtures used by the integration tests, including subscription cleanup.
 window.matchMedia = (query: string): MediaQueryList => {
@@ -7,7 +18,11 @@ window.matchMedia = (query: string): MediaQueryList => {
     const landscape =
       !query.includes('orientation: landscape') ||
       window.innerWidth > window.innerHeight;
-    return window.innerWidth >= minimum && landscape;
+    const input =
+      (!query.includes('any-pointer: fine') &&
+        !query.includes('any-hover: hover')) ||
+      desktopInput;
+    return window.innerWidth >= minimum && landscape && input;
   };
   let previous = readMatches();
   const resize = () => {

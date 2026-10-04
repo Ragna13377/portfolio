@@ -72,23 +72,35 @@ async (page) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   check(await page.locator('[data-frame]').evaluateAll(frames => frames.every(el => getComputedStyle(el).animationName === 'none') && getComputedStyle(frames[0]).opacity === '1' && frames.slice(1).every(el => getComputedStyle(el).opacity === '0')), 'Reduced motion uses one neutral hero frame');
   await power.click(); check(await animation() === 'none', 'Reduced motion collapse disabled'); await wait('off'); await power.click(); check(await lineAnimation() === 'none', 'Reduced motion wake disabled'); await wait('on');
-  for(const [width,height] of [[390,844],[1080,1920],[900,700]]) {
+  for(const [width,height] of [[390,844],[767,700]]) {
     await page.setViewportSize({width,height}); await page.locator('[data-hardware]').first().waitFor({state:'detached'});
     check(await page.locator('details, nav, button, a').count() === 0, 'Minimal desktop-only fallback');
-    check(await page.locator('main').textContent().then(t => t.includes('wide landscape window')), 'Wide-window message');
+    check(await page.locator('main').textContent().then(t => t.includes('mouse or trackpad')), 'Desktop input message');
     check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Fallback no horizontal overflow');
   }
   await page.setViewportSize({width:1600,height:900}); await main(); await page.emulateMedia({ reducedMotion: 'no-preference' });
   check(await page.evaluate(() => document.documentElement.scrollHeight === innerHeight && document.documentElement.scrollWidth === innerWidth), 'Desktop no overflow');
   check(await rom.evaluate(el => [...el.querySelectorAll('button')].every(b => b.getBoundingClientRect().bottom <= el.getBoundingClientRect().bottom)), 'Menu fits CRT');
   // Inspect the supplied composition at the required desktop sizes after React has resized.
-  for(const [width,height] of [[1920,1080],[1600,900],[1366,768],[1600,500],[1366,550]]) {
+  for(const [width,height] of [[1920,1200],[1920,1080],[1600,900],[1366,768],[1024,768],[900,700],[1000,1000],[1080,1920],[1600,500],[1366,550]]) {
     await page.setViewportSize({width,height});
     await page.waitForFunction(() => Math.abs(document.querySelector('[data-power-state]').getBoundingClientRect().height - Math.min(innerHeight, innerWidth / 1600 * 900)) < 1);
     await page.screenshot({path:`output/playwright/comet-${width}x${height}.png`});
     check(await page.locator('[data-hardware-art]').evaluate(el => {const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight;}), 'Whole hardware fits desktop');
     check(await crt.locator('[data-frame]').count() === 4, 'Four supplied hero poses');
   }
+  const tablet = await page.context().browser().newContext({hasTouch:true,isMobile:true,viewport:{width:1024,height:768}});
+  try {
+    const touchPage = await tablet.newPage();
+    await touchPage.goto(page.url());
+    for (const [width,height] of [[768,1024],[1024,768],[1366,1024]]) {
+      await touchPage.setViewportSize({width,height});
+      await touchPage.locator('h1').waitFor();
+      check(await touchPage.evaluate(() => matchMedia('(any-pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches), 'Real touch-only input emulation');
+      check(await touchPage.locator('[data-hardware]').count() === 0, 'Tablet fallback in both orientations');
+    }
+  } finally { await tablet.close(); }
+  await page.setViewportSize({width:1920,height:1200});
   await page.route('**/*crt-main-background*', route => route.request().resourceType() === 'image' ? route.abort() : route.continue()); await page.reload(); await wait('on'); await choices().nth(0).click(); check(await rom.getAttribute('data-screen') === 'about', 'Missing art does not block navigation'); await page.unroute('**/*crt-main-background*');
   check(issues.length === 0, `Runtime errors: ${issues.join(', ')}`);
   return { projectDetails:4, toolkitCategories:5, controllerHitboxes:11, resetStates:states, runtimeErrors:issues, passed:['single cartridge','no swapping/readable view','keyboard/mouse/controller','EN/RU','powered ROM reset without line','power line/collapse','scanlines','reduced motion','minimal mobile fallback','no overflow','asset failure'] };

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import HardwareScene from '../../widgets/hardware-scene';
 import App from '../App';
+import { setDesktopInput } from './setupMediaQuery';
 
 const environment = globalThis as typeof globalThis & {
   IS_REACT_ACT_ENVIRONMENT?: boolean;
@@ -67,15 +68,14 @@ test('desktop renders one hardware composite around a live CRT viewport', async 
     container.querySelectorAll('[data-hardware="controller"] button'),
   ).toHaveLength(11);
   expect(container.textContent).not.toContain(
-    'This scene needs a wide landscape window. Widen your browser window to view the portfolio.',
+    'Open the portfolio on a computer with a mouse or trackpad, in a window at least 768 px wide.',
   );
 });
 
 test.each([
   [390, 844],
-  [900, 700],
-  [1080, 1920],
-  [1000, 1000],
+  [767, 700],
+  [600, 1000],
 ])(
   'unsupported %i x %i viewport shows accessible fallback instead of hardware',
   async (width, height) => {
@@ -87,11 +87,37 @@ test.each([
     expect(container.querySelector('h1')?.textContent).toBe('Ivan Dmitrievich');
     expect(container.textContent).toContain('Frontend Developer');
     expect(container.textContent).toContain(
-      'This scene needs a wide landscape window. Widen your browser window to view the portfolio.',
+      'Open the portfolio on a computer with a mouse or trackpad, in a window at least 768 px wide.',
     );
     expect(container.querySelectorAll('details, a, button')).toHaveLength(0);
   },
 );
+
+test.each([
+  [1920, 1200],
+  [1366, 768],
+  [1024, 768],
+  [900, 700],
+  [1000, 1000],
+  [1080, 1920],
+])('computer at %i x %i opens the scene', async (width, height) => {
+  setViewport(width, height);
+  await act(async () => root.render(<App />));
+  expect(container.querySelector('[aria-label="CRT viewport"]')).not.toBeNull();
+});
+
+test.each([
+  [768, 1024],
+  [1024, 768],
+  [1366, 1024],
+])('touch-only tablet at %i x %i shows fallback', async (width, height) => {
+  setViewport(width, height);
+  setDesktopInput(false);
+  await act(async () => root.render(<App />));
+  expect(container.querySelector('[aria-label="CRT viewport"]')).toBeNull();
+  await act(async () => setDesktopInput(true));
+  expect(container.querySelector('[aria-label="CRT viewport"]')).not.toBeNull();
+});
 
 test('desktop resizing scales one artboard and keeps the hardware mounted', async () => {
   await act(async () => root.render(<App />));
@@ -120,7 +146,7 @@ test('wide desktop window stays usable below 600px height and recovers after res
   setViewport(1600, 500);
   await act(async () => root.render(<App />));
   expect(container.querySelector('[aria-label="CRT viewport"]')).not.toBeNull();
-  await act(async () => setViewport(900, 700));
+  await act(async () => setViewport(767, 700));
   expect(container.querySelector('[aria-label="CRT viewport"]')).toBeNull();
   await act(async () => setViewport(1366, 550));
   expect(container.querySelector('[aria-label="CRT viewport"]')).not.toBeNull();
