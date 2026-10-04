@@ -381,7 +381,9 @@ test('Controls documents actual keyboard/mouse support in both languages without
     await act(async () => {
       await instance.changeLanguage(locale);
     });
-    expect(container.querySelectorAll('dt')).toHaveLength(5);
+    expect(
+      container.querySelectorAll('[aria-label="CRT viewport"] dt'),
+    ).toHaveLength(5);
     for (const control of [
       'navigation',
       'confirm',

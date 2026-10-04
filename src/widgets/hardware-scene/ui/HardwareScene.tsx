@@ -39,14 +39,6 @@ export default function HardwareScene({
         } as CSSProperties
       }
     >
-      <div className={styles.identity}>
-        <strong>
-          Ivan
-          <br />
-          Dmitrievich
-        </strong>
-        <p>{t('about:role')}</p>
-      </div>
       <div className={styles.hardware}>
         <img
           data-hardware-art
@@ -119,7 +111,6 @@ export default function HardwareScene({
           />
         </div>
       </div>
-      <p className={styles.inputLegend}>{t('inputLegend')}</p>
     </section>
   );
 }

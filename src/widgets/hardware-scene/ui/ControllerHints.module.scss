@@ -1,0 +1,10 @@
+.hints { position: absolute; z-index: 6; left: 4.5vw; top: 50%; width: clamp(220px, 21vw, 360px); padding: clamp(16px, 1.5vw, 26px); color: #f4eee3; font: clamp(16px, 1.15vw, 22px)/1.5 Arial, sans-serif; border: 1px solid #f3ead52b; border-radius: 14px; background: linear-gradient(135deg, #071322e8, #071322b8); box-shadow: 0 12px 40px #0004; backdrop-filter: blur(12px); }
+.title { margin: 0 0 16px; font-size: 1.1em; font-weight: 600; }
+.hints dl { margin: 0; display: grid; gap: 12px; }
+.hints dl > div { display: flex; justify-content: space-between; gap: 12px; }
+.hints dt { white-space: nowrap; font-weight: 600; }
+.hints dt span { color: #c1ccd5; font-size: .85em; font-weight: 400; }
+.hints dd { margin: 0; color: #e3d7c5; }
+.arrow { position: absolute; right: -18%; top: calc(100% + 10px); width: clamp(90px, 8vw, 140px); height: auto; color: #f4eee3; filter: drop-shadow(0 2px 4px #000); pointer-events: none; }
+@media (max-width: 1100px) { .hints { left: 12px; width: 190px; padding: 12px; } .hints dl > div { gap: 6px; } .hints dt { font-size: 14px; } .hints dt span { display: block; } .arrow { top: 75%; right: -45%; width: 90px; transform: scaleY(-1); } }
+@media (max-height: 600px) { .hints { top: 30%; padding: 12px; } .hints dl { gap: 6px; } .arrow { width: 75px; } }

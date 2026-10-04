@@ -289,9 +289,6 @@ export default function Rom({
     <div
       data-theme={cartridgeId}
       data-screen={state.screen}
-      data-world-label={t(
-        `worlds:${cartridgeId}.${state.screen === 'projectDetail' ? 'detail' : state.screen}`,
-      )}
       data-location={t(
         `worlds:${cartridgeId}.stages.${state.selectedProjectIndex}`,
       )}
@@ -305,15 +302,6 @@ export default function Rom({
         }
       }}
     >
-      {state.screen !== 'boot' && (
-        <div className={styles.hud} aria-hidden="true">
-          <span>✦ ✦ ✦</span>
-          <span>
-            {cartridge(cartridgeId).number} /{' '}
-            {state.screen === 'main' ? 'HOME' : 'ARCHIVE'}
-          </span>
-        </div>
-      )}
       {state.screen === 'boot' && (
         <>
           <div className={styles.bootTitle} aria-hidden="true">

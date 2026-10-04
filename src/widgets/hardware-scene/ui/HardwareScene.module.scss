@@ -3,10 +3,6 @@
   &::before { content: ''; position: absolute; left: 7%; right: 4%; bottom: 2%; height: 9%; background: #020609b0; border-radius: 50%; filter: blur(22px); z-index: -1; }
 }
 .hardwareArt { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; user-select: none; -webkit-user-drag: none; }
-.identity { position: absolute; left: 80px; top: 190px; width: 220px;
- strong { display: block; font: 500 25px/1.3 Arial,sans-serif; color: #eee2d4; letter-spacing: -.5px; }
- p { margin-top: 14px; font-size: 10px; letter-spacing: 1px; color: #c6b4a5; }
-}
 .crt { position: absolute; left: 225px; top: 123px; width: 710px; height: 464px; z-index: 2; }
 .viewport { position: absolute; inset: 0; overflow: hidden; contain: paint; border-radius: 45px / 30px; background: #080c13; color: #e8d49c;
   &::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 8; background: repeating-linear-gradient(0deg, #0002 0 1px, transparent 1px 3px), radial-gradient(ellipse, transparent 45%, #01020775 100%); box-shadow: inset 0 0 32px 8px #0008; mix-blend-mode: multiply; }
@@ -54,5 +50,4 @@
 .start { left: 254px; top: 887px; width: 46px; height: 21px; border-radius: 9px; transform: rotate(5deg); }
 .activeCartridge { position: absolute; left: 897px; top: 649px; width: 222px; height: 103px; z-index: 4; pointer-events: none; transform: skewY(3deg); overflow: hidden; background: #080e29; }
 .insertedLabel { display: block; width: 100%; height: 100%; object-fit: fill; user-select: none; -webkit-user-drag: none; }
-.inputLegend { position: absolute; left: 80px; top: 375px; font-size: 11px; line-height: 2.1; color: #c6b4a5; white-space: pre-line; }
 @media (prefers-reduced-motion: reduce) { .scene[data-power-state='shuttingDown'] .romContent { animation: none; visibility: hidden; } .scene[data-power-state='booting'] .romContent { animation: none; } .scene[data-power-state] .powerEffect::after { animation: none; opacity: 0; } }

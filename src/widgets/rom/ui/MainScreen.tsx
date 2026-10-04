@@ -26,6 +26,12 @@ export default function MainScreen({
   const { t } = useTranslation('common');
   return (
     <>
+      <div className={styles.starlight} aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <i />
+      </div>
       <div
         className={styles.clouds}
         aria-hidden="true"
@@ -75,7 +81,7 @@ export default function MainScreen({
             key={src}
             src={src}
             className={styles.heroFrame}
-            data-frame={index}
+            data-frame={index === 0 ? 0 : index + 1}
             alt=""
             draggable={false}
           />

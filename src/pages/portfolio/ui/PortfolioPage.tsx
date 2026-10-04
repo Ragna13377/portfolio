@@ -14,7 +14,9 @@ import {
 } from '../../../shared/lib/power';
 import type { RomInputHandle } from '../../../shared/lib/rom-input';
 import DesktopFallback from '../../../shared/ui/desktop-fallback';
-import HardwareScene from '../../../widgets/hardware-scene';
+import HardwareScene, {
+  ControllerHints,
+} from '../../../widgets/hardware-scene';
 import Rom from '../../../widgets/rom';
 import styles from './PortfolioPage.module.scss';
 
@@ -91,6 +93,7 @@ export default function PortfolioPage() {
 
   return (
     <main className={styles.desktop} aria-label={t('portfolio')}>
+      <ControllerHints />
       <div className={styles.artboard} ref={artboard}>
         <HardwareScene
           powerState={powerState}

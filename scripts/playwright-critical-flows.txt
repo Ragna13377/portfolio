@@ -16,18 +16,26 @@ async (page) => {
   const animation = () => crt.locator('[aria-label="CRT viewport"] > div').first().evaluate(el => getComputedStyle(el).animationName);
   const lineAnimation = () => crt.locator('[aria-label="CRT viewport"] > div').last().evaluate(el => getComputedStyle(el, '::after').animationName);
   await wait('on');
+  check(await rom.getAttribute('data-world-label') === null, 'World captions removed');
+  check(await crt.locator('main, [aria-hidden="true"]').allTextContents().then(texts => texts.every(text => !text.includes('✦ ✦ ✦') && !text.includes(' / HOME') && !text.includes(' / ARCHIVE'))), 'Decorative CRT HUD removed');
   const heroOrder = await crt.locator('[data-frame]').evaluateAll(frames => {
     const animations = frames.map(frame => frame.getAnimations()[0]);
     animations.forEach(animation => animation.pause());
-    const order = [0,600,1200,1800,2400].map(time => {
+    const order = [0,900,1800,2700].map(time => {
       animations.forEach(animation => { animation.currentTime = time; });
       return frames.filter(frame => getComputedStyle(frame).opacity === '1').map(frame => Number(frame.dataset.frame) + 1);
     });
     animations.forEach(animation => { animation.currentTime = 0; animation.play(); });
     return order;
   });
-  check(JSON.stringify(heroOrder) === JSON.stringify([[1],[2],[3],[4],[1]]), 'Hero loops 1 → 2 → 3 → 4 → 1 with exactly one visible pose');
-  check(await crt.locator('[data-frame]').evaluateAll(frames => frames.every((frame,index) => frame.getAttribute('src').includes(`hero-idle-0${index + 1}`))), 'Hero file names follow the pose numbers');
+  check(JSON.stringify(heroOrder) === JSON.stringify([[1],[3],[4],[1]]), 'Hero loops 1 → 3 → 4 → 1 with exactly one visible pose');
+  check(await crt.locator('[data-frame]').evaluateAll(frames => frames.every((frame,index) => frame.getAttribute('src').includes(`hero-idle-0${[1,3,4][index]}`))), 'Hero file names follow the pose numbers');
+  check(await crt.locator('[data-menu-player]').evaluate(el => {
+    const menu = el.parentElement.querySelector('nav').getBoundingClientRect();
+    const hero = el.getBoundingClientRect();
+    return hero.left > menu.right;
+  }), 'Hero stands clear of the menu');
+  check(await crt.locator('[data-screen="main"] i').evaluateAll(stars => stars.length === 4 && stars.every(star => Number.parseFloat(getComputedStyle(star).animationDuration) >= 8)), 'Only a few stars pulse slowly');
   check(await page.locator('[data-hardware="active-cartridge"]').count() === 1, 'Exactly one fixed cartridge');
   check(await page.locator('[data-cartridge-action], [data-cartridge-id], [data-readable-toggle], [data-hardware="inactive-cartridge"]').count() === 0, 'Obsolete interactions absent');
   check(await page.locator('[data-hardware="active-cartridge"] button').count() === 0, 'Cartridge is decorative');
@@ -99,7 +107,13 @@ async (page) => {
     await page.waitForFunction(() => Math.abs(document.querySelector('[data-power-state]').getBoundingClientRect().height - Math.min(innerHeight, innerWidth / 1600 * 900)) < 1);
     await page.screenshot({path:`output/playwright/comet-${width}x${height}.png`});
     check(await page.locator('[data-hardware-art]').evaluate(el => {const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight;}), 'Whole hardware fits desktop');
-    check(await crt.locator('[data-frame]').count() === 4, 'Four supplied hero poses');
+    check(await crt.locator('[data-frame]').count() === 3, 'Three approved hero poses');
+    check(await page.locator('[data-controller-hints]').evaluate(el => Number.parseFloat(getComputedStyle(el).fontSize) >= 16), 'Hints remain readable without scene scaling');
+    const hintBounds = await page.locator('[data-controller-hints]').boundingBox();
+    check(await page.locator('[data-controller-input], [data-console-control]').evaluateAll((buttons, hint) => buttons.every(button => {
+      const r = button.getBoundingClientRect();
+      return r.right <= hint.x || r.left >= hint.x + hint.width || r.bottom <= hint.y || r.top >= hint.y + hint.height;
+    }), hintBounds), 'Hint card never covers hardware controls');
   }
   const tablet = await page.context().browser().newContext({hasTouch:true,isMobile:true,viewport:{width:1024,height:768}});
   try {
@@ -115,5 +129,5 @@ async (page) => {
   await page.setViewportSize({width:1920,height:1200});
   await page.route('**/*crt-main-background*', route => route.request().resourceType() === 'image' ? route.abort() : route.continue()); await page.reload(); await wait('on'); await choices().nth(0).click(); check(await rom.getAttribute('data-screen') === 'about', 'Missing art does not block navigation'); await page.unroute('**/*crt-main-background*');
   check(issues.length === 0, `Runtime errors: ${issues.join(', ')}`);
-  return { projectDetails:4, toolkitCategories:5, controllerHitboxes:11, resetStates:states, runtimeErrors:issues, passed:['single cartridge','no swapping/readable view','keyboard/mouse/controller','EN/RU','powered ROM reset without line','power line/collapse','scanlines','reduced motion','minimal mobile fallback','no overflow','asset failure'] };
+  return { heroOrder, projectDetails:4, toolkitCategories:5, controllerHitboxes:11, resetStates:states, runtimeErrors:issues, passed:['single cartridge','no swapping/readable view','keyboard/mouse/controller','EN/RU','powered ROM reset without line','power line/collapse','scanlines','reduced motion','minimal mobile fallback','no overflow','asset failure','readable hints clear of controls','three-pose hero clear of menu','slow star pulses','no decorative CRT HUD'] };
 }
