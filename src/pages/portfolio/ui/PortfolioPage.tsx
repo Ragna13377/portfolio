@@ -82,11 +82,11 @@ export default function PortfolioPage() {
         const scene = artboard.current.parentElement;
         scene?.style.setProperty(
           '--hint-x',
-          `${Math.max(16, controllerLeft - 156)}px`,
+          `${Math.max(16, controllerLeft - 172)}px`,
         );
         scene?.style.setProperty(
           '--hint-y',
-          `${Math.max(16, controllerTop - 170)}px`,
+          `${Math.max(16, controllerTop - 186)}px`,
         );
       }
     };
