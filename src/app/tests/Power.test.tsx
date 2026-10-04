@@ -233,7 +233,12 @@ test('deep ROM state stays dormant for all keyboard/controller/direct input duri
   await choice(1);
   expect(selected()).toBe(0);
   await clickControl('a');
-  expect(heading()).not.toBe(oldHeading);
+  expect(
+    container
+      .querySelector('[data-project-information]')
+      ?.getAttribute('data-project-information'),
+  ).toBe('transport-control');
+  expect(heading()).toBe(oldHeading);
 });
 
 test('fresh boots discard Main, Projects, Toolkit, Options selections and previous Options context', async () => {

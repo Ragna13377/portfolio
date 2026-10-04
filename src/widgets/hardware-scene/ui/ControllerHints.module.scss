@@ -7,3 +7,4 @@
 .hints dt span { color: #9ca8b0; font-size: .9em; }
 .hints dd { margin: 0; color: #bdb8ae; }
 .arrow { position: absolute; right: -1em; top: calc(100% + 1em); width: 8em; height: auto; transform: translateX(var(--hint-arrow-offset, 0px)); color: #e0dcd3; opacity: .55; filter: drop-shadow(0 .07em .2em #000); pointer-events: none; }
+.hints { cursor: pointer; }

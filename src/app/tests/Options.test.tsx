@@ -95,14 +95,7 @@ function expectFocus(index: number) {
   expect(document.activeElement).toBe(choices()[index]);
 }
 
-test.each([
-  'main',
-  'about',
-  'projects',
-  'projectDetail',
-  'toolkit',
-  'contact',
-] as const)(
+test.each(['main', 'about', 'projects', 'toolkit', 'contact'] as const)(
   'O from %s restores exact context, selection, focus and hardware without booting',
   async (screen) => {
     await boot();
@@ -110,14 +103,13 @@ test.each([
       await clickChoice(
         screen === 'about'
           ? 0
-          : screen === 'projects' || screen === 'projectDetail'
+          : screen === 'projects'
             ? 1
             : screen === 'toolkit'
               ? 2
               : 3,
       );
-    if (screen === 'projectDetail') await clickChoice(2);
-    if (screen === 'projects') await press('ArrowDown');
+    if (screen === 'projects') await press('ArrowRight');
     if (screen === 'main') await press('ArrowUp');
     const previousHeading = container.querySelector('h1,h2')?.textContent;
     const previousIndex = selectedIndex();
@@ -146,11 +138,6 @@ test.each([
     ).forEach((node, index) => {
       expect(node).toBe(hardware[index]);
     });
-    if (screen === 'projectDetail') {
-      await press('Escape');
-      expect(heading()).toBe('PROJECTS SELECT');
-      expectFocus(2);
-    }
   },
 );
 
@@ -447,18 +434,21 @@ test('all portfolio namespaces translate through Options while project IDs, tech
   await back();
   expect(choices()[1].textContent).toContain('ПРОЕКТЫ');
   await clickChoice(1);
-  expect(heading()).toBe('ВЫБОР ПРОЕКТА');
+  expect(heading()).toBe('ПРОЕКТЫ');
   for (let index = 0; index < PROJECTS.length; index++) {
     await clickChoice(index);
     const project = PROJECTS[index];
     const copy = resources.ru.projects[project.id];
-    expect(heading()).toBe(copy.label);
-    expect(container.textContent).toContain(copy.type);
+    expect(heading()).toBe('ПРОЕКТЫ');
+    const information = container.querySelector('[data-project-information]');
+    expect(information?.querySelector('h3')?.textContent).toBe(copy.label);
+    expect(information?.querySelector('p')?.textContent).toBe(copy.description);
     expect(
-      Array.from(container.querySelectorAll('li'), (li) => li.textContent),
-    ).toEqual(Object.values(copy.highlights));
-    expect(container.textContent).toContain(project.tech);
-    await back();
+      Array.from(
+        information?.querySelectorAll('li') ?? [],
+        (li) => li.lastElementChild?.textContent,
+      ),
+    ).toEqual(project.technologies.map((item) => item.name));
   }
   await back();
   await clickChoice(2);
@@ -500,8 +490,12 @@ test('all portfolio namespaces translate through Options while project IDs, tech
       ?.click(),
   );
   expect(clipboard).toHaveBeenCalledWith('koseki.bijou987@gmail.com');
+  expect(
+    container.querySelector('[aria-label="Копировать адрес почты"]')
+      ?.textContent,
+  ).toBe('Скопировано');
   expect(container.querySelector('[role="status"]')?.textContent).toBe(
-    'СКОПИРОВАНО!',
+    'Скопировано',
   );
 });
 

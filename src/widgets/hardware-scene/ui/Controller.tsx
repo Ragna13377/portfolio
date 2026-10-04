@@ -25,6 +25,9 @@ export default function Controller({
   const { t } = useTranslation('common');
   return (
     <>
+      <span className={styles.startLegend} aria-hidden="true">
+        START
+      </span>
       {CONTROLS.map((control) => (
         <ControlButton
           key={control.id}
@@ -62,6 +65,12 @@ function ControlButton({
       }}
       onBlur={() => setKeyPressed(false)}
       onClick={() => onInput?.(control.input)}
-    ></button>
+    >
+      {['a', 'b', 'c', 'x', 'y', 'z'].includes(control.id) && (
+        <span className={styles.capLegend} aria-hidden="true">
+          {control.label}
+        </span>
+      )}
+    </button>
   );
 }

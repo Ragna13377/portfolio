@@ -75,6 +75,12 @@ export default function HardwareScene({
           </section>
         </div>
         <div className={styles.console} data-hardware="console">
+          <div className={styles.consoleMarkings} aria-hidden="true">
+            <span className={styles.powerLegend}>POWER</span>
+            <span className={styles.resetLegend}>RESET</span>
+            <span className={styles.bitLegend}>16-BIT</span>
+            <span className={styles.megaDriveLegend}>MEGA DRIVE</span>
+          </div>
           <span className={styles.powerLed} aria-hidden="true" />
           <button
             type="button"

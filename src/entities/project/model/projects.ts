@@ -1,18 +1,38 @@
 export const PROJECTS = [
   {
     id: 'transport-control',
-    tech: 'React · TypeScript · TanStack Query · TanStack Virtual · React Hook Form · Zod · 2GIS',
+    technologies: [
+      { name: 'React', slug: 'react', mark: 'Re' },
+      { name: 'TypeScript', slug: 'typescript', mark: 'TS' },
+      { name: 'TanStack Virtual', slug: 'tanstack', mark: 'TV' },
+      { name: '2GIS', slug: null, mark: '2G' },
+    ],
   },
   {
     id: 'financial-platform',
-    tech: 'Next.js · TypeScript · Radix UI · shadcn/ui · next-intl · Chart.js',
+    technologies: [
+      { name: 'Next.js', slug: 'nextdotjs', mark: 'N' },
+      { name: 'TypeScript', slug: 'typescript', mark: 'TS' },
+      { name: 'Radix UI', slug: 'radixui', mark: 'Rx' },
+      { name: 'Chart.js', slug: 'chartdotjs', mark: 'Ch' },
+    ],
   },
   {
     id: 'facade-builder',
-    tech: 'React · TypeScript · Redux · React DnD · jsPDF',
+    technologies: [
+      { name: 'React', slug: 'react', mark: 'Re' },
+      { name: 'TypeScript', slug: 'typescript', mark: 'TS' },
+      { name: 'Redux', slug: 'redux', mark: 'Rx' },
+      { name: 'React DnD', slug: null, mark: 'DnD' },
+    ],
   },
   {
-    id: 'real-time-platform',
-    tech: 'React · Next.js · TypeScript · Redux · React Hook Form · Tailwind CSS · WebSocket',
+    id: 'vps-control-panel',
+    technologies: [
+      { name: 'React', slug: 'react', mark: 'Re' },
+      { name: 'Redux Toolkit', slug: 'redux', mark: 'Rx' },
+      { name: 'MUI', slug: 'mui', mark: 'M' },
+      { name: 'Storybook', slug: 'storybook', mark: 'S' },
+    ],
   },
 ] as const;

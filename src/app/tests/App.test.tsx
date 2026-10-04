@@ -281,16 +281,24 @@ test('copy writes exact raw values and shows transient feedback only inside the 
   ] as const) {
     await act(async () => copyButton(channel).click());
     expect(writeText).toHaveBeenLastCalledWith(value);
+    expect(copyButton(channel).textContent).toBe('Copied');
+    expect(copyButton(channel).getAttribute('data-copied')).toBe('true');
+    expect(copyButton(channel).querySelector('svg')).not.toBeNull();
+    expect(
+      copyButton(channel === 'Telegram' ? 'email' : 'Telegram').textContent,
+    ).toBe('Copy');
     const status = container.querySelector('[role="status"]');
-    expect(status?.textContent).toBe('COPIED!');
+    expect(status?.textContent).toBe('Copied');
     expect(
       container.querySelector('[aria-label="CRT viewport"]')?.contains(status),
     ).toBe(true);
     expect(document.querySelectorAll('[role="status"]')).toHaveLength(1);
     await act(async () => vi.advanceTimersByTime(1199));
-    expect(status?.textContent).toBe('COPIED!');
+    expect(status?.textContent).toBe('Copied');
     await act(async () => vi.advanceTimersByTime(1));
     expect(status?.textContent).toBe('');
+    expect(copyButton(channel).textContent).toBe('Copy');
+    expect(copyButton(channel).getAttribute('data-copied')).toBe('false');
   }
   expect(writeText).toHaveBeenCalledTimes(2);
   expect(alert).not.toHaveBeenCalled();
@@ -309,12 +317,12 @@ test('pending and rejected clipboard writes never claim success and Contact stay
   );
   await openContact();
   await act(async () => copyButton('Telegram').click());
-  expect(container.textContent).not.toContain('COPIED!');
+  expect(container.textContent).not.toContain('Copied');
   await act(async () => finish());
-  expect(container.textContent).toContain('COPIED!');
+  expect(container.textContent).toContain('Copied');
   writeText.mockRejectedValue(new Error('Permission denied'));
   await act(async () => copyButton('email').click());
-  expect(container.textContent).not.toContain('COPIED!');
+  expect(container.textContent).not.toContain('Copied');
   expect(container.querySelector('h2')?.textContent).toBe('CONTACT');
   await act(async () =>
     container.querySelector<HTMLButtonElement>('[data-rom-back]')?.click(),
@@ -326,7 +334,7 @@ test('unavailable clipboard is safe and pending writes are ignored after leaving
   vi.stubGlobal('navigator', {});
   await openContact();
   await act(async () => copyButton('Telegram').click());
-  expect(container.textContent).not.toContain('COPIED!');
+  expect(container.textContent).not.toContain('Copied');
   let finish: () => void = () => {};
   stubClipboard(
     vi.fn().mockImplementation(
@@ -341,7 +349,7 @@ test('unavailable clipboard is safe and pending writes are ignored after leaving
   await act(async () => press('Enter'));
   await act(async () => finish());
   expect(container.querySelector('h2')?.textContent).toBe('CONTACT');
-  expect(container.textContent).not.toContain('COPIED!');
+  expect(container.textContent).not.toContain('Copied');
 });
 
 test.each(['Escape', 'Backspace', 'button'])(
@@ -713,193 +721,135 @@ test('mouse opens Contact and About directly', async () => {
 
 const projectCases = [
   {
+    id: 'transport-control',
     label: 'TRANSPORT CONTROL',
-    type: 'Transport / kicksharing admin platform',
-    highlights: [
-      'Real-time maps and route visualization',
-      'Virtualized large datasets',
-      'Complex validated workflows',
-      'Nested modal infrastructure',
-    ],
-    tech: 'React · TypeScript · TanStack Query · TanStack Virtual · React Hook Form · Zod · 2GIS',
+    description:
+      'An admin platform for transport and scooter sharing: maps, real-time routes, large tables, filters, forms and complex modal workflows.',
+    technologies: ['React', 'TypeScript', 'TanStack Virtual', '2GIS'],
   },
   {
-    label: 'FINANCIAL PLATFORM',
-    type: 'Financial platform',
-    highlights: [
-      '~7s → ~2s page-load improvement',
-      'Transaction state handling',
-      'Analytics dashboards',
-      'Support/dispute workflows',
-    ],
-    tech: 'Next.js · TypeScript · Radix UI · shadcn/ui · next-intl · Chart.js',
+    id: 'financial-platform',
+    label: 'FINTECH PLATFORM',
+    description:
+      'A financial platform with payment workflows, analytics, user support and application performance optimization.',
+    technologies: ['Next.js', 'TypeScript', 'Radix UI', 'Chart.js'],
   },
   {
+    id: 'facade-builder',
     label: 'FACADE BUILDER',
-    type: 'Visual configuration tool',
-    highlights: [
-      'Visual DnD editor',
-      'Snap + zoom interaction',
-      'Undo/redo state model',
-      'PDF output workflow',
-    ],
-    tech: 'React · TypeScript · Redux · React DnD · jsPDF',
+    description:
+      'A visual facade builder with drag-and-drop, grid snapping, zoom, undo/redo and PDF estimate generation.',
+    technologies: ['React', 'TypeScript', 'Redux', 'React DnD'],
   },
   {
-    label: 'REAL-TIME PLATFORM',
-    type: 'Internal corporate platform',
-    highlights: [
-      'WebSocket chat',
-      'Reconnect / notification flows',
-      'Scheduling / planning UI',
-      'Role-based access',
-    ],
-    tech: 'React · Next.js · TypeScript · Redux · React Hook Form · Tailwind CSS · WebSocket',
+    id: 'vps-control-panel',
+    label: 'VPS CONTROL PANEL',
+    description:
+      'A VPS/VDS control panel for server status, configurations and plans, file management and payment workflows.',
+    technologies: ['React', 'Redux Toolkit', 'MUI', 'Storybook'],
   },
 ];
 
-test('keyboard Projects flow wraps, restores selection/focus and preserves hardware nodes', async () => {
+async function openProjects() {
   await boot();
+  await act(async () =>
+    container.querySelectorAll<HTMLButtonElement>('nav button')[1].click(),
+  );
+}
+function projectButtons() {
+  return container.querySelectorAll<HTMLButtonElement>('[data-project-id]');
+}
+function selectedProject() {
+  return Array.from(projectButtons()).findIndex(
+    (button) => button.getAttribute('aria-current') === 'true',
+  );
+}
+
+test('Projects selects its first island, moves Left/Right with one selector, and preserves mounted hardware', async () => {
+  await openProjects();
   const hardware = Array.from(container.querySelectorAll('[data-hardware]'));
-  const scene = container.querySelector(
-    '[aria-label="Desktop hardware scene"]',
-  );
-  const viewport = container.querySelector('[aria-label="CRT viewport"]');
-  const reserved = container.querySelector(
-    '[data-cartridge-position="reserved"]',
-  );
-  const assertHardware = () => {
+  const selector = container.querySelector('[data-project-selector]');
+  expect(selectedProject()).toBe(0);
+  expect(container.querySelector('h2')?.textContent).toBe('PROJECTS');
+  expect(projectButtons()).toHaveLength(4);
+  expect(
+    container
+      .querySelector('[data-project-information]')
+      ?.getAttribute('data-project-information'),
+  ).toBe('transport-control');
+  expect(document.activeElement).toBe(projectButtons()[0]);
+  for (const [key, index] of [
+    ['ArrowRight', 1],
+    ['ArrowRight', 2],
+    ['ArrowRight', 3],
+    ['ArrowRight', 0],
+    ['ArrowLeft', 3],
+  ] as const) {
+    await act(async () => press(key, document.activeElement as HTMLElement));
+    expect(selectedProject()).toBe(index);
+    expect(document.activeElement).toBe(projectButtons()[index]);
+    expect(container.querySelector('[data-project-selector]')).toBe(selector);
+    expect(container.querySelectorAll('[data-project-selector]')).toHaveLength(
+      1,
+    );
+    expect(
+      container
+        .querySelector('[data-project-information]')
+        ?.getAttribute('data-project-information'),
+    ).toBe(projectCases[index].id);
     expect(Array.from(container.querySelectorAll('[data-hardware]'))).toEqual(
       hardware,
     );
-    for (const element of hardware) {
-      expect(
-        container.querySelector(
-          `[data-hardware="${element.getAttribute('data-hardware')}"]`,
-        ),
-      ).toBe(element);
-    }
-    expect(
-      container.querySelector('[aria-label="Desktop hardware scene"]'),
-    ).toBe(scene);
-    expect(container.querySelector('[aria-label="CRT viewport"]')).toBe(
-      viewport,
-    );
-    expect(
-      container.querySelector('[data-cartridge-position="reserved"]'),
-    ).toBe(reserved);
-    expect(container.textContent).not.toContain('BOOTING...');
-  };
-  const projectsButton = container.querySelectorAll('nav button')[1];
-  expect(projectsButton.textContent).toContain('PROJECTS');
-  expect(projectsButton.getAttribute('aria-disabled')).toBe('false');
-  await act(async () => press('ArrowDown'));
-  expect(document.activeElement).toBe(projectsButton);
-  await act(async () => press('Enter', projectsButton));
-  expect(container.querySelector('h2')?.textContent).toBe('PROJECTS SELECT');
-  expect(
-    Array.from(container.querySelectorAll('nav button'), (button) =>
-      button.textContent?.replace(/^[▶\s]+/, ''),
-    ),
-  ).toEqual(projectCases.map((item) => item.label));
-  assertHardware();
-  for (const [key, index] of [
-    ['ArrowUp', 3],
-    ['ArrowDown', 0],
-    ['W', 3],
-    ['S', 0],
-    ['s', 1],
-    ['ArrowDown', 2],
-    ['ArrowDown', 3],
-    ['ArrowDown', 0],
-    ['w', 3],
-  ] as const) {
-    if (
-      (index === 3 && ['ArrowUp', 'W', 'w'].includes(key)) ||
-      (index === 0 &&
-        ['ArrowDown', 'S'].includes(key) &&
-        selected()?.includes(projectCases[3].label))
-    ) {
-      await act(async () => press(key));
-      expect(document.activeElement).toBe(
-        container.querySelector('[data-rom-back]'),
-      );
-    }
-    await act(async () => press(key));
-    expect(selected()).toBe(`▶${projectCases[index].label}`);
-    expect(document.activeElement).toBe(
-      container.querySelectorAll('nav button')[index],
-    );
   }
-  await act(async () => press(' ', document.activeElement as HTMLElement));
-  expect(container.querySelector('h2')?.textContent).toBe('REAL-TIME PLATFORM');
-  expect(document.activeElement).toBe(container.querySelector('h2'));
-  assertHardware();
-  // Direction keys select the shared Back action without changing the project.
-  await act(async () => {
-    press('ArrowDown');
-  });
-  expect(document.activeElement).toBe(
-    container.querySelector('[data-rom-back]'),
-  );
-  expect(container.querySelectorAll('h2')).toHaveLength(1);
-  expect(container.querySelector('h2')?.textContent).toBe('REAL-TIME PLATFORM');
-  await act(async () => press('Backspace'));
-  expect(container.querySelector('h2')?.textContent).toBe('PROJECTS SELECT');
-  expect(selected()).toBe('▶REAL-TIME PLATFORM');
-  expect(document.activeElement).toBe(
-    container.querySelectorAll('nav button')[3],
-  );
-  assertHardware();
-  await act(async () => press('Escape'));
+  for (const key of ['Enter', ' ', 'a']) {
+    await act(async () => press(key, document.activeElement as HTMLElement));
+    expect(container.querySelector('[data-screen="projects"]')).not.toBeNull();
+    expect(selectedProject()).toBe(3);
+  }
+  await act(async () => press('b'));
   expect(selected()).toBe('▶PROJECTS');
   expect(document.activeElement).toBe(
     container.querySelectorAll('nav button')[1],
   );
-  assertHardware();
-  await act(async () => {
-    press('Escape');
-    press('Backspace');
-  });
-  expect(selected()).toBe('▶PROJECTS');
+  expect(Array.from(container.querySelectorAll('[data-hardware]'))).toEqual(
+    hardware,
+  );
+  await act(async () => press('Enter', document.activeElement as HTMLElement));
+  expect(selectedProject()).toBe(0);
 });
 
 test.each(projectCases)(
-  'mouse opens $label with exactly its supplied details and Back hierarchy',
+  'clicking $label selects its card with four technologies and never opens a detail page',
   async (item) => {
-    await boot();
-    await act(async () =>
-      container.querySelectorAll<HTMLButtonElement>('nav button')[1].click(),
-    );
-    expect(container.querySelector('h2')?.textContent).toBe('PROJECTS SELECT');
+    await openProjects();
     const index = projectCases.indexOf(item);
-    await act(async () =>
-      container
-        .querySelectorAll<HTMLButtonElement>('nav button')
-        [index].click(),
-    );
-    expect(container.querySelectorAll('h2')).toHaveLength(1);
-    expect(container.querySelector('h2')?.textContent).toBe(item.label);
-    expect(container.textContent).toContain(item.type);
+    await act(async () => projectButtons()[index].click());
+    expect(selectedProject()).toBe(index);
+    const information = container.querySelector('[data-project-information]');
+    expect(information?.querySelector('h3')?.textContent).toBe(item.label);
+    expect(information?.querySelector('p')?.textContent).toBe(item.description);
     expect(
-      Array.from(container.querySelectorAll('li'), (li) => li.textContent),
-    ).toEqual(item.highlights);
-    expect(container.textContent).toContain(item.tech);
+      Array.from(
+        information?.querySelectorAll('li') ?? [],
+        (li) => li.lastElementChild?.textContent,
+      ),
+    ).toEqual(item.technologies);
+    expect(
+      information?.querySelectorAll('li > span[aria-hidden="true"]'),
+    ).toHaveLength(4);
+    expect(container.querySelector('[data-screen="projectDetail"]')).toBeNull();
     expect(
       container.querySelectorAll('[data-hardware="crt"] button'),
-    ).toHaveLength(1);
-    await act(async () =>
-      container.querySelector<HTMLButtonElement>('[data-rom-back]')?.click(),
-    );
-    expect(selected()).toBe(`▶${item.label}`);
+    ).toHaveLength(5);
+    expect(
+      container.querySelector('[data-project-id]')?.querySelector('img'),
+    ).not.toBeNull();
     await act(async () =>
       container.querySelector<HTMLButtonElement>('[data-rom-back]')?.click(),
     );
     expect(selected()).toBe('▶PROJECTS');
-    expect(container.querySelector('h1')?.textContent).toBe('IVAN DMITRIEVICH');
   },
 );
-
 test('Back buttons keep native activation and unrelated controls are protected on Projects screens', async () => {
   await boot();
   await act(async () =>
@@ -914,7 +864,7 @@ test('Back buttons keep native activation and unrelated controls are protected o
     );
     expect(press(' ', back as HTMLButtonElement).defaultPrevented).toBe(false);
   });
-  expect(container.querySelector('h2')?.textContent).toBe('PROJECTS SELECT');
+  expect(container.querySelector('h2')?.textContent).toBe('PROJECTS');
   const controls = ['input', 'textarea', 'select', 'a', 'button', 'div'].map(
     (tag) => {
       const element = document.createElement(tag);

@@ -1,45 +1,21 @@
 {
-  "heading": "PROJECTS SELECT",
-  "select": "Projects select",
-  "tech": "TECH",
+  "heading": "PROJECTS",
+  "select": "Select a project",
+  "tech": "TECHNOLOGIES:",
   "transport-control": {
     "label": "TRANSPORT CONTROL",
-    "type": "Transport / kicksharing admin platform",
-    "highlights": {
-      "0": "Real-time maps and route visualization",
-      "1": "Virtualized large datasets",
-      "2": "Complex validated workflows",
-      "3": "Nested modal infrastructure"
-    }
+    "description": "An admin platform for transport and scooter sharing: maps, real-time routes, large tables, filters, forms and complex modal workflows."
   },
   "financial-platform": {
-    "label": "FINANCIAL PLATFORM",
-    "type": "Financial platform",
-    "highlights": {
-      "0": "~7s → ~2s page-load improvement",
-      "1": "Transaction state handling",
-      "2": "Analytics dashboards",
-      "3": "Support/dispute workflows"
-    }
+    "label": "FINTECH PLATFORM",
+    "description": "A financial platform with payment workflows, analytics, user support and application performance optimization."
   },
   "facade-builder": {
     "label": "FACADE BUILDER",
-    "type": "Visual configuration tool",
-    "highlights": {
-      "0": "Visual DnD editor",
-      "1": "Snap + zoom interaction",
-      "2": "Undo/redo state model",
-      "3": "PDF output workflow"
-    }
+    "description": "A visual facade builder with drag-and-drop, grid snapping, zoom, undo/redo and PDF estimate generation."
   },
-  "real-time-platform": {
-    "label": "REAL-TIME PLATFORM",
-    "type": "Internal corporate platform",
-    "highlights": {
-      "0": "WebSocket chat",
-      "1": "Reconnect / notification flows",
-      "2": "Scheduling / planning UI",
-      "3": "Role-based access"
-    }
+  "vps-control-panel": {
+    "label": "VPS CONTROL PANEL",
+    "description": "A VPS/VDS control panel for server status, configurations and plans, file management and payment workflows."
   }
 }

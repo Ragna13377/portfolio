@@ -82,7 +82,9 @@ export default function ToolkitScreen({
   return (
     <>
       <header className={styles.header}>
-        <h2 tabIndex={-1}>{t('common:menu.toolkit')}</h2>
+        <h2 tabIndex={-1}>
+          <span data-heading-text>{t('common:menu.toolkit')}</span>
+        </h2>
       </header>
       <div className={styles.scene}>
         <div

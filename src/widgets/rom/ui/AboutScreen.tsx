@@ -168,7 +168,7 @@ export default function AboutScreen({
         />
       </div>
       <h2 className={styles.heading} tabIndex={-1}>
-        {t('common:menu.about')}
+        <span data-heading-text>{t('common:menu.about')}</span>
       </h2>
       <div className={styles.scene} data-about-scene>
         <div className={styles.hero} aria-hidden="true">

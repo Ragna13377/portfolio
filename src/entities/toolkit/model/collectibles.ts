@@ -30,17 +30,22 @@ const technologies = [
   ['Lefthook', 'lefthook'],
 ] as const;
 
-export const TOOLKIT_COLLECTIBLES = technologies.map(([name, slug]) => {
-  const icon = slug ? icons[slug] : undefined;
+export function technologyVisual(slug: string | null, mark: string) {
+  const catalog: Partial<Record<string, { path: string; hex: string }>> = icons;
+  const icon = slug ? catalog[slug] : undefined;
   return {
-    name,
-    id: slug ?? 'zustand',
     icon,
     color: icon ? `#${icon.hex}` : '#D9C5AC',
     glyphColor: readableGlyphColor(icon ? `#${icon.hex}` : '#D9C5AC'),
-    mark: 'Zu',
+    mark,
   };
-});
+}
+
+export const TOOLKIT_COLLECTIBLES = technologies.map(([name, slug]) => ({
+  name,
+  id: slug ?? 'zustand',
+  ...technologyVisual(slug, 'Zu'),
+}));
 export type ToolkitCollectible = (typeof TOOLKIT_COLLECTIBLES)[number];
 
 // Preserve brand colors wherever they are readable on the dark tile.

@@ -14,7 +14,6 @@ import {
   preloadTheme,
   themeAssetUrl,
 } from '../../../entities/cartridge';
-import { PROJECTS } from '../../../entities/project';
 import {
   initialRomState,
   isOptionsScreen,
@@ -36,7 +35,6 @@ import ControlsScreen from './ControlsScreen';
 import LanguageScreen from './LanguageScreen';
 import MainScreen from './MainScreen';
 import OptionsScreen from './OptionsScreen';
-import ProjectDetailScreen from './ProjectDetailScreen';
 import ProjectsScreen from './ProjectsScreen';
 import styles from './Rom.module.scss';
 import ToolkitScreen from './ToolkitScreen';
@@ -68,7 +66,6 @@ export default function Rom({
   const content = useRef<HTMLDivElement>(null);
   const actionScreen = useRef(state.screen);
   const selectedAction = useRef<HTMLButtonElement | null>(null);
-  const project = PROJECTS[state.selectedProjectIndex];
   const selectedKey = selectionKey(state.screen);
   const selectedIndex = selectedKey ? state[selectedKey] : undefined;
 
@@ -210,6 +207,17 @@ export default function Rom({
                   input.direction === 'left' ? -1 : 1,
                 );
             }
+            return;
+          }
+          if (
+            state.screen === 'projects' &&
+            (input.direction === 'left' || input.direction === 'right')
+          ) {
+            markAction(null);
+            dispatch({
+              type: 'move',
+              direction: input.direction === 'left' ? -1 : 1,
+            });
             return;
           }
           if (
@@ -392,7 +400,12 @@ export default function Rom({
       }
       switch (key) {
         case 'b':
-          if (state.screen !== 'toolkit' && state.screen !== 'about') return;
+          if (
+            state.screen !== 'toolkit' &&
+            state.screen !== 'about' &&
+            state.screen !== 'projects'
+          )
+            return;
           input = { type: 'back' };
           break;
         case 'arrowleft':
@@ -475,11 +488,8 @@ export default function Rom({
     <div
       data-theme={cartridgeId}
       data-screen={state.screen}
-      data-location={t(
-        `worlds:${cartridgeId}.stages.${state.selectedProjectIndex}`,
-      )}
       style={{ backgroundImage: `url("${themeAssetUrl(cartridgeId)}")` }}
-      className={`${styles.rom} ${state.screen === 'about' ? styles.about : ''} ${state.screen === 'projectDetail' ? styles.detail : ''} ${state.screen === 'toolkit' ? styles.toolkit : ''} ${state.screen === 'contact' ? styles.contact : ''} ${state.screen === 'optionsControls' ? styles.controlsScreen : ''}`}
+      className={`${styles.rom} ${state.screen === 'about' ? styles.about : ''} ${state.screen === 'projects' ? styles.projects : ''} ${state.screen === 'toolkit' ? styles.toolkit : ''} ${state.screen === 'contact' ? styles.contact : ''} ${state.screen === 'optionsControls' ? styles.controlsScreen : ''}`}
       ref={content}
       onFocusCapture={(event) => {
         if (event.target instanceof HTMLButtonElement) markAction(event.target);
@@ -540,18 +550,9 @@ export default function Rom({
       {state.screen === 'contact' && <ContactScreen onBack={back} />}
       {state.screen === 'projects' && (
         <ProjectsScreen
-          cartridgeId={cartridgeId}
           selectedIndex={state.selectedProjectIndex}
           onSelect={select}
-          onActivate={activate}
           onBack={back}
-        />
-      )}
-      {state.screen === 'projectDetail' && (
-        <ProjectDetailScreen
-          project={project}
-          onBack={back}
-          cartridgeId={cartridgeId}
         />
       )}
       {state.screen === 'toolkit' && (

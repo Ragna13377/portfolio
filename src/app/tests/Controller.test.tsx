@@ -105,7 +105,7 @@ test('eleven native controller buttons exist during boot and become useful after
   await click('down');
   expect(selected()).toBe(1);
   await click('a');
-  expect(heading()).toBe('PROJECTS SELECT');
+  expect(heading()).toBe('PROJECTS');
 });
 
 test('six-button controller mirrors confirmation, Back and Options and bounds menu-world movement', async () => {
@@ -131,46 +131,31 @@ test('six-button controller mirrors confirmation, Back and Options and bounds me
   expect(container.querySelector('h1')?.textContent).toBe('IVAN DMITRIEVICH');
 });
 
-test('D-pad wraps Main selection and A/B follow Projects detail hierarchy', async () => {
+test('D-pad selects project islands horizontally and A never opens a detail page', async () => {
   await boot();
-  await click('up');
-  expect(selected()).toBe(3);
-  await click('down');
-  if (container.querySelector('[data-rom-back][data-rom-selected]'))
-    await click('down');
-  expect(selected()).toBe(0);
   await click('down');
   await click('a');
-  expect(heading()).toBe('PROJECTS SELECT');
-  await click('up');
+  expect(heading()).toBe('PROJECTS');
+  expect(selected()).toBe(0);
+  await click('right');
+  expect(selected()).toBe(1);
   expect(
     container
-      .querySelector('[data-rom-back]')
-      ?.hasAttribute('data-rom-selected'),
-  ).toBe(true);
-  await click('up');
-  expect(selected()).toBe(choices().length - 1);
-  await click('down');
-  if (container.querySelector('[data-rom-back][data-rom-selected]'))
-    await click('down');
-  expect(selected()).toBe(0);
-  await click('down');
-  const projectName = choices()[1].textContent?.replace('▶', '').trim();
+      .querySelector('[data-project-information]')
+      ?.getAttribute('data-project-information'),
+  ).toBe('financial-platform');
   await click('a');
-  expect(heading()).toBe(projectName);
-  const detail = heading();
-  for (const control of ['up', 'down', 'left', 'right', 'c'])
-    await click(control);
-  expect(heading()).toBe(detail);
-  await click('b');
-  expect(heading()).toBe('PROJECTS SELECT');
+  await click('x');
+  expect(heading()).toBe('PROJECTS');
   expect(selected()).toBe(1);
-  await click('b');
-  expect(selected()).toBe(1);
+  await click('left');
+  expect(selected()).toBe(0);
+  await click('left');
+  expect(selected()).toBe(3);
   await click('b');
   expect(selected()).toBe(1);
+  expect(container.querySelector('h1')?.textContent).toBe('IVAN DMITRIEVICH');
 });
-
 test.each([0, 1, 2, 3])(
   'Start restores portfolio context %i and B returns Main',
   async (index) => {
@@ -211,10 +196,6 @@ test.each([0, 1, 2, 3])(
     );
     expect(selected()).toBe(selection);
     await click('b');
-    if (index === 1) {
-      expect(heading()).toBe('PROJECTS SELECT');
-      await click('b');
-    }
     expect(container.querySelector('h1')?.textContent).toBe('IVAN DMITRIEVICH');
     expect(selected()).toBe(index);
   },
@@ -328,7 +309,7 @@ test.each(['Enter', ' '])(
     await boot();
     await click('down');
     for (const [control, expected] of [
-      ['a', 'PROJECTS SELECT'],
+      ['a', 'PROJECTS'],
       ['b', undefined],
       ['start', 'OPTIONS'],
     ] as const) {
@@ -369,7 +350,6 @@ test('keyboard resumes ROM navigation after physical input and direct CRT clicks
   expect(selected()).toBe(1);
   await act(async () => choices()[2].click());
   const detail = heading();
-  await click('b');
   expect(selected()).toBe(2);
   await act(async () => button('start').focus());
   await click('start');
@@ -394,7 +374,7 @@ test('keyboard resumes ROM navigation after physical input and direct CRT clicks
   expect(heading()).toBe('CONTROLS');
   await click('b');
   await click('b');
-  expect(heading()).toBe('PROJECTS SELECT');
+  expect(heading()).toBe('PROJECTS');
   await click('a');
   expect(heading()).toBe(detail);
 });

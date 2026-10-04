@@ -1,13 +1,7 @@
 import { PROJECTS } from '../../../entities/project';
 import { MENU } from '../../../shared/config/navigation';
 
-type PortfolioScreen =
-  | 'main'
-  | 'about'
-  | 'projects'
-  | 'projectDetail'
-  | 'toolkit'
-  | 'contact';
+type PortfolioScreen = 'main' | 'about' | 'projects' | 'toolkit' | 'contact';
 export type RomState = {
   screen:
     | 'boot'
@@ -83,9 +77,7 @@ export function romReducer(state: RomState, action: RomAction): RomState {
         ? state.previousScreen
         : isOptionsScreen(state.screen)
           ? 'options'
-          : state.screen === 'projectDetail'
-            ? 'projects'
-            : 'main';
+          : 'main';
     return { ...state, screen };
   }
 
@@ -120,9 +112,14 @@ export function romReducer(state: RomState, action: RomAction): RomState {
         return {
           ...state,
           selectedProjectIndex: index,
-          screen: 'projectDetail',
         };
-      return { ...state, selectedIndex: index, screen: MENU[index] };
+      return {
+        ...state,
+        selectedIndex: index,
+        screen: MENU[index],
+        selectedProjectIndex:
+          MENU[index] === 'projects' ? 0 : state.selectedProjectIndex,
+      };
     }
   }
 }
