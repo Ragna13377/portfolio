@@ -1,10 +1,8 @@
 {
   "role": "Frontend Developer",
-  "education": "Higher education · English B2",
+  "education": "Higher education",
+  "english": "English B2",
   "dialogueLabel": "My story",
-  "revealHint": "A (Enter) — Reveal all",
-  "replayHint": "A (Enter) — Dialogue complete",
-  "backHint": "B (Esc) — Back",
   "dialogue": {
     "tools": "I build admin panels and internal tools.",
     "interfaces": "Data, forms, maps — I enjoy complex interfaces.",

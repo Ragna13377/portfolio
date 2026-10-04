@@ -78,4 +78,7 @@
 .rom:has(button[data-rom-selected]:not(nav button)) nav button[aria-current='true'] { background: transparent; border-color: transparent; box-shadow: none; color: inherit; .cursor { visibility: hidden; } }
 .rom.toolkit { padding: 48px 32px 24px; }
 
-.rom.about { padding: 48px 32px 24px; h2 { margin-bottom: 12px; } }
+.rom.about[data-screen='about'] { padding: 48px 32px 24px; background-image: url('../../../assets/about-stage-bg.webp') !important; background-size: 100% 100%; background-position: center;
+  &::before { display: none; }
+  h2 { margin-bottom: 12px; }
+}

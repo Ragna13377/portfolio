@@ -442,7 +442,7 @@ test('all portfolio namespaces translate through Options while project IDs, tech
   expect(container.textContent).toContain(resources.ru.about.education);
   expect(container.textContent).toContain(resources.ru.about.dialogue.tools);
   expect(container.textContent).toContain(resources.ru.about.dialogue.hobbies);
-  expect(container.textContent).toContain('Ivan Dmitrievich');
+  expect(container.textContent).not.toContain('Ivan Dmitrievich');
   await back();
   expect(choices()[1].textContent).toContain('ПРОЕКТЫ');
   await clickChoice(1);

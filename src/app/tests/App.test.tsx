@@ -423,7 +423,6 @@ test('automatic boot and About navigation preserve every hardware element', asyn
   await act(async () => press('Enter'));
   expect(container.querySelector('h2')?.textContent).toBe('ABOUT');
   for (const text of [
-    'Ivan Dmitrievich',
     'Frontend Developer',
     'Higher education',
     'English B2',
@@ -492,7 +491,8 @@ test('About reveals whole beats, can skip with Enter or controller A, and replay
   await open();
   expect(container.querySelectorAll('[data-about-beat]')).toHaveLength(6);
   expect(visible()).toHaveLength(0);
-  expect(container.textContent).toContain('Higher education · English B2');
+  expect(container.textContent).toContain('Higher education');
+  expect(container.textContent).toContain('English B2');
   await act(async () => vi.advanceTimersByTime(350));
   expect(visible()).toHaveLength(1);
   expect(visible()[0].textContent).toBe(

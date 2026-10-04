@@ -49,9 +49,9 @@ export default function AboutScreen({
       <h2 tabIndex={-1}>{t('common:menu.about')}</h2>
       <div className={styles.scene} data-about-scene>
         <div className={styles.profile}>
-          <strong>{t('common:name')}</strong>
           <span>{t('role')}</span>
           <small>{t('education')}</small>
+          <small>{t('english')}</small>
         </div>
         <div
           className={styles.hero}
@@ -73,8 +73,10 @@ export default function AboutScreen({
           data-reduced-motion={reducedMotion}
           aria-label={t('dialogueLabel')}
         >
+          <svg className={styles.tail} viewBox="0 0 56 66" aria-hidden="true">
+            <path d="M54 3 Q37 39 5 60 Q27 57 39 47 Q46 52 54 56" />
+          </svg>
           <div className={styles.dialogueBody}>
-            <span className={styles.speaker}>{t('common:name')}</span>
             <ol>
               {beats.map((beat, index) => (
                 <li
@@ -87,22 +89,13 @@ export default function AboutScreen({
               ))}
             </ol>
             <span className={styles.end} aria-hidden="true">
-              {complete ? '◆' : '···'}
+              {complete ? '▼' : '···'}
             </span>
           </div>
         </section>
       </div>
       <footer className={styles.footer}>
-        <RomBackButton onBack={onBack} />
-        <button
-          type="button"
-          className={styles.reveal}
-          onClick={revealAll}
-          data-about-reveal
-        >
-          {t(complete ? 'replayHint' : 'revealHint')}
-        </button>
-        <span>{t('backHint')}</span>
+        <RomBackButton onBack={onBack} className={styles.back} />
       </footer>
     </>
   );
