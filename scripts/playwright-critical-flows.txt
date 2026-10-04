@@ -16,6 +16,18 @@ async (page) => {
   const animation = () => crt.locator('[aria-label="CRT viewport"] > div').first().evaluate(el => getComputedStyle(el).animationName);
   const lineAnimation = () => crt.locator('[aria-label="CRT viewport"] > div').last().evaluate(el => getComputedStyle(el, '::after').animationName);
   await wait('on');
+  const heroOrder = await crt.locator('[data-frame]').evaluateAll(frames => {
+    const animations = frames.map(frame => frame.getAnimations()[0]);
+    animations.forEach(animation => animation.pause());
+    const order = [0,600,1200,1800,2400].map(time => {
+      animations.forEach(animation => { animation.currentTime = time; });
+      return frames.filter(frame => getComputedStyle(frame).opacity === '1').map(frame => Number(frame.dataset.frame) + 1);
+    });
+    animations.forEach(animation => { animation.currentTime = 0; animation.play(); });
+    return order;
+  });
+  check(JSON.stringify(heroOrder) === JSON.stringify([[1],[2],[3],[4],[1]]), 'Hero loops 1 → 2 → 3 → 4 → 1 with exactly one visible pose');
+  check(await crt.locator('[data-frame]').evaluateAll(frames => frames.every((frame,index) => frame.getAttribute('src').includes(`hero-idle-0${index + 1}`))), 'Hero file names follow the pose numbers');
   check(await page.locator('[data-hardware="active-cartridge"]').count() === 1, 'Exactly one fixed cartridge');
   check(await page.locator('[data-cartridge-action], [data-cartridge-id], [data-readable-toggle], [data-hardware="inactive-cartridge"]').count() === 0, 'Obsolete interactions absent');
   check(await page.locator('[data-hardware="active-cartridge"] button').count() === 0, 'Cartridge is decorative');

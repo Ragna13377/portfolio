@@ -28,10 +28,10 @@
 .heroFrame[data-frame='1'] { animation-name: heroSecond; }
 .heroFrame[data-frame='2'] { animation-name: heroThird; }
 .heroFrame[data-frame='3'] { animation-name: heroFourth; }
-@keyframes heroFirst { 0%, 100% { opacity: 1; } 16.666% { opacity: 0; } }
-@keyframes heroSecond { 0% { opacity: 0; } 16.666% { opacity: 1; } 33.333% { opacity: 0; } 83.333% { opacity: 1; } 100% { opacity: 0; } }
-@keyframes heroThird { 0% { opacity: 0; } 33.333% { opacity: 1; } 50% { opacity: 0; } 66.666% { opacity: 1; } 83.333% { opacity: 0; } }
-@keyframes heroFourth { 0% { opacity: 0; } 50% { opacity: 1; } 66.666% { opacity: 0; } }
+@keyframes heroFirst { 0%, 100% { opacity: 1; } 25% { opacity: 0; } }
+@keyframes heroSecond { 0%, 50%, 100% { opacity: 0; } 25% { opacity: 1; } }
+@keyframes heroThird { 0%, 75%, 100% { opacity: 0; } 50% { opacity: 1; } }
+@keyframes heroFourth { 0%, 100% { opacity: 0; } 75% { opacity: 1; } }
 .rom .clouds { position: absolute; left: 0; right: 0; top: 61%; height: 20%; pointer-events: none; background-repeat: repeat-x; background-size: 734px auto; opacity: .28; animation: cloudDrift 110s linear infinite; }
 @keyframes cloudDrift { to { background-position-x: -734px; } }
 .rom .island { position: absolute; left: 57%; top: 52%; width: 22%; pointer-events: none; animation: islandFloat 7s ease-in-out infinite; img { display: block; width: 100%; } }
