@@ -1,3 +1,3 @@
 # Portfolio
 
-Personal portfolio of Ivan Dmitrievich, frontend developer.
+A retro-inspired website with the look and feel of a Sega Mega Drive.
