@@ -47,7 +47,8 @@
 @keyframes starPulse { 50% { opacity: .55; } }
 @media (prefers-reduced-motion: reduce) { .heroFrame { animation: none; opacity: 0; } .heroFrame[data-frame='0'] { opacity: 1; } }
 .back { margin-top: 18px; }
-.about,.projects,.toolkit,.contact,.controlsScreen { padding: 72px 40px 24px; font-family: 'Courier New',monospace; font-size: 18px; line-height: 1.4; letter-spacing: 0; h2 { font-family: Tiny5,monospace; } }
+.about,.projects,.toolkit,.contact { padding: 72px 40px 24px; font-family: 'Courier New',monospace; font-size: 18px; line-height: 1.4; letter-spacing: 0; h2 { font-family: Tiny5,monospace; } }
+.controlsScreen { padding: 72px 40px 24px; }
 .inventory { display: grid; grid-template-columns: 218px minmax(0,1fr); gap: 24px; nav { font-family: Tiny5,monospace; font-size: 25px; } nav button { width: 100%; } }
 .technologies { list-style: none; margin: 0; padding: 12px 18px; font-size: 16px; background: #36323bcc; border: 1px solid #c5ab8544; box-shadow: 5px 5px #030c1c66; li + li { margin-top: 18px; } }
 .channels { list-style: none; padding: 0; margin: 28px 0 0; width: 410px; max-width: 100%; display: grid; gap: 10px;
@@ -65,7 +66,7 @@
 .contactFooter { display: flex; align-items: center; gap: 24px; margin-top: 28px; font-size: 15px; }
 .activeLocale { color: #f3d8a7; margin-left: 16px; width: 1ch; flex: 0 0 1ch; }
 .activeLabel { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.controlList { margin: 0; font-size: 16px; div { margin-bottom: 8px; display: grid; grid-template-columns: 160px 1fr; gap: 10px; } dt { font-weight: bold; color: #dfcbaa; } dd { margin: 0; } }
+.controlList { margin: 0; div { margin-bottom: 8px; display: grid; grid-template-columns: 190px 1fr; gap: 16px; } dt { font-weight: normal; color: #dfcbaa; } dd { margin: 0; } }
 .bootTitle { margin: 112px auto 30px; text-align: center; font: 48px Tiny5,monospace; color: #efd89e; small { font-size: 15px; letter-spacing: 4px; } }
 .rom[data-screen='boot'] { background-image: none !important; background-color: #070f1d; > p { text-align: center; font-size: 23px; letter-spacing: 5px; } }
 .bootProgress { width: 230px; height: 4px; margin: 24px auto; background: #264149; &::after { content: ''; display: block; height: 100%; background: #d8cd8c; transform-origin: left; animation: loading 1.2s steps(10) both; } }
@@ -84,7 +85,6 @@
   &::before { display: none; }
   h2 { margin-bottom: 12px; }
 }
-.rom nav button { cursor: default; }
 .rom.projects[data-screen='projects'] { padding: 48px 32px 24px; background-image: url('../../../assets/project-stage-bg.webp') !important; background-size: 100% 100%; background-position: center;
   &::before { display: none; }
 }

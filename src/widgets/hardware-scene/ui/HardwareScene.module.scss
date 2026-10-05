@@ -70,7 +70,7 @@
 .b .capLegend { translate: 1px 1px; }
 .c .capLegend { translate: -1px 3px; }
 .z .capLegend { translate: 0 1px; }
-.startLegend { position: absolute; left: 255px; top: 868px; width: 46px; height: 12px; display: grid; place-items: center; pointer-events: none; user-select: none; color: #898d91; font: 700 10px/1 Arial, sans-serif; letter-spacing: .5px; text-shadow: 0 -.35px .35px #0008; transform: rotate(7deg) skewX(-8deg) scaleY(.85); }
+.startLegend { position: absolute; left: 256px; top: 868px; width: 46px; height: 12px; display: grid; place-items: center; pointer-events: none; user-select: none; color: #898d91; font: 700 10px/1 Arial, sans-serif; letter-spacing: .5px; text-shadow: 0 -.35px .35px #0008; transform: rotate(7deg) skewX(-8deg) scaleY(.85); }
 .consoleMarkings { position: absolute; inset: 0; pointer-events: none; user-select: none;
   span { position: absolute; display: block; color: #777a7b; font-family: Arial, sans-serif; font-weight: 700; line-height: 1; white-space: nowrap; transform: rotate(4.2deg) skewX(-28deg) scaleY(.68); transform-origin: left center; text-shadow: 0 -.35px .35px #0008; }
 }
