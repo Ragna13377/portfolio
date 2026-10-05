@@ -4,7 +4,7 @@ export const PROJECTS = [
     technologies: [
       { name: 'React', slug: 'react', mark: 'Re' },
       { name: 'TypeScript', slug: 'typescript', mark: 'TS' },
-      { name: 'TanStack Virtual', slug: 'tanstack', mark: 'TV' },
+      { name: 'TanStack', slug: 'tanstack', mark: 'TV' },
       { name: '2GIS', slug: null, mark: '2G' },
     ],
   },

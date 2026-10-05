@@ -347,7 +347,12 @@ test('keyboard resumes ROM navigation after physical input and direct CRT clicks
   expect(selected()).toBe(1);
   await click('a');
   await click('down');
-  expect(selected()).toBe(1);
+  expect(selected()).toBe(0);
+  expect(
+    container
+      .querySelector('[data-rom-back]')
+      ?.hasAttribute('data-rom-selected'),
+  ).toBe(true);
   await act(async () => choices()[2].click());
   const detail = heading();
   expect(selected()).toBe(2);

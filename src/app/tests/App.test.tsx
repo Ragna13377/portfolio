@@ -725,7 +725,7 @@ const projectCases = [
     label: 'TRANSPORT CONTROL',
     description:
       'An admin platform for transport and scooter sharing: maps, real-time routes, large tables, filters, forms and complex modal workflows.',
-    technologies: ['React', 'TypeScript', 'TanStack Virtual', '2GIS'],
+    technologies: ['React', 'TypeScript', 'TanStack', '2GIS'],
   },
   {
     id: 'financial-platform',
@@ -817,6 +817,57 @@ test('Projects selects its first island, moves Left/Right with one selector, and
   await act(async () => press('Enter', document.activeElement as HTMLElement));
   expect(selectedProject()).toBe(0);
 });
+
+test.each(['keyboard', 'controller'] as const)(
+  'Projects %s moves vertically between the selected island and Back without cycling islands',
+  async (source) => {
+    await openProjects();
+    const navigate = async (direction: 'up' | 'down' | 'left' | 'right') => {
+      await act(async () => {
+        if (source === 'keyboard') {
+          press(
+            `Arrow${direction[0].toUpperCase()}${direction.slice(1)}`,
+            document.activeElement as HTMLElement,
+          );
+        } else {
+          container
+            .querySelector<HTMLButtonElement>(
+              `[data-controller-input="${direction}"]`,
+            )
+            ?.click();
+        }
+      });
+    };
+    await navigate('right');
+    expect(selectedProject()).toBe(1);
+    const back = container.querySelector('[data-rom-back]');
+    for (const direction of ['down', 'down', 'left', 'right'] as const) {
+      await navigate(direction);
+      expect(selectedProject()).toBe(1);
+      expect(back?.hasAttribute('data-rom-selected')).toBe(true);
+      expect(document.activeElement).toBe(back);
+    }
+    await navigate('up');
+    expect(selectedProject()).toBe(1);
+    expect(document.activeElement).toBe(projectButtons()[1]);
+    expect(back?.hasAttribute('data-rom-selected')).toBe(false);
+    await navigate('right');
+    expect(selectedProject()).toBe(2);
+    await navigate('down');
+    await act(async () => {
+      if (source === 'keyboard') {
+        // Model native Enter activation, which JSDOM does not perform.
+        press('Enter', back as HTMLElement);
+        (back as HTMLButtonElement).click();
+      } else {
+        container
+          .querySelector<HTMLButtonElement>('[data-controller-input="a"]')
+          ?.click();
+      }
+    });
+    expect(container.querySelector('[data-screen="main"]')).not.toBeNull();
+  },
+);
 
 test.each(projectCases)(
   'clicking $label selects its card with four technologies and never opens a detail page',

@@ -4,19 +4,30 @@ import islandOne from '../../../assets/project_1.webp';
 import islandTwo from '../../../assets/project_2.webp';
 import islandThree from '../../../assets/project_3.webp';
 import islandFour from '../../../assets/project_4.webp';
+import showFirst from '../../../assets/project_sprites/show_1.webp';
+import showSecond from '../../../assets/project_sprites/show_2.webp';
+import showThird from '../../../assets/project_sprites/show_3.webp';
+import showFourth from '../../../assets/project_sprites/show_4.webp';
 import { PROJECTS } from '../../../entities/project';
 import { technologyVisual } from '../../../entities/toolkit';
 import { RomBackButton } from '../../../shared/ui/rom-back-button';
 import styles from './ProjectsScreen.module.scss';
 
 const islands = [islandOne, islandTwo, islandThree, islandFour];
+const heroFrames = [
+  { id: 'rest', src: showFirst },
+  { id: 'raise', src: showSecond },
+  { id: 'point', src: showThird },
+  { id: 'hold', src: showFourth },
+  { id: 'return-point', src: showThird },
+  { id: 'return-raise', src: showSecond },
+];
+const routePath =
+  'M84 74 C118 74 136 56 167 60 S216 62 251 62 C286 62 302 58 335 63 S384 76 419 76 C452 76 470 90 502 86 S552 78 586 78';
 const routeStars = [
-  [139, 74],
-  [195, 79],
-  [303, 88],
-  [362, 74],
-  [473, 72],
-  [529, 82],
+  [167, 60],
+  [335, 63],
+  [502, 86],
 ];
 
 type Props = {
@@ -41,12 +52,51 @@ export default function ProjectsScreen({
       </header>
       <nav className={styles.stages} aria-label={t('select')}>
         <svg className={styles.route} viewBox="0 0 670 150" aria-hidden="true">
-          <path d="M84 90 C145 46 188 92 251 90 S355 51 419 68 S527 110 586 88" />
+          <defs>
+            <filter
+              id="project-island-outline"
+              x="-10%"
+              y="-10%"
+              width="120%"
+              height="120%"
+              colorInterpolationFilters="sRGB"
+            >
+              <feMorphology
+                in="SourceAlpha"
+                operator="dilate"
+                radius="0.8"
+                result="expanded"
+              />
+              <feComposite
+                in="expanded"
+                in2="SourceAlpha"
+                operator="out"
+                result="edge"
+              />
+              <feFlood
+                floodColor="#ffe080"
+                floodOpacity="0.9"
+                result="yellow"
+              />
+              <feComposite
+                in="yellow"
+                in2="edge"
+                operator="in"
+                result="outline"
+              />
+              <feMerge>
+                <feMergeNode in="outline" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <path className={styles.routeGlow} d={routePath} />
+          <path className={styles.routeDust} d={routePath} />
           {routeStars.map(([x, y]) => (
             <path
               key={x}
               className={styles.star}
-              d={`M${x} ${y - 3}v6m-3-3h6`}
+              d={`M${x} ${y - 6}l1.5 4.5 4.5 1.5-4.5 1.5-1.5 4.5-1.5-4.5-4.5-1.5 4.5-1.5Z`}
             />
           ))}
         </svg>
@@ -70,13 +120,28 @@ export default function ProjectsScreen({
                 onFocus={() => onSelect(index)}
                 onClick={() => onSelect(index)}
               >
-                <img src={islands[index]} alt="" draggable={false} />
-                <span>{t(`${item.id}.label`)}</span>
+                <span className={styles.islandArt}>
+                  <img src={islands[index]} alt="" draggable={false} />
+                </span>
+                <span className={styles.stageLabel}>
+                  {t(`${item.id}.label`)}
+                </span>
               </button>
             </li>
           ))}
         </ul>
       </nav>
+      <div className={styles.hero} aria-hidden="true">
+        {heroFrames.map(({ id, src }, index) => (
+          <img
+            key={id}
+            src={src}
+            alt=""
+            draggable={false}
+            style={{ '--pose': index } as CSSProperties}
+          />
+        ))}
+      </div>
       <section
         className={styles.information}
         id="project-information"

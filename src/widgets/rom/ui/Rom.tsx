@@ -209,15 +209,30 @@ export default function Rom({
             }
             return;
           }
-          if (
-            state.screen === 'projects' &&
-            (input.direction === 'left' || input.direction === 'right')
-          ) {
-            markAction(null);
-            dispatch({
-              type: 'move',
-              direction: input.direction === 'left' ? -1 : 1,
-            });
+          if (state.screen === 'projects') {
+            if (input.direction === 'up' || input.direction === 'down') {
+              const button =
+                input.direction === 'down'
+                  ? content.current?.querySelector<HTMLButtonElement>(
+                      '[data-rom-back]',
+                    )
+                  : content.current?.querySelectorAll<HTMLButtonElement>(
+                      '[data-project-id]',
+                    )[state.selectedProjectIndex];
+              markAction(button ?? null);
+              if (
+                !document.activeElement?.closest(
+                  '[data-hardware="controller"], [data-console-control]',
+                )
+              )
+                button?.focus({ preventScroll: true });
+            } else if (!selectedAction.current?.matches('[data-rom-back]')) {
+              markAction(null);
+              dispatch({
+                type: 'move',
+                direction: input.direction === 'left' ? -1 : 1,
+              });
+            }
             return;
           }
           if (
@@ -294,6 +309,7 @@ export default function Rom({
     },
     [
       state.screen,
+      state.selectedProjectIndex,
       selectedIndex,
       activate,
       inputEnabled,

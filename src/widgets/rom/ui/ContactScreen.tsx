@@ -85,6 +85,7 @@ function CopyIcon({ copied }: { copied: boolean }) {
       <path
         fill="currentColor"
         fillRule="evenodd"
+        transform={copied ? 'translate(1 0)' : undefined}
         d={
           copied
             ? 'M12 3h2v2h-2v2h-2v2H8v2H6v2H4v-2H2V9H0V7h2v2h2v2h2V9h2V7h2V5h2Z'

@@ -1,7 +1,7 @@
 .sky.sky { position: absolute; inset: 0 0 auto; height: 150px; overflow: hidden; pointer-events: none; z-index: 0; mask-image: linear-gradient(#000 72%, transparent); }
 .cloudsNear,.cloudsMid { position: absolute; left: 0; width: 200%; background-repeat: repeat-x; background-size: 50% 100%; will-change: transform; animation: cloudDrift linear infinite; }
-.cloudsNear { top: -72px; height: 244px; opacity: .28; animation-duration: 100s; animation-delay: -37s; }
-.cloudsMid { top: -68px; height: 220px; opacity: .45; animation-duration: 65s; animation-delay: -15s; }
+.cloudsNear { top: -112px; height: 244px; opacity: .28; animation-duration: 100s; animation-delay: -37s; }
+.cloudsMid { top: -108px; height: 220px; opacity: .45; animation-duration: 65s; animation-delay: -15s; }
 .heading { z-index: 2; }
 .scene { position: relative; z-index: 1; height: 338px; isolation: isolate; }
 .hero { position: absolute; left: 22px; bottom: 18px; width: 142px; height: 164px; filter: drop-shadow(0 4px 2px #0b173588);
@@ -9,7 +9,8 @@
 }
 .dialogue { position: absolute; top: 28px; left: 190px; width: 400px; max-width: calc(100% - 200px); transform-origin: left bottom; animation: dialogueOpen 140ms ease-out both; }
 .tail { position: absolute; z-index: 1; left: -52px; bottom: 30px; width: 56px; height: 66px; overflow: visible;
-  path { fill: #111932; stroke: #b9bde5; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  path { fill: none; stroke: #b9bde5; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .tailFill { fill: #111932; stroke: none; }
 }
 .dialogueBody { position: relative; padding: 14px 10px 32px 18px; background: #111932; color: #f6e7c5; border: 2px solid #b9bde5; border-radius: 18px; box-shadow: 3px 4px #070e2a55;
   ol { height: 176px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: auto; scrollbar-color: auto; list-style: none; padding: 0 10px 0 0; margin: 0;

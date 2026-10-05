@@ -30,15 +30,10 @@
   .menu { display: grid; grid-template-columns: minmax(0, 1fr); }
   .menu button { display: flex; align-items: center; width: 100%; min-height: 46px; }
 }
-.menuPlayer { position: absolute !important; left: calc(300px + var(--offset) * .05px); top: 299px; width: 76px; height: 82px; transform-origin: center bottom; z-index: 2; transition: left 300ms ease-out; animation: heroBreathe 5s ease-in-out infinite; }
-.heroFrame { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; animation: heroFirst 2.7s steps(1, end) infinite; pointer-events: none; filter: drop-shadow(2px 2px 2px #101b36a8); }
-.menuPlayer::before { content: ''; position: absolute; left: 12%; right: 9%; bottom: 1px; height: 8px; border-radius: 50%; background: #10162f80; filter: blur(2px); transform: rotate(-3deg); }
-.heroFrame[data-frame='0'] { animation-name: heroFirst; }
-.heroFrame[data-frame='2'] { animation-name: heroThird; }
-.heroFrame[data-frame='3'] { animation-name: heroFourth; }
-@keyframes heroFirst { 0%, 100% { opacity: 1; } 33.333% { opacity: 0; } }
-@keyframes heroThird { 0%, 66.666%, 100% { opacity: 0; } 33.333% { opacity: 1; } }
-@keyframes heroFourth { 0%, 100% { opacity: 0; } 66.666% { opacity: 1; } }
+.menuPlayer { position: absolute !important; left: calc(300px + var(--offset) * .05px); top: 289px; width: 75px; height: 100px; transform-origin: center bottom; z-index: 2; transition: left 300ms ease-out; animation: heroBreathe 5s ease-in-out infinite; }
+.heroFrame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; animation: heroPose 3.2s steps(1, end) calc(var(--pose) * .4s) infinite; pointer-events: none; filter: drop-shadow(2px 2px 2px #101b36a8); }
+.menuPlayer::before { content: ''; position: absolute; left: 12%; right: 9%; bottom: 11px; height: 8px; border-radius: 50%; background: #10162f80; filter: blur(2px); transform: rotate(-3deg); }
+@keyframes heroPose { 0% { opacity: 1; } 12.5%, 100% { opacity: 0; } }
 .rom[data-screen='main'] nav, .gameTitle { z-index: 2; }
 .rom .island { position: absolute; right: 3%; bottom: 2%; width: 17%; pointer-events: none; animation: islandFloat 7s ease-in-out infinite; img { display: block; width: 100%; } }
 @keyframes islandFloat { 50% { transform: translateY(-7px); } }
@@ -50,7 +45,7 @@
 .starlight i:nth-child(3) { left: 91%; top: 14.7%; animation-duration: 9s; animation-delay: -6s; }
 .starlight i:nth-child(4) { left: 50%; top: 31.8%; animation-duration: 12s; animation-delay: -5s; }
 @keyframes starPulse { 50% { opacity: .55; } }
-@media (prefers-reduced-motion: reduce) { .heroFrame { opacity: 0; } .heroFrame[data-frame='0'] { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .heroFrame { animation: none; opacity: 0; } .heroFrame[data-frame='0'] { opacity: 1; } }
 .back { margin-top: 18px; }
 .about,.projects,.toolkit,.contact,.controlsScreen { padding: 72px 40px 24px; font-family: 'Courier New',monospace; font-size: 18px; line-height: 1.4; letter-spacing: 0; h2 { font-family: Tiny5,monospace; } }
 .inventory { display: grid; grid-template-columns: 218px minmax(0,1fr); gap: 24px; nav { font-family: Tiny5,monospace; font-size: 25px; } nav button { width: 100%; } }
@@ -58,9 +53,9 @@
 .channels { list-style: none; padding: 0; margin: 28px 0 0; width: 410px; max-width: 100%; display: grid; gap: 10px;
   li { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 12px 0; border-bottom: 1px solid #c7b29230; }
   h3 { margin: 0; font: normal 26px Tiny5,monospace; color: #edd1a6; letter-spacing: .7px; }
-  button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; flex: 0 0 166px; width: 166px; height: 40px; padding: 7px 10px; font: 22px/1 Tiny5,monospace; color: #d2c7ad; background: #101d2d66; border: 1px solid #b4bdca40; border-radius: 3px; box-shadow: inset 0 1px #e0e8f00b; text-shadow: none; transition: color 120ms, border-color 120ms, background 120ms;
+  button { display: inline-grid; grid-template-columns: 16px minmax(0, 1fr); align-items: center; gap: 9px; flex: 0 0 182px; width: 182px; height: 40px; padding: 7px 14px; font: 22px/1 Tiny5,monospace; color: #d2c7ad; background: #101d2d66; border: 1px solid #b4bdca40; border-radius: 3px; box-shadow: inset 0 1px #e0e8f00b; text-shadow: none; transition: color 120ms, border-color 120ms, background 120ms;
     svg { width: 16px; height: 16px; flex: 0 0 16px; }
-    span { white-space: nowrap; }
+    span { white-space: nowrap; text-align: left; }
     &:hover { color: #f1dfb8; border-color: #c4c8bf88; background: #24364b80; }
     &:active { background: #0b162ba6; }
     &[data-copied='true'] { color: #bbd2b1; border-color: #a9c79c66; background: #263a3266; }

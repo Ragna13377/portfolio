@@ -188,6 +188,10 @@ export default function AboutScreen({
           aria-label={t('dialogueLabel')}
         >
           <svg className={styles.tail} viewBox="0 0 56 66" aria-hidden="true">
+            <path
+              className={styles.tailFill}
+              d="M60 3H54 Q37 39 5 60 Q27 57 39 47 Q46 52 54 56H60Z"
+            />
             <path d="M54 3 Q37 39 5 60 Q27 57 39 47 Q46 52 54 56" />
           </svg>
           <div className={styles.dialogueBody}>

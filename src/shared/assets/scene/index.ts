@@ -1,10 +1,12 @@
+import first from '../../../assets/main_sprites/hello_1.webp';
+import second from '../../../assets/main_sprites/hello_2.webp';
+import third from '../../../assets/main_sprites/hello_3.webp';
+import fourth from '../../../assets/main_sprites/hello_4.webp';
+import fifth from '../../../assets/main_sprites/hello_5.webp';
 import floatingIsland from './floating-island.webp';
-import first from './hero-idle-01.webp';
-import third from './hero-idle-03.webp';
-import fourth from './hero-idle-04.webp';
 
 export { floatingIsland };
-export const heroFrames = [first, third, fourth] as const;
+export const heroFrames = [first, second, third, fourth, fifth] as const;
 
 let preload: Promise<void> | undefined;
 const images: HTMLImageElement[] = [];

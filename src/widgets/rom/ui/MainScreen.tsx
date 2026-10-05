@@ -4,6 +4,14 @@ import { floatingIsland, heroFrames } from '../../../shared/assets/scene';
 import { MENU } from '../../../shared/config/navigation';
 import styles from './Rom.module.scss';
 
+const heroSequence = [
+  ...heroFrames.map((src) => ({ id: src, src })),
+  ...heroFrames
+    .slice(1, -1)
+    .reverse()
+    .map((src) => ({ id: `${src}-return`, src })),
+];
+
 type Props = {
   selectedIndex: number;
   onSelect: (index: number) => void;
@@ -67,12 +75,13 @@ export default function MainScreen({
           } as import('react').CSSProperties
         }
       >
-        {heroFrames.map((src, index) => (
+        {heroSequence.map(({ id, src }, index) => (
           <img
-            key={src}
+            key={id}
             src={src}
             className={styles.heroFrame}
-            data-frame={index === 0 ? 0 : index + 1}
+            data-frame={index}
+            style={{ '--pose': index } as import('react').CSSProperties}
             alt=""
             draggable={false}
           />
