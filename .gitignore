@@ -5,4 +5,11 @@ coverage/
 *.local
 *.tsbuildinfo
 .playwright-cli/
-output/playwright/
+
+# Local IDE settings
+/.idea/
+
+# Generated previews, screenshots and temporary image references
+/output/
+/ChatGPT Image *.png
+/121111111
