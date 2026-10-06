@@ -108,7 +108,7 @@ test('eleven native controller buttons exist during boot and become useful after
   expect(heading()).toBe('PROJECTS');
 });
 
-test('six-button controller mirrors confirmation, Back and Options and bounds menu-world movement', async () => {
+test('A confirms, B goes back, Start opens Options and menu-world movement stays bounded', async () => {
   await boot();
   const offset = () =>
     (
@@ -121,15 +121,53 @@ test('six-button controller mirrors confirmation, Back and Options and bounds me
   for (let index = 0; index < 8; index++) await click('left');
   expect(offset()).toBe('-45');
   expect(selected()).toBe(0);
-  await click('x');
+  await click('a');
   expect(heading()).toBe('ABOUT');
-  await click('y');
+  await click('b');
   expect(selected()).toBe(0);
-  await click('z');
+  await click('start');
   expect(heading()).toBe('OPTIONS');
-  await click('y');
+  await click('b');
   expect(container.querySelector('h1')?.textContent).toBe('IVAN DMITRIEVICH');
 });
+
+test.each(['c', 'x', 'y', 'z'])(
+  '%s remains pressable without changing ROM state',
+  async (control) => {
+    await boot();
+    for (const screen of ['main', 'about', 'options', 'language']) {
+      if (screen === 'about' || screen === 'language') await click('a');
+      if (screen === 'options') await click('start');
+      const previous = container.querySelector(
+        '[data-hardware="crt"]',
+      )?.innerHTML;
+      const node = button(control);
+      expect(node.disabled).toBe(false);
+      await click(control);
+      for (const key of ['Enter', ' ']) {
+        await act(async () => {
+          node.focus();
+          node.dispatchEvent(
+            new KeyboardEvent('keydown', { key, bubbles: true }),
+          );
+        });
+        expect(node.dataset.keyPressed).toBe('true');
+        await act(async () => {
+          node.dispatchEvent(
+            new KeyboardEvent('keyup', { key, bubbles: true }),
+          );
+          node.click();
+        });
+        expect(node.dataset.keyPressed).toBeUndefined();
+      }
+      expect(container.querySelector('[data-hardware="crt"]')?.innerHTML).toBe(
+        previous,
+      );
+      expect(instance.resolvedLanguage).toBe('en');
+      expect(localStorage.getItem(LOCALE_STORAGE_KEY)).toBeNull();
+    }
+  },
+);
 
 test('D-pad selects project islands horizontally and A never opens a detail page', async () => {
   await boot();

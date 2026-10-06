@@ -10,12 +10,16 @@ const CONTROLS = [
   { id: 'down', label: '↓', input: { type: 'navigate', direction: 'down' } },
   { id: 'a', label: 'A', input: { type: 'confirm' } },
   { id: 'b', label: 'B', input: { type: 'back' } },
-  { id: 'c', label: 'C', input: { type: 'secondary' } },
+  { id: 'c', label: 'C', input: null },
   { id: 'start', label: 'START', input: { type: 'options' } },
-  { id: 'x', label: 'X', input: { type: 'confirm' } },
-  { id: 'y', label: 'Y', input: { type: 'back' } },
-  { id: 'z', label: 'Z', input: { type: 'options' } },
-] as const satisfies readonly { id: string; label: string; input: RomInput }[];
+  { id: 'x', label: 'X', input: null },
+  { id: 'y', label: 'Y', input: null },
+  { id: 'z', label: 'Z', input: null },
+] as const satisfies readonly {
+  id: string;
+  label: string;
+  input: RomInput | null;
+}[];
 
 export default function Controller({
   onInput,
@@ -64,7 +68,9 @@ function ControlButton({
         if (event.key === 'Enter' || event.key === ' ') setKeyPressed(false);
       }}
       onBlur={() => setKeyPressed(false)}
-      onClick={() => onInput?.(control.input)}
+      onClick={() => {
+        if (control.input) onInput?.(control.input);
+      }}
     >
       {['a', 'b', 'c', 'x', 'y', 'z'].includes(control.id) && (
         <span className={styles.capLegend} aria-hidden="true">

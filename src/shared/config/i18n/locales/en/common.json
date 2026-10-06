@@ -23,12 +23,12 @@
     "up": "D-pad Up",
     "left": "D-pad Left",
     "a": "A — Confirm",
-    "c": "C — Secondary (reserved)",
+    "c": "C — No action",
     "start": "Start — Options",
     "down": "D-pad Down",
-    "x": "X — Confirm",
-    "y": "Y — Back",
-    "z": "Z — Options"
+    "x": "X — No action",
+    "y": "Y — No action",
+    "z": "Z — No action"
   },
   "experienceError": "The console could not start. Please reload to try again.",
   "reset": "Reset — Reboot the active ROM",
