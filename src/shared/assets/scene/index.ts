@@ -8,20 +8,24 @@ import floatingIsland from './floating-island.webp';
 export { floatingIsland };
 export const heroFrames = [first, second, third, fourth, fifth] as const;
 
-let preload: Promise<void> | undefined;
+let preload: Promise<boolean> | undefined;
 const images: HTMLImageElement[] = [];
 export function preloadMainScene() {
   preload ??= Promise.all(
     [floatingIsland, ...heroFrames].map(
       (src) =>
-        new Promise<void>((resolve) => {
+        new Promise<boolean>((resolve) => {
           const image = new Image();
           images.push(image);
-          image.onload = () => resolve();
-          image.onerror = () => resolve();
+          image.onload = () => resolve(true);
+          image.onerror = () => resolve(false);
           image.src = src;
         }),
     ),
-  ).then(() => undefined);
+  ).then((results) => {
+    const loaded = results.every(Boolean);
+    if (!loaded) preload = undefined;
+    return loaded;
+  });
   return preload;
 }

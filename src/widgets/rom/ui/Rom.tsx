@@ -28,6 +28,7 @@ import {
 } from '../../../shared/config/i18n';
 import { MENU } from '../../../shared/config/navigation';
 import type { RomInput, RomInputHandle } from '../../../shared/lib/rom-input';
+import { preloadScreenBackgrounds } from '../model/preloadScreenBackgrounds';
 import type { ToolkitMovement } from '../model/useToolkitScene';
 import AboutScreen, { type AboutDialogueHandle } from './AboutScreen';
 import ContactScreen from './ContactScreen';
@@ -89,6 +90,19 @@ export default function Rom({
     void preloadTheme(cartridgeId);
     void preloadMainScene();
   }, [cartridgeId]);
+
+  useEffect(() => {
+    if (state.screen !== 'main' || !inputEnabled) return;
+    let cancelled = false;
+    void Promise.all([preloadTheme(cartridgeId), preloadMainScene()]).then(
+      (loaded) => {
+        if (!cancelled && loaded.every(Boolean)) preloadScreenBackgrounds();
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [cartridgeId, state.screen, inputEnabled]);
 
   useEffect(() => {
     if (state.screen !== 'boot') return;
